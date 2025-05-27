@@ -27,6 +27,7 @@ class xinhuClassAction extends Action
 		foreach($rows as $k=>$rs){
 			$base = ''.DB_BASE.'_company_'.$rs['num'].'';
 			$this->sevessee($base, 'reimhostsystem');
+			$this->sevessee($base, 'reimpushurlsystem');
 			$this->sevessee($base, 'reimrecidsystem', $rs['num']);
 			$this->sevessee($base, 'reimchehuisystem');
 			$this->sevessee($base, 'reimservertype');
@@ -38,7 +39,14 @@ class xinhuClassAction extends Action
 	{
 		$val = $this->option->getval($key);
 		if($key=='reimrecidsystem')$val.='_'.$bh.'';
-		$sql = "update ".$base.".`[Q]option` set `value`='$val',`optdt`='{$this->now}' where `num`='$key'";
+		$table = "".$base.".`[Q]option`";
+		$where = "`num`='$key'";
+		$ors 	= $this->db->getone($table, $where);
+		if($ors){
+			$sql 	= "update $table set `value`='$val',`optdt`='{$this->now}' where $where";
+		}else{
+			$sql 	= "insert into $table set `value`='$val',`optdt`='{$this->now}',`num`='$key'";
+		}
 		$this->db->query($sql, false);
 	}
 	
@@ -140,5 +148,38 @@ class xinhuClassAction extends Action
 			'url'	=> urlencode($url),
 		));
 		return $barr;
+	}
+	
+	public function getonlineAjax()
+	{
+		
+		$barr = m('reim')->pushserver('getonline');
+		if(!$barr['success'])return $barr;
+		$data = $barr['data'];
+		if(!$data)return returnerror('无人员在线');
+		$ondats = json_decode($data, true);
+		$pc  = $ondats['pc'];
+		$app = $ondats['app'];
+		$uar1= explode(',', $pc);
+		$uar2= explode(',', $app);
+		$str = $pc;
+		$on1 = count($uar1);
+		$on2 = count($uar2);
+		if($app){
+			if($str)$str.=',';
+			$str.=$app;
+		}
+		if(!$str)return returnerror('无人员在线');
+		if(!$app)$on2 = 0;
+		if(!$pc)$on1 = 0;
+		$rows = m('admin')->getall('id in('.$str.') and `status`=1','id,name,face','sort asc');
+		foreach($rows as $k=>$rs){
+			$rows[$k]['pconline']  = in_array($rs['id'], $uar1);
+			$rows[$k]['apponline'] = in_array($rs['id'], $uar2);
+		}
+		return returnsuccess(array(
+			'rows' => $rows,
+			'msg'	=> 'PC在线'.$on1.'人，APP在线'.$on2.'人',
+		));
 	}
 }

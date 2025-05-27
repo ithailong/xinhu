@@ -59,6 +59,7 @@ abstract class mainAction{
 		$this->display	= true;
 		$this->initMysql();	
 		$this->initConstruct();
+		$this->getTheme();
 		$this->initProject();
 		$this->initAction();
 	}
@@ -124,6 +125,27 @@ abstract class mainAction{
 			|| $this->rock->iswebbro(2))$showheader = 0; //隐藏头部
 		if($this->get('showheader')=='true')$showheader = 1;
 		$this->assign('showheader', $showheader);
+		$nowtime = $this->getsession('nowtime');
+		if(!$nowtime || getconfig('systype')=='dev'){
+			$nowtime = time();
+			$this->rock->setsession('nowtime', $nowtime);
+		}
+		$this->assign('nowtime', $nowtime);
+	}
+	
+	//主题颜色处理
+	public function getTheme()
+	{
+		$theme	= $this->get('apptheme');
+		if($theme){
+			$this->rock->setsession('apptheme', $theme);
+		}else{
+			$theme = $this->getsession('apptheme');
+		}
+		if($theme)$theme = '#'.$theme.'';
+		if(!$theme || strlen($theme)!=7)$theme = getconfig('apptheme', '#1389D3'); //默认颜色
+		$this->assign('apptheme', $theme);
+		return substr($theme, 1);
 	}
 
 	public function setSmartyData()

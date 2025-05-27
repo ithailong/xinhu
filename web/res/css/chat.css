@@ -29,12 +29,11 @@
 	margin-top:5px;
 	border-width:8px;
     border-style:solid;
-    border-color:transparent #e5e5e5 transparent transparent;
+    border-color:transparent rgba(0,0,0,0.05) transparent transparent;
 	z-index:1;
 }
 .qipao .qipaocontleft{
-	background:#e5e5e5;
-	border:0px #e5e5e5 solid;
+	background:rgba(0,0,0,0.05);
 }
 
 

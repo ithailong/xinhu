@@ -31,7 +31,7 @@ class crmClassModel extends Model
 	}
 	
 	//读取所有客户
-	public function custdata()
+	public function custdata($whe='')
 	{
 		$limit  = (int)$this->rock->get('limit', '10');
 		$page   = (int)$this->rock->get('page', '1');
@@ -40,6 +40,10 @@ class crmClassModel extends Model
 		if($key){
 			$key= $this->rock->jm->base64decode($key);
 			$where.= " and (`name` like '%$key%' or `unitname` like '%$key%')";
+		}
+		if($whe){
+			$whe	= str_replace('{uid}', $this->adminid, $whe);
+			$where .= " AND $whe";
 		}
 		$rows 	= $this->getrows("`status`=1 ".$where."",'SQL_CALC_FOUND_ROWS id as value,name,id,unitname as subname','`optdt` desc',''.(($page-1)*$limit).','.$limit.'');
 		$totalCount = $this->db->found_rows();

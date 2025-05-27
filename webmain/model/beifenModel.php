@@ -91,18 +91,21 @@ class beifenClassModel extends Model
 				foreach($fields as $k=>$frs){
 					$fname = $frs['name'];
 					if($fname=='id')continue;
-					$nstr  = $this->getfielstr($frs);
+					$nstr   = $this->getfielstr($frs);
+					$frs['explain'] = '';
+					$nstr1  = $this->getfielstr($frs);
 					if(!isset($nowfiel[$fname])){
 						$str.=',add '.$nstr.'';
 					}else{
 						$ofrs = $nowfiel[$fname]; //系统上字段类型
-						$ostr = $this->getfielstr($ofrs);
+						//$ostr = $this->getfielstr($ofrs);
+						$ofrs['explain'] = '';
+						$ostr1 = $this->getfielstr($ofrs);
 						$lxarr= array('text','mediumtext','bigint');
-						
 						//如果自己字段长度大于官网就不更新
 						if($frs['type']==$ofrs['type']  && !isempt($ofrs['lens']) && $ofrs['lens']>$frs['lens']){
 							
-						}else if($nstr != $ostr && !in_array($ofrs['type'], $lxarr) ){
+						}else if($nstr1 != $ostr1 && !in_array($ofrs['type'], $lxarr) ){
 							$str.=',MODIFY '.$nstr.'';
 						}
 					}

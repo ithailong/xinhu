@@ -207,6 +207,10 @@ $(document).ready(function(){
 	}
 	
 	$("input[name='_stylechange']").click(function(){
+		if(!get('mainstylecss')){
+			js.msg('success','最新已弃用');
+			return;
+		}
 		var val = parseFloat(this.value);
 		valchange=val;
 		var sear = ysarr.split(',')
@@ -245,7 +249,7 @@ $(document).ready(function(){
 </script>
 <div style="padding:10px">
 	
-	<ul id="tagsl{rand}" class="nav nav-tabs">
+	<ul id="tagsl{rand}" style="display:flex" class="nav nav-tabs">
 	  
 	  <li click="tesgs,0" class="active">
 		<a style="TEXT-DECORATION:none"><i class="icon-cog"></i> 基本设置</a>
@@ -255,7 +259,7 @@ $(document).ready(function(){
 	  </li>
 	
 	 <li click="tesgs,2">
-		<a style="TEXT-DECORATION:none"><i class="icon-magic"></i> 切换主题皮肤</a>
+		<a style="TEXT-DECORATION:none"><i class="icon-magic"></i> 切换主题皮肤（弃用了）</a>
 	  </li>
 	  <li click="tesgs,3">
 		<a style="TEXT-DECORATION:none"><i class="icon-edit"></i> 签名图片</a>

@@ -44,8 +44,8 @@ var rockmenuobj	= null;
 			}
 			var len	= json.length;
 			var str	= '<div class="rockmenu" id="rockmenu_'+rand+'">';
-			if(can.arrowup)str+='<div class="arrow-up"></div>';
-			str+='<div style="background:'+can.background+';"  id="rockmenuli_'+rand+'" class="rockmenuli '+can.maincls+'"><ul>';
+			//if(can.arrowup)str+='<div class="arrow-up"></div>';
+			str+='<div id="rockmenuli_'+rand+'" class="rockmenuli '+can.maincls+'"><ul>';
 			var s	= '',ys='',col,va;
 			for(var i=0; i<len; i++){
 				ys= '',
@@ -75,7 +75,7 @@ var rockmenuobj	= null;
 			oac.find('li').mouseout(function(){this.className='';});
 			oac.find('li').click(function(){me.itemsclick(this);});
 			if(can.width!=0){
-				$('#rockmenuli_'+rand+'').css('width',''+can.width+'px');
+				oac.css('width',''+can.width+'px');
 			};
 			js.addbody(rand, 'remove', 'rockmenu_'+rand+''); 
 			this.mdivobj = oac;

@@ -138,11 +138,11 @@ $(document).ready(function(){
 		
 		<tr id="changefields{rand}" style="display:none">
 			<td  align="right" nowrap >变化字段(可多选)：<br><font color="#888888">来自[表单元素管理]</font><font color=white>：</font></td>
-			<td class="tdinput"><select multiple name="changefields" size="8" class="form-control"></select></td>
+			<td class="tdinput"><select multiple style="height:100px;overflow:auto" name="changefields" size="8" class="form-control"></select></td>
 		</tr>
 		<tr id="changecourse{rand}" style="display:none">
 			<td  align="right" nowrap >处理的步骤(可多选)：<br><font color="#888888">来自[流程审核步骤]</font><font color=white>：</font></td>
-			<td class="tdinput"><select multiple name="changecourse" size="5" class="form-control"></select></td>
+			<td class="tdinput"><select multiple style="height:100px;overflow:auto" name="changecourse" size="5" class="form-control"></select></td>
 		</tr>
 		
 		<tr>

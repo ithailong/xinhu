@@ -44,7 +44,7 @@ class weixinClassAction extends apiAction{
 		$arr['location_y']	= $this->post('location_y');
 		$arr['scale']		= (int)$this->post('scale');
 		$arr['precision']	= (int)$this->post('precision');
-		$arr['label']		= $this->getvals('label');
+		$arr['label']		= $this->rock->iconvsql($this->getvals('label'));
 		$arr['explain']		= $this->rock->xssrepstr($this->getvals('sm'));
 		$arr['optdt']		= $now;
 		$arr['uid']			= $uid;

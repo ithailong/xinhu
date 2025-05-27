@@ -25,6 +25,11 @@ $(document).ready(function(){
 		},{
 			text:'最后在线',dataIndex:'moddt',sortable:true
 		},{
+			text:'极光',dataIndex:'regid',renderer:function(v){
+				var str='&nbsp;';if(v)str='<font color=green>已注册</font>';
+				return str;
+			}
+		},{
 			text:'ID',dataIndex:'id',sortable:true
 		}],
 		rendertr:function(d){

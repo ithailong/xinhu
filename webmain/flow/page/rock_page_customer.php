@@ -47,11 +47,11 @@ if(pnum=='' || pnum=='all'){
 		}
 		setTimeout(function(){js.getuser(cans);},10);
 	}
-	$('#tdright_{rand}').append('&nbsp; '+c.getbtnstr('客户转移','move'));
+	$('#tdright_{rand}').append('&nbsp;'+c.getbtnstr('客户转移','move'));
 }
 
 if(atype=='my'){
-	$('#tdright_{rand}').append('&nbsp; '+c.getbtnstr('共享','shates'));
+	$('#tdright_{rand}').append('&nbsp;'+c.getbtnstr('共享','shates'));
 	c.shates=function(){
 		var s= a.getchecked();
 		if(s==''){js.msg('msg','没有选择记录');return;}

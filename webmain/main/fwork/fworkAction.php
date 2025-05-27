@@ -283,7 +283,7 @@ class fworkClassAction extends Action
 		if($enddt=='')$enddt = $dtobj->adddate($startdt,'d',7);
 		$jg 		= $dtobj->datediff('d',$startdt, $enddt);
 		if($jg>30)$jg = 30;
-		$flow 		= m('flow:meet');
+		$flow 		= m('flow')->initflow('meet');
 		$data 		= m('meet')->getall("`status`=1 and `type`=0 and `startdt`<='$enddt 23:59:59' and `enddt`>='$startdt' order by `startdt` asc",'hyname,title,startdt,enddt,state,joinname,optname,id');
 		$datss 		= array();
 		foreach($data as $k=>$rs){
@@ -297,8 +297,21 @@ class fworkClassAction extends Action
 		$columns	= $rows;
 		$barr 		= array();
 		$dt 		= $startdt;
+		$gdrows 	= $flow->getall('`type`=1 and `status`=1');
 		for($i=0; $i<=$jg; $i++){
 			if($i>0)$dt = $dtobj->adddate($dt,'d',1);
+			
+			//固定会议
+			if($gdrows && $dt > $this->rock->date){
+				$srows  = $flow->createmeet($gdrows, $dt, true);
+				if($srows)foreach($srows as $k1=>$rs){
+					$key 	= substr($rs['startdt'],0,10).$rs['hyname'];
+					if(!isset($datss[$key]))$datss[$key] = array();
+					$str 	= '['.substr($rs['startdt'],11,5).'→'.substr($rs['enddt'],11,5).']'.$rs['title'].'('.$rs['joinname'].') <font color=blue>固定会议</font>';
+					$datss[$key][] = $str;
+				}
+			}
+			
 			$w 		= $dtobj->cnweek($dt);
 			$status	= 1;
 			if($w=='六'||$w=='日')$status	= 0;

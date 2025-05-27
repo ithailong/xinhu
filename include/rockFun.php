@@ -277,7 +277,7 @@ function lang($str,$lx='')
 {
 	if(!$str)return $str;
 	$da 	= arrvalue($GLOBALS,'langdata');
-	if(!$da)return $str;
+	if(!$da || !isset($da['xuhao']))return $str;
 	$xuhao 	= $da['xuhao'];
 	$key 	= 'data'.$lx.'';
 	if(!isset($da[$key])){

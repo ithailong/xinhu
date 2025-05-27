@@ -178,6 +178,10 @@ $(document).ready(function(){
 			</td></tr>
 			<tr><td height="10"></td></tr>
 			
+			<tr><td align="right" style="color:gray">可直接上传保存类型：</td><td><input name="savefiletype" type="text" value="<?=getconfig('savefiletype')?>" style="width:200px" placeholder="多个,分开：如exe,dll" class="form-control">
+			<span style="color:#aaaaaa;">因为一些特殊文件类型是可执行的如.php.exe.sh，不直接保存</span></td></tr>
+			<tr><td height="10"></td></tr>
+			
 			<tr><td align="right" style="color:gray">系统语言：</td><td><select style="width:200px" name="locallang" class="form-control">
 			<?php 
 			$arrd = c('lang')->getLocal();

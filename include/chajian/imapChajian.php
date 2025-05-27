@@ -32,7 +32,7 @@
 
 class imapChajian extends Chajian
 {
-	private $supportbool = true;
+	private $supportbool = true,$marubox,$struck_tearr;
 	
 	protected function initChajian()
 	{

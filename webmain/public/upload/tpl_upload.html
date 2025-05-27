@@ -3,6 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script language="javascript" src="js/jquery.js"></script>
 <script language="javascript" src="js/js.js"></script>
+<link rel="stylesheet" type="text/css" href="<?=$da['p']?>/css/rock.css"/>
 <title><?=$da['title']?></title>
 <script language="javascript">
 var callback= '<?=$params['callback']?>',
@@ -333,11 +334,10 @@ document.ondrop=function(e){e.preventDefault();};
 $maincolor = getconfig('apptheme','#1389D3');
 ?>
 .alert{ padding:1px 5px; border:1px #996 solid; background-color:#ffffff; color:<?=$maincolor?>}
-*{ font-size:14px;}
-.mdiv{ border-bottom:1px #cccccc solid;display:inline-block;width:100%}
+.mdiv{ border-bottom:var(--border);display:inline-block;width:100%}
 .mdiv div{ float:left; line-height:22px; overflow:hidden; padding:5px 3px}
-.div01{ width:55%;text-align:left;border-right:1px #cccccc solid;}
-.div02{ width:15%; text-align:center;border-right:1px #cccccc solid;}
+.div01{ width:55%;text-align:left;border-right:var(--border);}
+.div02{ width:15%; text-align:center;border-right:var(--border);}
 .div03{ width:25%;text-align:left}
 #prou{overflow:hidden; background-color:#ffffff; margin:5px 0px; border:1px #666 solid;padding:0px; text-align:left;font-size:12px; position:relative; height:18px;line-height:18px}
 #prou span{ left:5px; position:absolute; top:2px}
@@ -345,24 +345,27 @@ $maincolor = getconfig('apptheme','#1389D3');
 button{ cursor:pointer}
 #footmsg{ text-align:left; padding:3px}
 .quebntha{position:fixed;right:10px;bottom:10px;}
-.webbtn{color:#ffffff;opacity:0.8; background-color:<?=$maincolor?>; padding:5px 8px; border:none; cursor:pointer;font-size:14px;outline:none;border-radius:5px}
-.webbtn:disabled{background-color:#aaaaaa; color:#eeeeee}
-.webbtn:hover{box-shadow:0px 0px 5px rgba(0,0,0,0.3);opacity:1}
+.webbtn{height:34px}
 </style>
+<?php
+echo c('color')->getApptheme();
+?>
 </head>
 <body style="padding:1px" onLoad="up.init()">
 <center>
 <form name="myform" style="display:none"><input type="file" name="inputfile" id="inputfileid" <?php if($params['maxup']!=1)echo 'multiple';?> onChange="up.change(this)"></form>
 <div align="left" style="padding:3px"></div>
+<div style="padding:0px 5px">
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
   <tr>
     <td align="left"><button type="button" class="webbtn" id="addbtn" onClick="up.add()">＋添加文件</button>&nbsp; <button type="button" class="webbtn" id="clearbtn" onClick="up.clear()">－清除所有文件</button>&nbsp; <button type="button" class="webbtn" onClick="up.closeaa()">关闭</button></td>
     <td align="right"><button type="button" class="webbtn" id="startbtn" onClick="up.upload()">开始上传</button></td>
   </tr>
 </table>
+</div>
 <div style="overflow:hidden; height:5px"></div>
 <div id="prou" style="display:none"><div id="proudiv"></div><span id="proushow">等待上传...</span></div>
-<div class="mdiv" style="background-color:#eeeeee">
+<div class="mdiv" style="background-color:var(--main-bgcolor);border-top:var(--border)">
 <div class="div01">文件名</div>
 <div class="div02">大小</div>
 <div class="div03">状态</div>

@@ -13,4 +13,8 @@ function changesubmit(d){
 		if(!d.rankings)len2=0;
 		if(len2!=len1)return '多部门和多职位的数量不一致';
 	}
+	
+	js.setoption('userjson','');
+	js.setoption('deptjson','');
+	js.setoption('groupjson','');
 }

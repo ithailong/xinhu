@@ -87,7 +87,7 @@ class flow_subscribeinfoClassModel extends flowModel
 			$newid = $this->insert(array(
 				'mid' 		=> $id,
 				'receid' 	=> $receid,
-				'recename' 	=> $recename,
+				'recename' 	=> $this->rock->xssrepstr($recename),
 				'title' 	=> $title,
 				'cont' 		=> $cont,
 				'optdt' 	=> $this->rock->now,

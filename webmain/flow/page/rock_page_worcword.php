@@ -54,7 +54,7 @@ $(document).ready(function(){
 		},{
 			text:'创建者',dataIndex:'optname'
 		},{
-			text:'创建时间',dataIndex:'optdt'
+			text:'时间',dataIndex:'optdt'
 		},{
 			text:'共享给',dataIndex:'shate'
 		},{
@@ -265,7 +265,7 @@ $(document).ready(function(){
 <table width="100%">
 <tr valign="top">
 <td width="220">
-	<div style="border:1px #cccccc solid;width:220px">
+	<div style="border:var(--border);width:220px">
 	  <div id="optionview_{rand}" style="height:400px;overflow:auto;"></div>
 	  <div  class="panel-footer">
 		<a href="javascript:" title="分区管理" click="openglfe" onclick="return false"><i class="icon-cog"></i></a>&nbsp; &nbsp;

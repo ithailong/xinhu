@@ -15,10 +15,10 @@
 		js.msg('none');
 		if(!fun)fun=function(){};
 		if(lx=='none')return;
-		var s = '<div id="rockmodelmsg" onclick="$(this).remove()" align="center" style="position:fixed;left:45%;top:30%;z-index:9999;border-radius:10px; background:rgba(0,0,0,0.7);color:white;font-size:18px;min-width:80px"><div style="padding:30px;">';
+		var s = '<div id="rockmodelmsg" onclick="$(this).remove()" align="center" style="position:fixed;left:45%;top:30%;z-index:9999;border-radius:10px; background:rgba(0,0,0,0.5);color:white;min-width:80px"><div style="padding:30px;">';
 		if(lx=='wait'){
 			if(!txt)txt='处理中...';
-			s+='<div><img src="images/mloading.gif"></div>';
+			s+='<div><i style="height:35px;width:35px" class="rock-loading"></i></div>';
 			s+='<div style="padding-top:5px">'+txt+'</div>';
 			if(!sj)sj= 60;
 		}

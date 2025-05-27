@@ -99,6 +99,7 @@ function loginsubmit(){
 	js.ajax(url,data,function(a){
 		abcpass = '';
 		if(a.success){
+			js.setoption('admintoken', a.token);
 			get('imglogo').src=a.face;
 			js.setoption('loginface', a.face);
 			var burl = js.request('backurl');

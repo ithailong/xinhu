@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title><?=$da['title']?>-<?=TITLE?></title>
-<link rel="stylesheet" href="webmain/css/css.css" />
+<link rel="stylesheet" href="webmain/css/rock.css?<?=time()?>" />
 <link rel="stylesheet" href="mode/kindeditor/themes/default/default.css" />
 <link rel="shortcut icon" href="favicon.ico" />
 <script type="text/javascript" src="js/jquery.js"></script>
@@ -139,6 +139,9 @@ select{font-size:12px}
 #page_left div{text-align:left;padding:5px 10px;cursor:pointer}
 #page_left div:hover{ background-color:#f1f1f1;color:#225DE8}
 </style>
+<?php
+echo c('color')->getApptheme(false);
+?>
 </head>
 <body>
 <div align="center">

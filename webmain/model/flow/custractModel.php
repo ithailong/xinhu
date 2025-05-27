@@ -111,7 +111,14 @@ class flow_custractClassModel extends flowModel
 				$arr['type'] 	= $this->rs['type'];
 				$arr['explain'] = $arrs['sm'];
 				$arr['money'] 	= $money;
-				m('custfina')->insert($arr);
+				$newid = m('custfina')->insert($arr);
+				
+				if($this->rs['type']=='0'){
+					m('flow')->submit('custfina', $newid, '提交');
+				}else{
+					m('flow')->submit('custfinb', $newid, '提交');
+				}
+				
 			}
 		}
 	}

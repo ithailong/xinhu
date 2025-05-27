@@ -21,6 +21,7 @@ $(document).ready(function(){
 		},{
 			text:'',dataIndex:'ishui',renderer:function(v, d){
 				var s='<font color="green">可更新</font>';
+				s+='&nbsp;<button type="button" onclick="upgradefile.upfile(this,'+d.id+')" class="btn btn-default btn-xs">更新</button>';
 				if(v==1)s='已忽略';
 				if(d.ting=='1')s='不同步更新模块';
 				return s;
@@ -41,10 +42,30 @@ $(document).ready(function(){
 			js.ajax(js.getajaxurl('hullue','{mode}','{dir}'),{sid:sid,id:id,lx:lx},function(s){
 				a.reload();
 			},'post','','处理中...,处理完成');
+		},
+		upfile:function(o1, fid){
+			o1.disabled = true;
+			$(o1).html(js.getmsg('更新中...'));
+			var ad = {};
+			ad.id = id;
+			ad.fileid = fid;
+			ad.oii = 1;
+			ad.lens = 0;
+			ad.ban = '';
+			js.ajax(js.getajaxurl('shengjianss','{mode}','{dir}'),ad,function(s){
+				if(s=='ok'){
+					$(o1).html('更新成功');
+				}else{
+					$(o1).html(s);
+				}
+			},'post',function(s){
+				$(o1).html('失败');
+			});
 		}
 	};
 
 	js.initbtn(c);
+	upgradefile = c;
 	
 	
 });

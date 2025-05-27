@@ -112,10 +112,12 @@ class adminClassModel extends Model
 		$tj[]	= $this->rock->dbinstr($fids, 'all');
 		$tj[]	= $this->rock->dbinstr($fids, 'u'.$uid);
 		if($us){
-			$dep = explode(',', $us['deptpath']);
-			foreach($dep as $deps){
-				$_deps 	= str_replace(array('[',']'), array('',''), $deps);
-				$tj[]	= $this->rock->dbinstr($fids, 'd'.$_deps);
+			if(!isempt($us['deptpath'])){
+				$dep = explode(',', $us['deptpath']);
+				foreach($dep as $deps){
+					$_deps 	= str_replace(array('[',']'), array('',''), $deps);
+					$tj[]	= $this->rock->dbinstr($fids, 'd'.$_deps);
+				}
 			}
 			//所在组Id
 			$gids 		= m('sjoin')->getgroupid($uid);
@@ -794,15 +796,15 @@ class adminClassModel extends Model
 	
 	public function getcompanyid($uid=0)
 	{
-		$comid = (int)$this->rock->session('companyid','0');
-		if($comid==0)$comid = $this->getcompanyinfo($uid,2);
+		//$comid = (int)$this->rock->session('companyid','0');
+		$comid = $this->getcompanyinfo($uid,2);
 		if(!$comid)$comid=1;
 		return $comid;
 	}
 	
 	public function setcompanyid($comid)
 	{
-		$this->rock->setsession('companyid', $comid);
+		//$this->rock->setsession('companyid', $comid);
 		return $comid;
 	}
 	

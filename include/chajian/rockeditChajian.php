@@ -5,21 +5,24 @@
 
 class rockeditChajian extends Chajian{
 	
+	public $officebj_url = '';
+	private $officebj_urls = '';
 
 	protected function initChajian()
 	{
+		//$urs = $this->rock->jm->base64decode('aHR0cHM6Ly9kb2NzLnR1emlvYS5jb20vb2ZmaWNlLw::');
 		$urs = $this->rock->jm->base64decode('aHR0cDovL29mZmljZS5yb2Nrb2EuY29tLw::');
 		$url = getconfig('officebj_url', $urs);
 		$this->agentkey = getconfig('officebj_key');
 		if(substr($url,-1)!='/')$url.='/';
-		$this->updatekel = $url;
-		$this->updatekey = $url.'api.php';
+		$this->officebj_url = $url;
+		$this->officebj_urls = $url.'api.php';
 	}
 	
 	
 	public function geturlstr($mod, $act, $can=array())
 	{
-		$url 	= $this->updatekey;
+		$url 	= $this->officebj_urls;
 		$url.= '?m='.$mod.'&a='.$act.'';
 		$url.= '&host='.$this->rock->jm->base64encode(HOST).'&ip='.$this->rock->ip.'&xinhukey='.getconfig('xinhukey').'';
 		$url.= '&adminid='.$this->adminid.'';
@@ -73,6 +76,7 @@ class rockeditChajian extends Chajian{
 			$filepath = $filepathout;
 			$recedata = $filepath;
 		}
+		if(substr($filepath,0,4)=='http' && !$recedata)$recedata = $filepath;
 		
 		if(isempt($onlynum)){
 			$onlynum	= md5(''.$this->rock->jm->getRandkey().date('YmdHis').'file'.$id.'');
@@ -93,7 +97,7 @@ class rockeditChajian extends Chajian{
 		$type 		= $data['type'];
 		$gokey		= $data['gokey'];
 		$gourl 		= arrvalue($data,'gourl');
-		if(isempt($gourl))$gourl = $this->updatekel;
+		if(isempt($gourl))$gourl = $this->officebj_url;
 		$bsar		= $data;
 		if($type=='0'){
 			if($recedata=='')$recedata = $this->rock->jm->base64encode(file_get_contents($filepath));
@@ -121,8 +125,33 @@ class rockeditChajian extends Chajian{
 				$callurl = $this->rock->getouturl().'api.php?m=upload&a=upfilevb&fileid='.$id.'&adminid='.$this->adminid.'&token='.$admintoken.'';
 				$url.='&callurl='.$this->rock->jm->base64encode($callurl).'';
 			}
-			$bsar['url'] = $url;
+			
+			$bsar['url'] = 'index.php?m=public&a=goto&url='.urlencode($url).'';
 		}
 		return returnsuccess($bsar);
+	}
+	
+	/**
+	*	获取推送配置
+	*/
+	public function getwsinfo()
+	{
+		$barr 	= $this->getdata('file','wsinfo');
+		if(!$barr['success'])return '';
+		return $barr['data'];
+	}
+	
+	/**
+	*	跳转地址获取
+	*/
+	public function gotourl($gourl,$gokey,$filenum, $otype, $token, $id)
+	{
+		if(!$gourl)$gourl = $this->officebj_url;
+		$url = $gourl.'api.php?m=file&a=goto&filenum='.$filenum.'&optid='.$this->adminid.'&gokey='.$gokey.'&otype='.$otype.'';
+		if($otype==0){
+			$callurl = $this->rock->getouturl().'api.php?m=upload&a=upfilevb&fileid='.$id.'&adminid='.$this->adminid.'&token='.$token.'';
+			$url.='&callurl='.$this->rock->jm->base64encode($callurl).'';
+		}
+		return 'index.php?m=public&a=goto&url='.urlencode($url).'';
 	}
 }

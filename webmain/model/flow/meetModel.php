@@ -51,15 +51,17 @@ class flow_meetClassModel extends flowModel
 		$nzt 		 = $zt;
 		$time 		 = time();
 		
-		$stime 	= strtotime($rs['startdt']);
-		$etime 	= strtotime($rs['enddt']);
-		if($zt < 2){
-			if($etime<$time){
-				$nzt = 2;
-			}else if($stime>$time){
-				$nzt = 0;
-			}else{
-				$nzt = 1;
+		if(!isempt($rs['startdt']) && !isempt($rs['enddt'])){
+			$stime 	= strtotime($rs['startdt']);
+			$etime 	= strtotime($rs['enddt']);
+			if($zt < 2){
+				if($etime<$time){
+					$nzt = 2;
+				}else if($stime>$time){
+					$nzt = 0;
+				}else{
+					$nzt = 1;
+				}
 			}
 		}
 		
@@ -231,9 +233,13 @@ class flow_meetClassModel extends flowModel
 	//每天运行计划任务将固定会议生成普通会议通知对应人
 	public function createmeet($id=0, $nowdt='', $gbrr=false)
 	{
-		$owhe 	= '';
-		if($id>0)$owhe='`id`='.$id.' and ';
-		$narr 	= $this->getall(''.$owhe.'`type`=1 and `status`=1');
+		if(is_array($id)){
+			$narr = $id;
+		}else{
+			$owhe 	= '';
+			if($id>0)$owhe='`id`='.$id.' and ';
+			$narr 	= $this->getall(''.$owhe.'`type`=1 and `status`=1');
+		}
 		$dtobj	= c('date');
 		$jlarr 	= array();
 		foreach($narr as $k=>$rs){

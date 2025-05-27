@@ -1,7 +1,7 @@
 <?php
 /**
 *	群英考勤机
-* 	请求地址如：http://127.0.0.1/api.php?m=opendkq&openkey=key
+* 	请求地址如：http://127.0.0.1/api.php?m=openkqj&openkey=key
 */
 class openkqjClassAction extends openapiAction
 {
@@ -31,8 +31,10 @@ class openkqjClassAction extends openapiAction
 		$data 	= array();
 		$num	= $this->get('sn'); //设备号
 		if(!$num)return 'notdata';
+		if(c('check')->onlynoen($num))return 'error:sn0';
 		$dbs 	= m('kqjsn');
 		$snid	= (int)$dbs->getmou('id',"`num`='$num'");
+		if($snid==0)return 'error:sn1'; //20250307新增没有设备就不执行了
 		if($snid==0)$snid = $dbs->insert(array(
 			'num' => $num,
 			'optdt' => $this->rock->now,

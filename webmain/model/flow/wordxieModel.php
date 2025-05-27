@@ -70,6 +70,6 @@ class flow_wordxieClassModel extends flowModel
 	//在线编辑
 	public function floweditoffice($frs, $ofrs)
 	{
-		
+		$this->update("`optdt`='".$this->rock->now."'", $this->id);
 	}
 }

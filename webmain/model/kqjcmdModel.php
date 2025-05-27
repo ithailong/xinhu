@@ -468,6 +468,8 @@ class kqjcmdClassModel extends Model
 	//保存指纹
 	public function savefingerprint($snid, $uid, $finge)
 	{
+		$snid  = (int)$snid;
+		$uid   = (int)$uid;
 		$where = "`snid`='$snid' and `uid`='$uid'";
 		$arr['fingerprint1'] = str_replace("\n",'', arrvalue($finge, 0));
 		$arr['fingerprint2'] = str_replace("\n",'', arrvalue($finge, 1));
@@ -483,6 +485,8 @@ class kqjcmdClassModel extends Model
 	//保存设备头像
 	private function saveheadpic($snid, $uid, $headpic, $face='')
 	{
+		$snid  = (int)$snid;
+		$uid   = (int)$uid;
 		$where = "`snid`='$snid' and `uid`='$uid'";
 		if(isempt($face)){
 			if(isempt($headpic))return;

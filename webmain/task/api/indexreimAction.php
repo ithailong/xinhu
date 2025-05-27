@@ -26,7 +26,8 @@ class indexreimClassAction extends apiAction
 				$modearr[]=array('type'=>$rs['type'],'num'=>$rs['num'],'name'=>$rs['name']);
 			}
 		}
-		
+		$arr['loadtime'] 	= time();
+		if($historyarr)$arr['loadtime'] = strtotime($historyarr[0]['optdt']);
 		$arr['deptjson']	= json_encode($deptarr);
 		$arr['userjson']	= json_encode($userarr);
 		$arr['groupjson']	= json_encode($grouparr);

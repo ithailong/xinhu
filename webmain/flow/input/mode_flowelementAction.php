@@ -87,7 +87,7 @@ class mode_flowelementClassAction extends inputAction{
 		
 		return array(
 			'rows' 		=> $rows,
-			'modearr' 	=> m('mode')->getmodearr(),
+			//'modearr' 	=> m('mode')->getmodearr(),
 			'mkrs' => $mkrs,
 		);
 	}

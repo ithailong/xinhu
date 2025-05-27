@@ -92,6 +92,28 @@ class agentModel extends Model
 			$barr = $barr['rows'];
 		}
 		$arr['rows'] 	= $this->showrowsface($barr);
+		
+		//合计处理
+		if($this->moders && $arr['rows']){
+			$hjfields	= arrvalue($this->moders, 'hjfields');
+			if(!isempt($hjfields)){
+				$htrows = m('base')->hjfieldsRows($arr['rowd'], $hjfields);
+				$bstr 	= '';
+				$farr 	= array();
+				foreach($this->flow->fieldsarra as $k=>$rs)$farr[$rs['fields']] = $rs['name'];
+				foreach($htrows as $k=>$v){
+					if(isset($farr[$k]) && $farr[$k]!='id'){
+						if($bstr)$bstr.="\n";
+						$bstr.=''.$farr[$k].'：'.$v.'';
+					}
+				}
+				$arr['rows'][] = array(
+					'cont' => $bstr,
+					'optdt' => '合计'
+				);
+			}
+		}
+		
 		$arr['stotal']	= $this->agenttotals($uid);
 		unset($arr['rowd']);
 		return $arr;

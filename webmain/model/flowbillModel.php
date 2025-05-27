@@ -154,7 +154,7 @@ class flowbillClassModel extends Model
 				$modename 	= $mors['name'];
 				$rers 		= $this->db->getone('[Q]'.$rs['table'].'', $rs['mid']);
 				if($rers){
-					$tihsrs  = $flow->flowrsreplace($rers, 2);
+					$tihsrs  = $flow->rsreplace($rers, 2, null, 1);
 					$summary = $this->rock->reparr($mors['summary'], $tihsrs);
 					$summarx = $this->rock->reparr($mors['summarx'], $tihsrs);
 	
@@ -316,7 +316,7 @@ class flowbillClassModel extends Model
 				$rers 		= $this->db->getone('[Q]'.$rs['table'].'', $rs['mid']);
 				$summary	= $this->rock->reparr($summary, $rers);
 				if($rers){
-					$tihsrs  = $flow->flowrsreplace($rers, 2);
+					$tihsrs  = $flow->rsreplace($rers, 2, null, 1);
 					$summary = $this->rock->reparr($mors['summary'], $tihsrs);
 					
 					$nowsets	 = $rs['nowcheckname']; //当前审核人

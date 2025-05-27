@@ -22,6 +22,7 @@ function notifyClass(opts){
 	this.sounderr= '';
 	this.soundbo = true;
 	this.showbool= false;
+	this.macos	 = false;
 	this._init=function(){
 		if(opts)for(var o1 in opts)this[o1]=opts[o1];
 		var strsr = '';
@@ -32,6 +33,8 @@ function notifyClass(opts){
 			strsr = '<audio id="notify_sound_audio" src="web/res/sound/wu.mp3" autoplay="autoplay" hidden="true"></audio>';
 		}
 		if(this.sound)$('body').append(strsr);
+		var llq = navigator.userAgent.toLowerCase();
+		if(llq.indexOf('reimclient')>0)this.macos = true;
 	};
 	this.setsound	= function(bo){
 		this.soundbo=bo;
@@ -76,7 +79,7 @@ function notifyClass(opts){
 			this.close();
 			var url =NOWURL+'web/res/js/notification.html?'+Math.random()+'';
 			localStorage.setItem('xinhuoa_notification', JSON.stringify({icon:can.icon,title:can.title,body:can.body}));
-			var canss={"frame": false,title:"消息提醒","width": 350,resizable:false,'always_on_top':true,show:false,"height": 110,"show_in_taskbar":false}
+			var canss={"frame": false,title:"消息提醒","width": 350,resizable:false,'always_on_top':true,show:false,"height": 110,"show_in_taskbar":false,"transparent":true}
 			nw.Window.open(url,canss,function(wis){
 				me.notification = wis;
 				wis.on('close',function(){
@@ -89,6 +92,13 @@ function notifyClass(opts){
 					}
 					me.notification=false;
 				});
+			});
+		}else if(this.macos){
+			rockclient.rockFun("Notification",{
+				title:can.title,
+				msg:can.body
+			}, function(ret){
+				
 			});
 		}else{
 			var notification= new Notification(title, can);

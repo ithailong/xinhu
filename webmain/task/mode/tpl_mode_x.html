@@ -42,14 +42,11 @@ function initApp(){
 	js.setapptitle('详情');
 }
 </script>
-<style>
 <?php
-$maincolor = getconfig('apptheme','#1389D3');
-$maincolora= c('image')->colorTorgb($maincolor);
-$maincolors= ''.$maincolora[0].','.$maincolora[1].','.$maincolora[2].'';
-echo 'body{--main-color:'.$maincolor.';}';
+echo c('color')->getApptheme(false);
 ?>
-.stitle{padding:10px;border-bottom:0.5px #dddddd solid;font-size:16px;}
+<style>
+.stitle{padding:10px;border-bottom:var(--border);font-size:16px;}
 .ydullist{display:inline-block;width:100%;}
 .ydullist li{float:left;width:16.6%;text-align:center;padding:5px 0px;font-size:12px;display:block;line-height:25px;padding-top:10px}
 .ydullist li:active{ background-color:#eeeeee}
@@ -59,12 +56,12 @@ echo 'body{--main-color:'.$maincolor.';}';
 .pinglun td{padding:10px 0px}
 .pinglun .dt,.pinglun .act{font-size:12px;color:#888888;padding-top:5px}
 .pinglun .name{color:#555555}
-.pinglun tr{border-bottom: 1px solid #eeeeee;}
+.pinglun tr{border-bottom:var(--border);}
 .pinglun .sm{padding-top:8px;font-size:14px}
 .faces{margin-right:10px}
 .createtable{width:98%}
 .status{position: absolute;left:5px;top:5px;display:}
-td.tdys1{border:0.5px #e5e5e5 solid;text-align:center;padding:0px 5px}
+td.tdys1{border:var(--border);text-align:center;padding:0px 5px}
 .divinput{padding:0px}
 .datesss{background:url(mode/icons/date.png) no-repeat right;cursor:pointer;}
 
@@ -72,6 +69,10 @@ td.tdys1{border:0.5px #e5e5e5 solid;text-align:center;padding:0px 5px}
 
 .btn-danger{background-color:#d9534f;}
 #contentshow img{max-width:100%}
+body{
+background:#f1f1f1;
+--border:0.5px rgba(0,0,0,0.2) solid;
+}
 </style>
 
 </head>
@@ -84,7 +85,7 @@ if($showheader==1)echo '<div class="header" style="padding-top:'.$cenghei.'px" i
 
 if($da['arr']['isdefaultview']==1)echo '<div onclick="c.changeshow(0)" class="r-subtitle">&nbsp;&nbsp;'.$da['arr']['modename'].'</div>';
 ?>
-<div id="contentshow" class="padding10<?php if($da['arr']['isdefaultview']==1) echo ' r-border-t';?>" style="position:relative; background:white">
+<div id="contentshow" class="padding10" style="position:relative; background:white;border-bottom:var(--border);<?php if($da['arr']['isdefaultview']==1) echo 'border-top:var(--border)';?>">
 	<?php
 	if($da['arr']['isflow']>0){
 		echo '<div class="statustext" style="color:'.$da['arr']['statuscolor'].';border-color:'.$da['arr']['statuscolor'].'">'.$da['arr']['statustext'].'</div>';
@@ -92,7 +93,6 @@ if($da['arr']['isdefaultview']==1)echo '<div onclick="c.changeshow(0)" class="r-
 	echo $da['arr']['contview']
 	?>
 </div>
-<div class="r-border-t"></div>
 <?php
 if($da['arr']['optmenu']){
 	$opsts = '<div class="padding10" align="center">';
@@ -113,9 +113,9 @@ if($da['spagepath']!=''){
 if($da['arr']['isplview']=='1'){
 ?>
 <div class="r-subtitle">&nbsp;&nbsp;评论</div>
-<div class="r-border-t" style="background:white" >
+<div style="background:white;border-top:var(--border);border-bottom:var(--border)" >
 <div align="left" class="padding10">
-	<div align="left"><textarea class="inputs" id="pinglun_explain" style="width:98%;height:60px" placeholder="请输入评论内容"></textarea></div>
+	<div align="left" style="display:flex"><textarea class="inputs" id="pinglun_explain" style="flex:1;height:60px" placeholder="请输入评论内容"></textarea></div>
 	<div style="padding-top:5px">
 	<button class="webbtn" style="border-radius:5px" onclick="c.pinglun(this)" id="check_btn" type="button">
 	提交评论</button>
@@ -123,7 +123,6 @@ if($da['arr']['isplview']=='1'){
 	</div>	
 </div>	
 </div>
-<div class="r-border-t"></div>
 
 <?php
 }
@@ -134,12 +133,12 @@ if($da['arr']['isplview']=='1'){
 		$flowinfor = $da['arr']['flowinfor'];
 	?>
 	<div class="r-subtitle">&nbsp;&nbsp;流程信息</div>
-	<div class="r-border-t" style="background:white" >
+	<div style="background:white;border-top:var(--border)" >
 	
 		<div class="padding10" align="center">
 		<form name="myform" autocomplete="off">
 		<table border="0" width="100%" class="tabled1" style="border-collapse:collapse;" cellspacing="0" cellpadding="0">
-		<tr height="40" bgcolor="#E1F4F0">
+		<tr height="40" style="background:#E1F4F0; background:var(--main-hgcolor)">
 			<td class="tdys1"><div align="right" style="color:#555555">状态</div></td>
 			<td class="tdys1"><div align="left"><?=$flowinfor['nstatustext']?></div></td>
 		</tr>
@@ -219,8 +218,8 @@ if($da['arr']['isplview']=='1'){
 		?>
 		<tr style="display:none" id="tuihuidiv" height="40">
 			<td class="tdys1" nowrap><div align="right" style="color:#555555"><font color=red>*</font><?=$tuiname?>退回</div></td>
-			<td class="tdys1"><div align="left">
-			<select class="inputb" name="check_tuiid" style="width:99%"><option value="0">退回到提交人</option>
+			<td class="tdys1"><div align="left" style="display:flex">
+			<select class="inputb" name="check_tuiid" style="flex:1"><option value="0">退回到提交人</option>
 			<?php 
 			if($flowinfor['tuicourse']){
 				$tstr = '<optgroup label="退回到步骤">';
@@ -277,7 +276,7 @@ if($da['arr']['isplview']=='1'){
 		
 		<tr>
 			<td class="tdys1"><div  align="right" style="color:#555555"><?php if($smlx==1)echo '<font color=red>*</font>';?>说明</div></td>
-			<td class="tdys1" style="padding:5px"><div align="left"><textarea class="inputb" name="check_explain" style="width:95%;height:60px;"></textarea></div></td>
+			<td class="tdys1" style="padding:5px"><div align="left" style="display:flex"><textarea class="inputb" name="check_explain" style="flex:1;height:60px;"></textarea></div></td>
 		</tr>
 		
 		<?php
@@ -289,7 +288,7 @@ if($da['arr']['isplview']=='1'){
 			<td class="tdys1" nowrap><div  align="right" style="color:#555555"><?php if($wjlx==1)echo '<font color=red>*</font>';?>相关文件</div></td>
 			<td class="tdys1" style="padding:5px"><div align="left">
 				<input name="fileid" type="hidden">
-				<div id="filedivview" style="height:60px;overflow:auto;width:96%" class="inputb"></div>
+				<div style="display:flex"><div id="filedivview" style="height:60px;overflow:auto;flex:1;" class="inputb"></div></div>
 				<div id="filedivviewfile"><input style="width:150px" onchange="f.change(this)" type="file"></div>
 			</div></td>
 		</tr>
@@ -323,8 +322,8 @@ if($da['arr']['isplview']=='1'){
 	if($logarr && $da['arr']['isgbjl']==0){
 	$logcount= count($logarr);
 	?>
-	<div onclick="c.changeshow(0)" class="r-subtitle">&nbsp;&nbsp;处理记录(<?=$logcount?>) <img align="absmiddle" height="16" width="16" src="images/xiangyou1.png"> </div>
-	<div id="showrecord0" class="pinglun r-border-t" style="background:white;display:<?php if(getconfig('xiangrecord')!='1')echo 'none';?>">
+	<div onclick="c.changeshow(0)" class="r-subtitle" style="border-bottom:var(--border);">&nbsp;&nbsp;处理记录(<?=$logcount?>) <img align="absmiddle" height="16" width="16" src="images/xiangyou1.png"> </div>
+	<div id="showrecord0" class="pinglun" style="border-bottom:var(--border);background:white;display:<?php if(getconfig('xiangrecord')!='1')echo 'none';?>">
 	<table width="100%">
 	<?php 
 	foreach($logarr as $k=>$rs){
@@ -341,7 +340,6 @@ if($da['arr']['isplview']=='1'){
 	?>
 	</table>
 	</div>
-	<div class="r-border-t"></div>
 
 	<?php 
 	}
@@ -352,25 +350,23 @@ if($da['arr']['isplview']=='1'){
 	
 	?>
 	<div onclick="location.reload()"  class="r-subtitle">&nbsp;&nbsp;查阅记录(<?=count($da['arr']['readarr'])?>)</div>
-	<div class="r-border-t" style="background:white"><ul class="ydullist"><?php
+	<div style="background:white;border-top:var(--border);border-bottom:var(--border)"><ul class="ydullist"><?php
 		foreach($da['arr']['readarr'] as $k=>$rs){
 			echo '<li onclick="showchayue(\''.$rs['optdt'].'\',\''.$rs['stotal'].'\')"><img src="'.$rs['face'].'" align="absmiddle"><br><span>'.$rs['name'].'</span></li>';
 		}
 	?></ul></div>
-	<div class="r-border-t"></div>
 	
 	<?php 
 		if($da['arr']['readunarr']){
 	?>
 	
 	<div onclick="location.reload()" class="r-subtitle">&nbsp;&nbsp;未查阅人员(<?=count($da['arr']['readunarr'])?>)</div>
-	<div class="r-border-t" style="background:white"><ul class="ydullist"><?php
+	<div style="background:white;border-top:var(--border);border-bottom:var(--border)"><ul class="ydullist"><?php
 		foreach($da['arr']['readunarr'] as $k=>$rs){
 			if($k>=30)break;//最多显示30人
 			echo '<li ><img src="'.$rs['face'].'" align="absmiddle"><br><span>'.$rs['name'].'</span></li>';
 		}
 	?></ul></div>
-	<div class="r-border-t"></div>
 	
 	<?php 
 	}}

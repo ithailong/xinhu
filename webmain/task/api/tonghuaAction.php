@@ -9,14 +9,33 @@ class tonghuaClassAction extends apiAction
 		if(!getconfig('video_bool'))return returnerror('系统未开启音视频');
 		$id 		= (int)$this->get('id');
 		$type 		= (int)$this->get('type');
+		$rtctype 	= 1; //0，1腾讯
 		if($id==$this->adminid)return returnerror('不能和自己通话');
 		$nowtime 	= strtotime($this->now);
+		
+		$allfields	= $this->db->getallfields('[Q]im_tonghua');
+		if(!in_array('toid', $allfields)){
+			$this->db->addFields('[Q]im_tonghua','toid','int(11)','0','对于人id可能是组');
+		}
+		
+		
+		//判断是不是在通话中
+		$thrs 		= m('im_tonghua')->getone('(`faid`='.$id.' or `toid`='.$id.') and (`state` in(0,4) or (`state`=1 and enddt is null))', '*', 'id desc');
+		if($thrs){
+			$time  	= time() - strtotime($thrs['adddt']);
+			$state	= (int)$thrs['state'];
+			$stime  = 60;
+			if($state == 1)$stime = 30* 60;
+			if($time < $stime)return returnerror('对方忙线');//60秒内
+		}
 		
 		//判断用户有没有在线
 		$gbarr = m('reim')->pushserver('getonline', array(
 			'onlineid' => $id
 		));
 		if(!$gbarr)return returnerror('没有服务端');
+
+		
 		if(!$gbarr['success'])return $gbarr;
 		$ondats = json_decode(arrvalue($gbarr,'data'), true);
 		$online = false;
@@ -26,11 +45,21 @@ class tonghuaClassAction extends apiAction
 		}
 		
 		if(!$online){
-			$to = m('login')->rows('`uid`='.$id.' and `online`=1 and `ispush`=1');
-			if($to==0)return returnerror('对方不在线，无法通话');
+			$trows 	= m('login')->getall('`uid`='.$id.' and `online`=1 and `ispush`=1');
+			if(!$trows)return returnerror('对方不在线，无法通话');
+			
+			$appfw  = $this->option->getval('reimappwxsystem');
+			if($appfw != '1')return returnerror('服务端没开启APP可用');
+			
+			$isbo 	= true;
+			foreach($trows as $k=>$rs){
+				$web = $rs['web'];
+				if(!contain($web, 'iphone'))$isbo = false;
+			}
+			//if($isbo)return returnerror('对方使用iphone，暂不支持通话');
 		}
 		
-		$barr	= c('xinhuapi')->getdata('tonghua','thinit', array('faid'=>$this->adminid,'nowtime'=>$nowtime,'toid'=>$id,'type'=>$type));
+		$barr	= c('xinhuapi')->getdata('tonghua','thinit', array('faid'=>$this->adminid,'rtctype'=>$rtctype,'nowtime'=>$nowtime,'toid'=>$id,'type'=>$type));
 		if(!$barr['success'])return $barr;
 		$data 	= $barr['data'];
 		$key 	= $data['channel'];
@@ -42,7 +71,9 @@ class tonghuaClassAction extends apiAction
 			'faid' 	=> $this->adminid,
 			'channel' =>$data['channel'],
 			'type' 	  =>$data['type'],
+			'plat' 	  =>$rtctype,
 			'joinids' =>$id,
+			'toid' 	  =>$id,
 			'adddt' 	=>$this->now,
 		));
 		
@@ -67,7 +98,7 @@ class tonghuaClassAction extends apiAction
 	}
 	
 	/**
-	*	接电话了(1同意，2拒绝,3取消，4接受者已打开页面，5呼叫超过30秒无人接听)
+	*	接电话了(0呼叫中,1同意，2拒绝,3取消，4接受者已打开页面，5呼叫超过30秒无人接听)
 	*/
 	public function jieAction()
 	{
@@ -76,18 +107,22 @@ class tonghuaClassAction extends apiAction
 		$dbs 	 = m('im_tonghua');
 		$onrs	 = $dbs->getone("`channel`='$channel'");
 		$satype	 = '';
-		if(!$onrs)$satype = '通话不存在';
-		if($onrs && ($onrs['state']=='3' || $onrs['state']=='5'))$satype = '对方已取消';
-		if(!$satype){
-			$nowtime 	= strtotime($this->now);
-			$upstsr		= '`state`='.$state.'';
-			if($state==1)$upstsr.=",`jiedt`='$this->now'";
-			$dbs->update($upstsr,"`channel`='$channel'");
-			$barr = c('rockqueue')->push('tonghua,jie', array('key'=>$channel,'nowtime'=>$nowtime,'uid'=>$this->adminid,'state'=>$state));
-			if(!$barr['success'])return $barr;
-		}
+		if(!$onrs)return returnerror('通话不存在');
+		$zt 	 = $onrs['state'];
+		if($zt == '3' || $zt=='5')return returnerror('对方已取消');
+		
+		if($zt=='1')return returnerror('已在另端接通');
+		if($zt=='2')return returnerror('已在另端拒绝');
+		
+		$nowtime 	= strtotime($this->now);
+		$upstsr		= '`state`='.$state.'';
+		if($state==1)$upstsr.=",`jiedt`='$this->now'";
+		$dbs->update($upstsr,"`channel`='$channel'");
+		$barr = c('rockqueue')->push('tonghua,jie', array('key'=>$channel,'nowtime'=>$nowtime,'uid'=>$this->adminid,'state'=>$state));
+		if(!$barr['success'])return $barr;
+		
 		return returnsuccess(array(
-			'satype' => $satype
+			'satype' => ''
 		));
 	}
 	
@@ -143,10 +178,10 @@ class tonghuaClassAction extends apiAction
 	{
 		$channel 	= $this->get('channel');
 		$onrs 		= m('im_tonghua')->getone("`channel`='$channel'");
-		$tayar 		= array('','tongyi','jujue','cancel','wait','cancel');
-		
+		$tayar 		= array('call','tongyi','jujue','cancel','wait','cancel','end');
 		return returnsuccess(array(
-			'state' => arrvalue($tayar, $onrs['state'])
+			'state'  	=> arrvalue($tayar, $onrs['state']),
+			'th_channel'=> $channel
 		));
 	}
 	

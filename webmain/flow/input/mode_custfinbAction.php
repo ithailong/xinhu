@@ -108,8 +108,9 @@ class mode_custfinbClassAction extends inputAction{
 	
 	protected function storeafter($table, $rows)
 	{
-		$money 	 = 0;
-		if($rows){
+		$money 	 	= 0;
+		$hjfields	= arrvalue($this->flow->moders, 'hjfields');
+		if($rows && isempt($hjfields)){
 			foreach($rows as $k1=>$rs1){
 				$money+=floatval($rs1['money']);
 			}

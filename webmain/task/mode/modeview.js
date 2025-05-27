@@ -56,7 +56,7 @@ function initbody(){
 		$('body').append(s);
 	}
 	
-	$('#contentshow img[onclick=""]').click(function(){c.showviews(this)});
+	$('#contentshow img').click(function(){c.showviews(this)});
 	c.addwater();
 }
 function showchayue(opt, st){

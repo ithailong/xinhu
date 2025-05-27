@@ -67,7 +67,7 @@ class beifenClassAction extends Action
 		if(getconfig('systype')=='demo')exit('演示请勿操作');
 		$rows = array();
 		$folder = $this->post('folder');
-		$folder	= str_replace('../','', $folder);
+		$folder	= str_replace(array('..','/'),'', $folder);
 		$path 	= ''.UPDIR.'/data/'.$folder.'';
 		$carr 	= c('file')->getfilerows($path);
 		foreach($carr as $k=>$rs){
@@ -241,5 +241,95 @@ class beifenClassAction extends Action
 		$this->db->query('alter table `[Q]userinfos` AUTO_INCREMENT=1', false);
 		
 		return 'ok';
+	}
+	
+	
+	public function fenbiaoAjax()
+	{
+		$allfields = $this->db->getallfields('[Q]flow_set');
+		if(!in_array('logstr', $allfields)){
+			$bool = $this->db->query("alter table `[Q]flow_set` add `logstr` varchar(500) DEFAULT NULL COMMENT '操作记录分表';", false);
+			if(!$bool)return '无法操作:'.$this->db->error().'';
+		}
+		
+		$obj 	= m('mode');
+		$rows 	= $obj->getall('1=1');
+		$atable = array();
+		$count 	= m('flow_log')->rows('1=1');
+		if($count < 10000)return '操作记录少于1W条，不需要分表';
+		
+		$alltabls 	= $this->db->getalltable();
+		$barr		= $this->createbiao(1, $alltabls);
+		if(!$barr['success'])return $barr['msg'];
+		$biao 		= $barr['data'];
+		if(1==1)foreach($rows as $k=>$rs){
+			$tab = $rs['table'];
+			if(!isset($atable[$tab])){
+				$max = m($tab)->getmou('max(id) as ids', 'id>0');
+				if(!$max)$max = 0;
+				$max++;
+				$atable[$tab] = $max;
+			}
+			$max 	= $atable[$tab];
+			
+			$logstr = $rs['logstr'];
+			if(isempt($logstr)){
+				$logarr = array();
+			}else{
+				$logarr = json_decode($logstr, true);
+			}
+			if(!isset($logarr[$max]))$logarr[$max] = $biao;
+			$logstr = json_encode($logarr);
+			
+			$obj->update(array(
+				'logstr' => $logstr
+			), $rs['id']);
+		}
+		
+		//更新
+		$sql = "update `[Q]file` set `mtype`='flow_log".$biao."' where `mtype`='flow_log'";
+		$bool = $this->db->query($sql, false);
+		
+		return 'ok';
+	}
+	
+	public function createbiao($xu, $alltabls)
+	{
+		$biao 	= 'a'.$xu.'';
+		$lognab = 'flow_log'.$biao.'';
+		if(in_array(''.PREFIX.''.$lognab.'',$alltabls))return $this->createbiao($xu+1, $alltabls);
+		
+		$sql 	= 'ALTER TABLE `[Q]flow_log` RENAME TO `[Q]'.$lognab.'`;';
+		$bool	= $this->db->query($sql, false);
+		if(!$bool)return returnerror('无法操作:'.$this->db->error().'');
+		
+		$sql = "CREATE TABLE `[Q]flow_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `table` varchar(50) DEFAULT NULL,
+  `mid` int(11) DEFAULT NULL,
+  `status` tinyint(4) DEFAULT '0' COMMENT '1通过',
+  `statusname` varchar(20) DEFAULT NULL COMMENT '状态名称',
+  `name` varchar(50) DEFAULT NULL COMMENT '进程名称',
+  `courseid` int(11) DEFAULT NULL,
+  `optdt` datetime DEFAULT NULL COMMENT '操作时间',
+  `explain` varchar(500) DEFAULT NULL COMMENT '说明',
+  `ip` varchar(100) DEFAULT NULL,
+  `web` varchar(100) DEFAULT NULL COMMENT '浏览器',
+  `checkname` varchar(50) DEFAULT NULL COMMENT '审核人',
+  `checkid` int(11) DEFAULT '0' COMMENT '审核人id',
+  `modeid` smallint(6) DEFAULT NULL COMMENT '@模块Id',
+  `color` varchar(10) DEFAULT NULL,
+  `valid` tinyint(1) DEFAULT '1',
+  `step` smallint(6) DEFAULT '0' COMMENT '步骤号',
+  `qmimg` text COMMENT '签名的图片base64',
+  `iszb` tinyint(1) DEFAULT '0' COMMENT '是否转办记录',
+  PRIMARY KEY (`id`),
+  KEY `table` (`table`,`mid`)
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COMMENT='单据操作记录';
+";
+		$bool	= $this->db->query($sql, false);
+		if(!$bool)return returnerror('无法创建表:'.$this->db->error().'');
+		
+		return returnsuccess($biao);
 	}
 }

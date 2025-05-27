@@ -205,7 +205,9 @@ class flow_userClassModel extends flowModel
 			//读取部门Id
 			$deptarr 	= $this->getdeptid($rs['deptname'], $dbs);
 			
-			if($deptarr['deptid']==0)return '行'.($k+1).'找不到顶级部门['.$rs['deptname'].'],请写完整部门路径如：'.$dname.'/'.$rs['deptname'].'';
+			if($deptarr['deptid']==0){
+				$arr['drerr'] = '找不到顶级部门['.$rs['deptname'].'],请写完整部门路径如：'.$dname.'/'.$rs['deptname'].'';
+			}
 			
 			foreach($deptarr as $k1=>$v1)$arr[$k1]=$v1;
 			

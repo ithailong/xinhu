@@ -18,6 +18,7 @@
 		this.dushu	  = 0;
 		this.onloadsuccess=function(){};
 		this.init=function(){
+			if(get('imgview_main'))return;
 			for(var i in opts)this[i]=opts[i];
 			if(obj)this.url=obj.attr('src');
 			this.mheiht = document.body.scrollHeight,sed=$(window).height();
@@ -35,7 +36,7 @@
 			s+='	<div id="imgview_spanmask"  style="position:absolute;z-index:1;left:0px;top:0px;background-color:rgba(0,0,0,0);width:100%;height:100%;cursor:move;user-select:none;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;-khtml-user-select:none;"></div>';
 			s+='	<img style="position:absolute;z-index:0;left:0px;top:0px" id="imgview_spanimg" width="100%" height="100%" src="images/mloading.gif" >';
 			s+='</div>';
-			s+='<div style="position:fixed;z-index:2;left:0px;bottom:0px;text-align:center;color:white;width:100%;font-size:20px;background-color:rgba(0,0,0,0.2);height:40px;line-height:40px;overflow:hidden"><i style="cursor:pointer" id="imgview_zoom-out" class="icon-zoom-out" title="缩小"></i> &nbsp; <span id="imgview_nowbili" style="font-size:14px">100%</span> &nbsp; <i style="cursor:pointer" class="icon-zoom-in" title="放大" id="imgview_zoom-in"></i>';
+			s+='<div style="position:fixed;z-index:2;left:0px;bottom:0px;text-align:center;color:white;width:100%;font-size:20px;background-color:rgba(0,0,0,0.2);height:40px;line-height:40px;overflow:hidden;user-select:none"><i style="cursor:pointer" id="imgview_zoom-out" class="icon-zoom-out" title="缩小"></i> &nbsp; <span id="imgview_nowbili" style="font-size:14px">100%</span> &nbsp; <i style="cursor:pointer" class="icon-zoom-in" title="放大" id="imgview_zoom-in"></i>';
 			s+='  &nbsp; <i style="cursor:pointer" class="icon-move" title="原始大小" id="imgview_zoom-move"></i>';
 			if(!this.ismobile && this.downbool)s+='  &nbsp; <a target="_blank" download="" style="color:white;font-size:20px" href="'+this.url+'"><i style="cursor:pointer" class="icon-download-alt" title="下载"></i></a>';
 			s+='  &nbsp; <i style="cursor:pointer" class="icon-refresh" title="旋转90度" id="imgview_zoom-refresh"></i>';
@@ -181,6 +182,10 @@
 					me.touchci=0;
 				}
 			}); 
+		}
+		
+		this.loadimg=function(){
+			return "data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='80px' height='80px' viewBox='0 0 80 80' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3Eloading%3C/title%3E%3Cdefs%3E%3ClinearGradient x1='94.0869141%25' y1='0%25' x2='94.0869141%25' y2='90.559082%25' id='linearGradient-1'%3E%3Cstop stop-color='%23606060' stop-opacity='0' offset='0%25'%3E%3C/stop%3E%3Cstop stop-color='%23606060' stop-opacity='0.3' offset='100%25'%3E%3C/stop%3E%3C/linearGradient%3E%3ClinearGradient x1='100%25' y1='8.67370605%25' x2='100%25' y2='90.6286621%25' id='linearGradient-2'%3E%3Cstop stop-color='%23606060' offset='0%25'%3E%3C/stop%3E%3Cstop stop-color='%23606060' stop-opacity='0.3' offset='100%25'%3E%3C/stop%3E%3C/linearGradient%3E%3C/defs%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' opacity='0.9'%3E%3Cg%3E%3Cpath d='M40,0 C62.09139,0 80,17.90861 80,40 C80,62.09139 62.09139,80 40,80 L40,73 C58.2253967,73 73,58.2253967 73,40 C73,21.7746033 58.2253967,7 40,7 L40,0 Z' fill='url(%23linearGradient-1)'%3E%3C/path%3E%3Cpath d='M40,0 L40,7 C21.7746033,7 7,21.7746033 7,40 C7,58.2253967 21.7746033,73 40,73 L40,80 C17.90861,80 0,62.09139 0,40 C0,17.90861 17.90861,0 40,0 Z' fill='url(%23linearGradient-2)'%3E%3C/path%3E%3Ccircle id='Oval' fill='%23606060' cx='40.5' cy='3.5' r='3.5'%3E%3C/circle%3E%3C/g%3E%3CanimateTransform attributeName='transform' begin='0s' dur='1s' type='rotate' values='0 40 40;360 40 40' repeatCount='indefinite'/%3E%3C/g%3E%3C/svg%3E%0A";
 		}
 	}
 	

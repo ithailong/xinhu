@@ -52,6 +52,29 @@ class kaoqinClassAction extends apiAction
 		$this->showreturn($barr);
 	}
 	
+	/**
+	*	获取定位的URL
+	*/
+	//private $dwurl = 'http://127.0.0.1/app/rockfile/index.php?m=dingwei';
+	private $dwurl = 'aHR0cHM6Ly9maWxlLnJvY2tvYS5jb20vaW5kZXgucGhwP209ZGluZ3dlaQ::';
+	public function dwurlAction()
+	{
+		$dwrand 	= $this->get('dwrand');
+		return returnsuccess(array(
+			'url' 	 => $this->jm->base64decode($this->dwurl).'&dwrand='.$dwrand.'',
+			'dwrand' => $dwrand
+		));
+	}
+	
+	public function dwgetAction()
+	{
+		$dwrand 	= $this->get('dwrand');
+		$url 		= $this->jm->base64decode($this->dwurl).'&a=getdw&dwrand='.$dwrand.'';
+		$cont 		= c('curl')->getcurl($url);
+		if(!$cont)$cont = returnerror('无法获取');
+		return $cont;
+	}
+	
 
 	
 	/**

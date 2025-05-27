@@ -32,14 +32,18 @@ class flow_carmreseClassModel extends flowModel
 	//可预定的车辆
 	public function getcardata()
 	{
-		$where= $this->adminmodel->getcompanywhere(1);
-		$rows = m('carm')->getall("`ispublic`=1 and `state`=1 ".$where."",'carnum as name,id as value');
-		$arrs = $this->db->getrows('[Q]carmrese','`status`=1 group by carid','max(kmend)kmend,carid');
-		$arrsa= array();
-		foreach($arrs as $k=>$rs)$arrsa[$rs['carid']]=$rs['kmend'];
+		$where	= $this->adminmodel->getcompanywhere(1);
+		$rows 	= m('carm')->getall("`ispublic`=1 and `state`=1 ".$where."",'carnum as name,id as value');
+		$db 	= m('carmrese');
 		//读取车辆最后公里数
 		foreach($rows as $k=>$rs){
-			$rows[$k]['kmstart'] = $this->rock->arrvalue($arrsa, $rs['value']);
+			$onrs = $db->getone("`status`=1 and `carid`=".$rs['value']." and ifnull(`kmend`,0)<>0", '`kmend`,`kmstart`','`kmend` desc');
+			$km   = '';
+			if($onrs){
+				$km = $onrs['kmend'];
+				if(isempt($km))$km = $onrs['kmstart'];
+			}
+			$rows[$k]['kmstart'] = $km;
 		}
 		return $rows;
 	}

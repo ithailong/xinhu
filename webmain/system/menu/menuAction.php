@@ -4,6 +4,7 @@ class menuClassAction extends Action
 	public $rows,$alldata;
 	public function dataAjax()
 	{
+		$this->db->update('[Q]menu', '`status`=1' , '`id` in(1,2) and `status`=0');
 		$this->rows		= array();
 		$type 			= $this->get('type');
 		$loadci 		= (int)$this->get('loadci');

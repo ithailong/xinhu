@@ -7,13 +7,20 @@
 class JPushChajian extends Chajian{
 
 
-	//-------------最新原生app推送app是1.2.3版本 和 最新app+---------------
+	/**
+	*	-------------最新原生app推送app是1.2.3版本 和 最新app+---------------
+	*	title 没有base64的标题
+	*	desc 已经base64了
+	*	cont 原始的内容json
+	*	palias 可推送信息
+	*/
 	public function push($title, $desc, $cont, $palias)
 	{
 
 		$uids		= $palias['uids'];
 		$alias2019	= $palias['alias2019'];
-		$pushuids	= $palias['pushuids']; //可以推送的用户ID
+		$pushuids	= $palias['pushuids']; //可以推送的用户ID 就是ispush=1
+		$jparr		= $palias['jparr']; //应用内消息
 		$xmpush		= c('xmpush');
 		$hwpush		= c('hwpush');
 		$getui		= c('getui');
@@ -33,8 +40,8 @@ class JPushChajian extends Chajian{
 		$xharr = array(
 			'uids'  => $uids,
 			'title' => $this->rock->jm->base64encode($title),
-			//'cont'  => $this->rock->jm->base64encode($cont),
 			'desc'  => $desc,
+			'jpreg'  => arrvalue($palias, 'jpreg'),
 			'systype'=> getconfig('systype')
 		);
 		
@@ -161,5 +168,28 @@ class JPushChajian extends Chajian{
 			$stv[] = $alias2019[$j];
 		}
 		return $stv;
+	}
+	
+	/**
+	*	极光自定义消息发送20250105
+	*/
+	public function sendJpush($arr)
+	{
+		$receid = $arr['receid'];
+		if(isempt($receid))return;
+		$toregid= array();
+		//$this->rock->debugs($arr,'sendJpush');
+		$rows 	= m('logintoken')->getall('`uid` in('.$receid.') AND `online`=1 AND `ispush`=1');
+		foreach($rows as $k=>$rs){
+			$regid = arrvalue($rs,'regid');
+			if(!isempt($regid))$toregid[] = $regid;
+		}
+		if(!$toregid)return;
+		$runurl = c('xinhu')->geturlstr('jpushmess', array(
+			'msgcont' => $this->rock->jm->base64encode(json_encode($arr)),
+			'toregid' => join(',', $toregid)
+		));
+		$str  = c('curl')->getcurl($runurl);
+		return 'ok';
 	}
 }

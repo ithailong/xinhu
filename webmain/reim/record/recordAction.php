@@ -112,7 +112,7 @@ class recordClassAction extends Action
 	//删除聊天记录
 	public function delrecordAjax()
 	{
-		$id 	= $this->post('id');
+		$id 	= c('check')->onlynumber($this->post('id'));
 		$atype  = $this->post('atype');
 		if($atype!='all'){
 			if(!isempt($id)){

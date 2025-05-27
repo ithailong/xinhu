@@ -22,15 +22,15 @@ class kaoqinClassAction extends Action
 		$dt1	= $this->post('dt1');
 		$dt2	= $this->post('dt2');
 		$msg 	= '获取成功';
-		$daka 	= $this->option->getval('qywxplat_daka');
+		$daka 	= $this->option->getval('wxqyplat_daka');
 		if($daka=='1'){
-			$barr = c('rockqywx')->getcheckindata($uids, $dt1, $dt2, 1);
+			$barr = c('rockwxqy')->getcheckindata($uids, $dt1, $dt2, 1);
 			if(!$barr['success']){
 				$msg = $barr['msg'];
 			}else{
 				$data = $barr['data'];
-				$msg .= ',从代建中应用获取打卡(共'.$data['zongts'].'条,新增'.$data['okload'].'条)';
-				if($data['maxpage']>1)$msg.=',并发送异步请求1条';
+				//$msg .= ',从代建中应用获取打卡(共'.$data['zongts'].'条,新增'.$data['okload'].'条)';
+				//if($data['maxpage']>1)$msg.=',并发送异步请求1条';
 			}
 		}else{
 			if($reimbo->installwx(1)){

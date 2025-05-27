@@ -32,21 +32,56 @@ class uploadClassAction extends apiAction
 		$this->returnjson($arr);
 	}
 	
+	public function editfilebAction()
+	{
+		$fileid = (int)$this->get('fileid','0');
+		$frs 	= m('file')->getone($fileid);
+		if(!$frs)return 'error';
+		$editobj= c('rockedit');
+		$barr   = $editobj->getdata('file','history', array(
+			'filekey' 	=> getconfig('xinhukey'),
+			'filenum' 	=> $frs['onlynum'],
+		));
+		if(!$barr['success'])return $barr['msg'];
+		$arr = $barr['data'];
+		
+		$data	= file_get_contents($arr['url']);
+		$result = $this->upfilevb_Query($fileid, $frs['fileext'], $data);
+		if(substr($result,0,2)=='ok'){
+			$editobj->getdata('file','upresult', array(
+				'isup' 	=> 3,
+				'upid' 	=> $arr['upid'],
+			));
+			return '“'.$frs['filename'].'”文件编辑已完成';
+		}else{
+			return '编辑失败;';
+		}
+	}
+	
+	
 	/**
 	*	这个是用来在线编辑文档上传的
 	*/
 	public function upfilevbAction()
 	{
 		$fileid = (int)$this->get('fileid','0');
-		if($fileid==0)exit('fileid=0');
+		$fileext= $this->get('fileext');
 		$data 	= $this->getpostdata();
 		if(isempt($data))return '没有数据';
-		$fileext= $this->get('fileext');
-		$uptype = '|doc|docx|xls|xlsx|ppt|pptx|';
-		if(!contain($uptype,'|'.$fileext.'|'))$fileext='doc';
+		return $this->upfilevb_Query($fileid, $fileext, base64_decode($data));
+	}
+	
+	public function upfilevb_Query($fileid, $fileext, $data)
+	{
+		if($fileid==0)return 'error';
+		
 		$fileobj  = m('file');
 		$frs 	  = $fileobj->getone($fileid); //记录
-		if(!$frs)exit('文件记录不存在了');
+		if(!$frs) return '文件记录不存在了';
+		if(!$fileext)$fileext = $frs['fileext'];
+		
+		$uptype = '|doc|docx|xls|xlsx|ppt|pptx|';
+		if(!contain($uptype,'|'.$fileext.'|'))$fileext='doc';
 		
 		$frs['oldfilepath'] = $frs['filepath'];
 		$filename 			= $frs['filename'];
@@ -55,7 +90,8 @@ class uploadClassAction extends apiAction
 		}
 		
 		$filepath = ''.UPDIR.'/'.date('Y-m').'/'.date('d_His').''.rand(10,99).'.'.$fileext.'';
-		$this->rock->createtxt($filepath, base64_decode($data));
+
+		$this->rock->createtxt($filepath, $data);
 		
 		$filesize 			  	= filesize($filepath);
 		$filesizecn 		  	= $this->rock->formatsize($filesize);
@@ -68,6 +104,7 @@ class uploadClassAction extends apiAction
 			'filesize' 		=> $filesize,
 			'filesizecn' 	=> $filesizecn,
 			'fileext' 		=> $fileext,
+			'filepathout' 	=> '',
 			'pdfpath' 		=> '',
 		),$fileid);
 		c('cache')->del('filetopdf'.$fileid.'');
@@ -99,9 +136,10 @@ class uploadClassAction extends apiAction
 			$ufrs['filepath'] = $frs['oldfilepath'];
 			unset($ufrs['oldfilepath']);
 			unset($ufrs['id']);
+			unset($ufrs['onlynum']);
 			$ufrs['mtype']  = 'flow_log';
 			$ufrs['mid'] 	= $ssid;
-			$ufrs['mknum'] 	= ''.$modenum.'|'.$mid.'';
+			$ufrs['mknum'] 		= ''.$modenum.'|'.$mid.'';
 			$ufrs['filename'] 	= str_replace('.'.$ufrs['fileext'].'','(备份).'.$ufrs['fileext'].'', $ufrs['filename']);
 			$fileobj->insert($ufrs); //记录原来的文件
 			
@@ -276,6 +314,7 @@ class uploadClassAction extends apiAction
 		return $this->fileinfoShow($fileid, $type, $ismobile);
 	}
 	
+	private $frs,$loadyuan;
 	public function fileinfoShow($fileid, $type, $ismobile)
 	{
 		$fobj 	= m('file');
@@ -339,8 +378,9 @@ class uploadClassAction extends apiAction
 			//编辑
 			if($type==2){
 				if(getconfig('officebj')=='1'){
-					$data['fileext']='rockedit';
-					$data['url'] = 'index.php?m=public&a=fileedit&id='.$fileid.'';
+					$data['fileext']= 'rockedit';
+					$data['url'] 	= 'index.php?m=public&a=fileedit&id='.$fileid.'';
+					$data['editwsinfo'] = c('rockedit')->getwsinfo();
 				}else{
 					if($ismobile==1)return returnerror('移动端不支持在线编辑');
 					$data['fileext']='rockoffice';
@@ -514,7 +554,7 @@ class uploadClassAction extends apiAction
 		$this->rock->createtxt($filepath, file_get_contents($lujing));
 		
 		$uarr = array(
-			'filename' => $fname,
+			'filename' => $this->rock->xssrepstr($fname),
 			'fileext' => $fileext,
 			'filepath' => $filepath,
 			'filesize' => filesize($filepath),
@@ -555,7 +595,7 @@ class uploadClassAction extends apiAction
 			$where.=" and `fileext` in('".$uptp."')";
 		}
 		$db 	= m('file');
-		$rows	= $db->getall($where,'id,filename,filesizecn,fileext,thumbpath,filepath,filepathout','`id` desc limit 10');
+		$rows	= $db->getall($where,'id,filename,filesizecn,fileext,thumbpath,thumbplat,filepath,filepathout','`id` desc limit 10');
 		foreach($rows as $k=>$rs){
 			$rows[$k]['value'] 	= $rs['id'];
 			$rows[$k]['name'] 	= $rs['filename'];
@@ -569,6 +609,7 @@ class uploadClassAction extends apiAction
 			unset($rows[$k]['filepathout']);
 			if(!isempt($rs['thumbpath'])){
 				$rows[$k]['iconsimg'] = $rs['thumbpath'];
+				if(!isempt($rs['thumbplat']))$rows[$k]['iconsimg'] = $rs['thumbplat'];
 			}else{
 				$flx = $rs['fileext'];
 				if(!contain($db->fileall,','.$flx.','))$flx='wz';
@@ -583,5 +624,141 @@ class uploadClassAction extends apiAction
 			'totalCount' => $count,
 			'selectdata' => $selectdata
 		);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	*	20250522更新修改
+	*/
+	private $upsize = 154857;
+	public function officeexistsAction()
+	{
+		$id 	= (int)$this->get('id');
+		$otype 	= (int)$this->get('otype'); //0编辑1预览
+		$frs 		= m('file')->getone($id);
+		if(!$frs)return returnerror('文件不存在0');
+		
+		$onlynum	= $frs['onlynum'];
+		if(isempt($onlynum)){
+			$onlynum	= md5(''.$this->rock->jm->getRandkey().date('YmdHis').'file'.$id.'');
+			m('file')->update("`onlynum`='$onlynum'", $id);
+		}
+		
+		$path 	= $this->getfurls($frs);
+		if(isempt($path))return returnerror('文件不存在1');
+		$obj 		= c('rockedit');
+		$urs 		= m('admin')->getone($this->adminid);
+		$barr 		= $obj->getdata('file','change', array(
+			'filenum' 	=> $onlynum,
+			'optid'		=> $this->adminid,
+			'otype'		=> $otype,
+			'fileext'	=> $frs['fileext'],
+			'filename'	=> $this->rock->jm->base64encode($frs['filename']),
+			'optname'	=> $this->rock->jm->base64encode($this->adminname),
+			'face'		=> $this->rock->jm->base64encode(m('admin')->getface($urs['face'])),
+		));
+		if(!$barr['success'])return $barr;
+		
+		$da 	= $barr['data'];
+		if($da['type']==0){
+			$barr['data']['filesizecn'] = $frs['filesizecn'];
+			$barr['data']['fileext'] 	= $frs['fileext'];
+			$barr['data']['fileid'] 	= $id;
+			if(substr($path,0,4)=='http'){
+				$zong = 1;
+			}else{
+				$filesize 	= filesize($path);
+				$zong	 	= ceil($filesize/$this->upsize);
+				if($zong<=0)$zong = 1;
+			}
+			$barr['data']['zong'] = $zong;
+		}else{
+			$barr['data']['url']  = $obj->gotourl($da['gourl'],$da['gokey'],$onlynum, $otype, $this->admintoken, $id);
+		}
+		return $barr;
+	}
+	
+	public function getfurls($frs)
+	{
+		$filepath 	 = $frs['filepath'];
+		if(file_exists($filepath))return $filepath;
+		$path 		 = $frs['filepathout'];
+		if(isempt($path))$path = $filepath;
+		if(substr($path,0,4)=='http')return $path;
+		if(!file_exists($path))return '';
+		return $path;
+	}
+	
+	//开始上传
+	public function officefstartAction()
+	{
+		$id 	= (int)$this->get('id');
+		$zong 	= (int)$this->get('zong');
+		$ci 	= (int)$this->get('ci');
+		$otype 	= (int)$this->get('otype');
+		$filemid 	= (int)$this->get('filemid');
+		$frs 	= m('file')->getone($id);
+		
+		$path 	 = $this->getfurls($frs);
+		$conts	 = '';
+		$datype  = 'base';
+
+		
+		if(substr($path,0,4)=='http'){
+			$datype  = 'http';
+			$conts	 = $path; //http远程地址的
+		}else{
+			$fp 	 = @fopen($path,'rb');
+			if(!$fp)return returnerror('无法读取文件');
+			$oi 	 = 0;
+			while(!feof($fp)){
+				$cont 	= fread($fp, $this->upsize);
+				if($oi==$ci){
+					$conts 	= $cont;
+					break;
+				}
+				$oi++;
+			}
+			fclose ($fp);
+		}
+		
+		
+		$obj = c('rockedit');
+		$barr 		= $obj->postdata('file','fstart', array(
+			'filenum' 	=> $frs['onlynum'],
+			'data'		=> $this->rock->jm->base64encode($conts),
+			'zong'		=> $zong,
+			'datype'	=> $datype,
+			'ci'		=> $ci,
+			'fileid'		=> $id,
+			'filemid'		=> $filemid,
+			'filesize'		=> $frs['filesize'],
+			'fileext'		=> $frs['fileext'],
+			'filename'		=> $this->rock->jm->base64encode($frs['filename']),
+		));
+		if(!$barr['success'])return $barr;
+		$bda = $barr['data'];
+		if($bda['result']=='ok'){
+			$gokey = $this->get('gokey');
+			$gourl = $this->rock->jm->base64decode($this->get('gourl'));
+			$barr['data']['url'] = $obj->gotourl($gourl,$gokey,$frs['onlynum'], $otype, $this->admintoken, $id);;
+		}
+		
+		return $barr;
 	}
 }

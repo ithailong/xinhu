@@ -30,7 +30,7 @@ homeobject.clicknewstabs=function(oi,na){
 	o1.find('li[tab="'+oi+'"]').addClass('active');
 	var das = this.newsrows[oi];
 	if(typeof(das)=='undefined'){
-		$('#newstabs_{rand}').after('<div id="losnew{rand}" style="margin:10px" align="center"><img src="images/mloading.gif"></div>');
+		$('#newstabs_{rand}').after('<div id="losnew{rand}" style="margin:10px" align="center">'+js.ling(30)+'</div>');
 		js.ajax(publicmodeurl('news','getnews'),{typename:na},function(ret){
 			homeobject.newsrows[oi]=ret;
 			homeobject.shownewsss(ret);
@@ -61,6 +61,8 @@ homeobject.shownewsss=function(das){
 	$('#homenewslist{rand}').append(s);
 }
 </script>
+
+
 
 <div class="panel panel-danger">
   <div class="panel-heading">

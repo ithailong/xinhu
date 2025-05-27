@@ -3,6 +3,8 @@
 class flow_officicClassModel extends flowModel
 {
 	public $xiangbordercolor = 'red';//默认边框颜色
+	private $readunarr = array();
+	private $logobj;
 	
 	public function initModel()
 	{

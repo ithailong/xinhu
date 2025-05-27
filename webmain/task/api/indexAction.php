@@ -139,6 +139,23 @@ class indexClassAction extends apiAction
 		return returnsuccess();
 	}
 	
+	/**
+	*	注册了极光推送
+	*/
+	public function updateJPushAction()
+	{
+		$allfields	= $this->db->getallfields('[Q]logintoken');
+		if(!in_array('regid', $allfields)){
+			$this->db->addFields('[Q]logintoken','regid','varchar(100)',null,'注册客户端id');
+		}
+		$regid = $this->get('regid');
+		$uarr['regid'] 		= $regid;
+		$uarr['moddt'] 		= $this->now;
+		if(!isempt($regid))$uarr['ispush'] = 1;
+		m('login')->update($uarr, "`token`='$this->admintoken'");
+		return returnsuccess();
+	}
+	
 	public function addlogAction()
 	{
 		$tit  = $this->post('title');

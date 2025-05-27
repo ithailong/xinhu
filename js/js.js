@@ -1,5 +1,5 @@
 var MODE	= '',ACTION = '',DIR='',PROJECT='',HOST='',PARAMS='',QOM='xinhu_',apiurl='',token='',device='',CFROM='pc',ISDEMO=false,NOWURL='',nwjsgui=false,apicloud=false,isapp=false,homestyle=0,maincolor='#1389D3';
-var windows	= null,ismobile=0;
+var windows	= null,ismobile=0,clientbool = false;;
 function initbody(){}
 function bodyunload(){}
 function globalbody(){}
@@ -15,11 +15,14 @@ $(document).ready(function(){
 	device= js.cookie('deviceid');
 	if(device=='')device=js.now('time');
 	js.savecookie('deviceid', device, 365);
+	js.apptheme();
 	try{
 		var winobj = js.request('winobj');
 		if(nwjsgui)window.focus=function(){nw.Window.get().focus()}
 		if(winobj!='')opener.js.openarr[winobj]=window;
 	}catch(e){}
+	var llq = navigator.userAgent;
+	if(llq.indexOf('REIMCLIENT')>0)clientbool = true;
 	globalbody();
 	initbody();
 	$('body').click(function(e){
@@ -36,7 +39,7 @@ $(document).ready(function(){
 		var msg = '文件：'+e.filename+'\n行：'+e.lineno+'\n错误：<font color=red>'+e.message+'</font>';
 		js.alert(msg,'js错误');
 	});
-	if(navigator.userAgent.indexOf('XINHUOA')<0){
+	if(llq.indexOf('XINHUOA')<0){
 		if(typeof(api)=='undefined')api={};
 	}
 	setTimeout(function(){
@@ -104,6 +107,18 @@ function winWb(){
 js.scrolla	= function(){
 	var top	= $(document).scrollTop();
 	js.scroll(top);
+}
+js.colorTorgb = function(col){
+	var r=0,g=0,b=0;
+	if(col.length==7){
+		r = parseInt(col.substr(1,2),16);
+		g = parseInt(col.substr(3,2),16);
+		b = parseInt(col.substr(5,2),16);
+	}
+	return [r,g,b];
+}
+js.apptheme = function(){
+	
 }
 js.request=function(name,dev,url){
 	this.requestarr = {};
@@ -191,14 +206,21 @@ js.open=function(url,w,h,wina,can,wjcan){
 	for(var o1 in a1)s+=','+o1+'='+a1[o1]+'';
 	var ja=(url.indexOf('?')>=0)?'&':'?';
 	if(wina)url+=''+ja+'winobj='+wina+'';
-	if(typeof(nw)=='undefined'){
+	 if(clientbool){
+		if(url.substr(0,4)!='http')url=NOWURL+url;
+		rockclient.rockFun("openWin",{
+			url:url,
+			width:w,
+			height:h
+		});
+	}else if(typeof(nw)=='undefined'){
 		var opar=window.open(url,'',s);
 	}else{
 		var ocsn=js.apply({'frame':true,width:w,height:h,x:l,y:t,icon:'images/logo.png'},wjcan);
 		if(url.substr(0,4)!='http')url=NOWURL+url;
 		var opar=nw.Window.open(url, ocsn, function(wis){
 			if(wina)js.openarr[wina]=wis;
-			if(w>=1000)wis.maximize();
+			//if(w>=1000)wis.maximize();
 		});
 	}
 	if(wina)this.openarr[wina]=opar;
@@ -283,7 +305,7 @@ js.upload=function(call,can, glx){
 	if(glx=='url')return url;
 	var s='',tit=can.title;if(!tit)tit='上传文件';
 	js.tanbody('uploadwin',tit,500,300,{
-		html:'<div style="height:280px;overflow:hidden"><iframe src="" name="winiframe" width="100%" height="100%" frameborder="0"></iframe></div>',
+		html:'<div style="height:280px;overflow:hidden;border-radius:0px 0px 5px 5px"><iframe src="" name="winiframe" width="100%" height="100%" frameborder="0"></iframe></div>',
 		bbar:'none'
 	});
 	winiframe.location.href=url;
@@ -308,7 +330,7 @@ js.winiframe=function(tit, url){
 	}
 	var wi = winWb()-150;if(wi>mxw)wi=mxw;if(wi<700)wi=700;
 	js.tanbody('winiframe',tit,wi,410,{
-		html:'<div style="height:'+hm+'px;overflow:hidden"><iframe src="" name="openinputiframe" width="100%" height="100%" frameborder="0"></iframe></div>',
+		html:'<div style="height:'+hm+'px;overflow:hidden;border-radius:0px 0px 5px 5px"><iframe src="" name="openinputiframe" width="100%" height="100%" frameborder="0"></iframe></div>',
 		bbar:'none'
 	});
 	openinputiframe.location.href=url;
@@ -387,6 +409,7 @@ js.fileopt=function(id,lx){
 				var da = ret.data;
 				var ext= da.fileext;
 				var url= da.url;
+				if(da.type==2)js.importplugin('rockoffice',da.editwsinfo);
 				if(ismobile==1){
 					if(da.type==0 && !da.isview && appobj1('openfile', id))return; //不能预览就用app打开
 					if(da.type==0 && !da.isview && js.fileoptWin(id))return; //不能预览就用app打开
@@ -627,24 +650,24 @@ js.tanbody=function(act,title,w,h,can1){
 	var s = '',mid	= ''+act+'_main',i,d;
 	var can	= js.applyIf(can1,{html:'',btn:[],bodystyle:'',showfun:function(){}});
 	if(w>winWb())w=winWb()-50;
-	var s = '<div id="'+mid+'" style="position:fixed;background-color:#ffffff;left:'+l+'px;width:'+w+'px;top:'+t+'px;box-shadow:0px 0px 10px rgba(0,0,0,0.3);border-radius:5px">';
-	s+='	<div style="-moz-user-select:none;-webkit-user-select:none;user-select:none;border-bottom:1px #eeeeee solid">';
+	var s = '<div id="'+mid+'" style="position:fixed;background-color:#ffffff;left:'+l+'px;width:'+w+'px;top:'+t+'px;box-shadow:0px 0px 10px rgba(0,0,0,0.3);border-radius:6px"><div style="background:var(--main-bgcolor);border-radius:5px;">';
+	s+='	<div style="-moz-user-select:none;-webkit-user-select:none;user-select:none;border-bottom:var(--border)">';
 	s+='		<table border="0" width="100%" style="background:none" cellspacing="0" cellpadding="0"><tr>';
-	s+='			<td height="50" style="font-size:16px; font-weight:bold;color:'+maincolor+'; padding-left:10px" width="100%" onmousedown="js.move(\''+mid+'\')" id="'+act+'_title">'+title+'</td>';
-	s+='			<td><div  id="'+act+'_spancancel1" style="padding:0px 8px;height:50px;line-height:45px;overflow:hidden;cursor:pointer;color:gray;" onclick="js.tanclose(\''+act+'\')">✖</div></td>';
+	s+='			<td height="50" style="font-size:16px; font-weight:bold;padding-left:10px" width="100%" onmousedown="js.move(\''+mid+'\')" id="'+act+'_title"  class="zhu">'+title+'</td>';
+	s+='			<td><div  id="'+act+'_spancancel1" style="padding:0px 8px;height:50px;line-height:45px;overflow:hidden;cursor:pointer;" onclick="js.tanclose(\''+act+'\')">✖</div></td>';
 	s+='		</tr></table>';
 	s+='	</div>';
 	s+='	<div id="'+act+'_body" style="'+can.bodystyle+'">'+can.html+'</div>';
-	s+='	<div id="'+act+'_bbar" style="overflow:hidden;padding:12px 10px;background:#f1f1f1;border-radius:0px 0px 5px 5px" align="right"><span id="msgview_'+act+'"></span>';
+	s+='	<div id="'+act+'_bbar" style="overflow:hidden;padding:12px 10px;background:rgba(0,0,0,0.05);border-radius:0px 0px 5px 5px" align="right"><span id="msgview_'+act+'"></span>';
 	for(i=0; i<can.btn.length; i++){
 		d = can.btn[i];
 		if(!d.bgcolor)d.bgcolor='';
 		s+='<button type="button" oi="'+i+'" style="border-radius:5px;padding:8px 15px;margin-left:10px;background:'+d.bgcolor+'" id="'+act+'_btn'+i+'" class="webbtn">'+d.text+'</button>';
 	}
-	s+='		<button type="button" id="'+act+'_spancancel" onclick="js.tanclose(\''+act+'\')" style="border-radius:5px;padding:8px 15px;background:gray;margin-left:10px" class="webbtn">取消</button>';
+	s+='		<button type="button" id="'+act+'_spancancel" onclick="js.tanclose(\''+act+'\')" style="border-radius:5px;padding:8px 15px;background:rgba(0,0,0,0.5);margin-left:10px" class="webbtn">取消</button>';
 	s+='		';
 	s+='	</div>';
-	s+='</div>';
+	s+='</div></div>';
 	var str = '<div id="amain_'+act+'" tanbodynew="'+act+'" oncontextmenu="return false" style="position:absolute;height:'+H+'px;width:'+W+'px;background:rgba(0,0,0,0.3);z-index:'+this.tanbodyindex+';left:0px;top:0px">'+s+'</div>';
 	$('body').append(str);
 	if(can.closed=='none'){
@@ -653,7 +676,7 @@ js.tanbody=function(act,title,w,h,can1){
 	}
 	if(can.bbar=='none'){
 		$('#'+act+'_bbar').remove();
-		$('#'+mid+'').append('<div style="height:5px;overflow:hidden;border-radius:0px 0px 5px 5px"></div>');
+		//$('#'+mid+'').append('<div style="height:5px;overflow:hidden;border-radius:0px 0px 5px 5px"></div>');
 	}
 	this.resizetan(act);
 	can.showfun(act);
@@ -715,7 +738,7 @@ js.getmsg  = function(txt,col){
 	var s	= '';
 	if(!txt)txt='';
 	if(txt.indexOf('...')>0){
-		s='<img src="images/loading.gif" height="16" width="16" align="absmiddle"> ';
+		s=''+this.ling(16)+' ';
 		col = '#ff6600';
 	}	
 	s+='<span style="color:'+col+'">'+txt+'</span>';
@@ -762,7 +785,7 @@ js.alertclose=function(){
 }
 js.tanstyle = 0;
 js.confirm	= function(txt,fun, tcls, tis, lx,ostr,bstr){
-	if(!lx)lx=0;
+	if(!lx)lx=0;js.alertclose();
 	var h = '<div style="padding:20px;line-height:30px" align="center">',w=320;
 	if(lx==1)w= 350;
 	if(w>winWb())w=winWb()-10;
@@ -807,7 +830,7 @@ js.msg = function(lx, txt,sj){
 		return;
 	}
 	if(lx == 'wait'){
-		txt	= '<img src="images/loadings.gif" height="14" width="15" align="absmiddle"> '+txt;
+		txt	= ''+this.ling(14)+' '+txt;
 		sj	= 60;
 	}
 	if(lx=='msg')txt='<font color=red>'+txt+'</font>';var t=10;
@@ -972,7 +995,7 @@ js.changeuser=function(na, lx, tits,ocans){
 	if(typeof(bcar)=='object')for(i in bcar)can[i]=bcar[i];
 	
 	js.tanbody('changeaction',tits,w,h,{
-		html:'<div id="showuserssvie" style="height:'+h+'px"><iframe src="" name="winiframe" width="100%" height="100%" frameborder="0"></iframe></div>',
+		html:'<div id="showuserssvie" style="height:'+h+'px;border-radius:0px 0px 5px 5px"><iframe src="" name="winiframe" width="100%" height="100%" frameborder="0"></iframe></div>',
 		bbar:'none'
 	});
 	
@@ -1043,12 +1066,12 @@ js.selectdate=function(o1,inp,lx){
 	$(o1).rockdatepicker({'view':lx,'initshow':true,'inputid':inp});
 	return false;
 }
-js.importjs=function(url,fun){
+js.importjs=function(url,fun,dzc){
 	var sid = jm.base64encode(url);
 	if(!fun)fun=function(){};
 	if(get(sid)){fun();return;}
-	var scr = document.createElement('script');
-	scr.src = url;
+	var scr = document.createElement('script');if(!dzc)dzc='';
+	scr.src = url+dzc;
 	scr.id 	= sid;
 	if(isIE){
 		scr.onreadystatechange = function(){
@@ -1060,7 +1083,12 @@ js.importjs=function(url,fun){
 	document.getElementsByTagName('head')[0].appendChild(scr);
 	return false;	
 }
-
+js.importplugin = function(na, cans){
+	var dz = 'mode/plugin/jquery-'+na+'.js';
+	this.importjs(dz, function(){
+		js['plugin_'+na+''](cans);
+	},'?'+this.getrand()+'');
+}
 js.importcss = function(url){
 	var sid  = jm.base64encode(url);
 	if(get(sid))return;
@@ -1215,4 +1243,27 @@ js.sendevent=function(typ,na,d){
 
 function lang(ky){
 	return ky;
+}
+
+js.ling = function(w){
+	var sve = 'style="height:'+w+'px;width:'+w+'px"';
+	if(!w)sve='';
+	return '<i '+sve+' class="rock-loading"></i>';
+}
+
+js.chajian = function(type, cans){
+	if(!$[type]){
+		js.importjs('mode/plugin/jquery-'+type+'.js?'+js.getrand()+'', function(){$[type](cans);});
+	}else{
+		$[type](cans);
+	}
+}
+
+function showDebug(strv,col){
+	var obj = $('div[temp="divt"]'),hei=50;
+	for(var i=0;i<obj.length;i++)hei+=$(obj[i]).height()+11;
+	if(!col)col='red';
+	if(typeof(strv)!='string')strv = JSON.stringify(strv);
+	var str = '<div temp="divt" onclick="$(\'div[temp=divt]\').remove()" style="background:rgba(0,0,0,0.8);font-size:12px;position:fixed;right:0px;top:'+hei+'px;padding:5px;z-index:99;word-wrap:break-word;word-break:break-all;white-space:normal;color:'+col+'">['+js.now('now')+']'+strv+'</div>';
+	$('body').append(str);
 }

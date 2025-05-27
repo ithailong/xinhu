@@ -77,7 +77,7 @@ class wordClassAction extends Action
 	
 	public function sharefileAjax()
 	{
-		$fileid 		= $this->post('fid','0');
+		$fileid 		= c('check')->onlynumber($this->post('fid','0'));
 		$arr['shateid'] = $this->post('sid');
 		$arr['shate']   = $this->post('sna');
 		m('word')->update($arr, "optid='$this->adminid' and fileid in($fileid)");

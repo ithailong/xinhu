@@ -46,6 +46,10 @@ $(document).ready(function(){
 			modeid=v;
 			a.setparams({modeid:v},true);
 		},
+		changemodes:function(v){
+			modeid=v;
+			a.setparams({modeid:v},true);
+		},
 		del:function(){
 			a.del({
 				url:js.getajaxurl('delmodeshuju','{mode}','{dir}'),
@@ -59,24 +63,13 @@ $(document).ready(function(){
 		openviewlog:function(id){
 			var d = a.getData(id);
 			addtabs({name:'['+d.id+'.'+d.modename+']操作记录','num':''+d.modenum+''+d.id+'',url:'main,flow,viewlog,modenum='+d.table+',mid='+d.id+''});
+		},
+		xuanmode:function(o1){
+			js.selectmode(o1, get('modes_{rand}'), function(sna,val,d){
+				c.changemodes(val);
+			});
 		}
 	};
-	$('#mode_{rand}').change(c.changemode);
-	$.get(js.getajaxurl('getmodearr','{mode}','{dir}'),function(str){
-		var d=js.decode(str);
-		
-		var s = '<option value="0">-选择模块-</option>',len=d.data.length,i,csd,types='';
-		for(i=0;i<len;i++){
-			csd = d.data[i];
-			if(types!=csd.type){
-				if(types!='')s+='</optgroup>';
-				s+='<optgroup label="'+csd.type+'">';
-			}
-			s+='<option value="'+csd.id+'">'+csd.name+'</option>';
-			types = csd.type;
-		}
-		$('#mode_{rand}').html(s);
-	});
 	js.initbtn(c);
 	openlogs{rand}=function(id){
 		c.openviewlog(id);
@@ -88,7 +81,10 @@ $(document).ready(function(){
 	<table width="100%">
 	<tr>
 	<td align="left">
-		<select style="width:180px" id="mode_{rand}" class="form-control" ><option value="0">-选择模块-</option></select>
+		<div class="btn-group"  style="width:260px;" click="xuanmode">
+		<input class="input" placeholder="-选择模块-" style="flex:1" id="modes_{rand}" readonly>
+		<button class="webbtn webbtn-default">v</button>
+		</div>
 	</td>
 	<td align="left"  style="padding:0px 10px;">
 		

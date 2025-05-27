@@ -295,6 +295,26 @@ $(document).ready(function(){
 });
 </script>
 
+<style>
+/*图形样式*/
+.rf{position:absolute;background-color:rgba(var(--rgb-r),var(--rgb-g),var(--rgb-b),0.2);border:var(--border);text-align:center;max-width:150px;min-width:100px;border-radius:5px}
+.rf_nei{padding:5px 10px}
+.rf_ract{}
+.rf_yuan{border-radius:20%}
+.rf-text{font-size:14px;word-wrap:nowrap;height:20px;line-height:20px;overflow:hidden}
+.rf-texts{font-size:12px;word-wrap:nowrap;height:20px;line-height:20px;overflow:hidden}
+
+.rf-txt{position:absolute;color:var(--main-color)}
+.rf-active{background-color:#60C2F7}
+
+/*箭头的*/
+.rf_shu{position:absolute;height:100px;border:none;width:12px;overflow:hidden;transform-origin:0px 0px;-webkit-transform-origin:0px 0px;-ms-transform-origin:0px 0px;-moz-transform-origin:0px 0px;}
+.rf_shu1{width:6px;height:94px;background-color:rgba(var(--rgb-r),var(--rgb-g),var(--rgb-b),0.2);margin-left:3px}
+.rf_shu2{width:0px;height:0px; overflow:hidden;border-width:6px;border-style:solid;border-color:rgba(var(--rgb-r),var(--rgb-g),var(--rgb-b),0.2) transparent transparent transparent;}
+
+.rf_shus{position:absolute;height:100px;border:none;width:6px;overflow:hidden;background-color:rgba(var(--rgb-r),var(--rgb-g),var(--rgb-b),0.1)}
+.rf_hens{position:absolute;height:6px;border:none;width:100px;overflow:hidden;background-color:rgba(var(--rgb-r),var(--rgb-g),var(--rgb-b),0.1)}
+</style>
 
 <table width="100%">
 <tr valign="top">
@@ -341,7 +361,7 @@ $(document).ready(function(){
 	
 	<div id="view_{rand}"></div>
 	<div class="blank10"></div>
-	<div id="mainvss{rand}" style="background:#f1f1f1;border:1px #dddddd solid;border-radius:5px;padding:10px;display:none;">
+	<div id="mainvss{rand}" style="background:rgba(0,0,0,0.1);border:var(--border);border-radius:5px;padding:10px;display:none;">
 	<div oncontextmenu="return false" id="mainv{rand}" class="notsel" style="position:relative;height:auto;"></div>
 	</div>
 </td>

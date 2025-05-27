@@ -36,7 +36,7 @@ class publicClassAction extends ActionNot{
 				$exta = substr($filepath, -4);
 				if($exta=='html')$this->rock->location($filepath);
 			}
-		}else if($type=='mp4'){
+		}else if($type=='mp4' || $type=='mp3'){
 			$this->displayfile = ''.P.'/public/fileopen_mp4.html';		
 		}else if($fobj->isyulan($type)){
 			
@@ -73,7 +73,10 @@ class publicClassAction extends ActionNot{
 		
 		$str = 'mode/pdfjs2/viewer.html';
 		//exit($this->rock->HTTPweb);
-		if(!$this->displayfile && file_exists($str) && !contain($this->rock->web,'MSIE') && !contain($this->rock->HTTPweb,'Chrome/5'))$this->displayfile = $str;
+		if(!$this->displayfile && file_exists($str) && !contain($this->rock->web,'MSIE') && !contain($this->rock->HTTPweb,'Chrome/5')){
+			if(contain($this->rock->HTTPweb, 'XINHUOAAPP IOS'))$str='';
+			$this->displayfile = $str;
+		}
 		
 		$fobj->addlogs($id,0);//记录预览记录
 	}
@@ -160,5 +163,17 @@ class publicClassAction extends ActionNot{
 		$otype = (int)$this->get('otype','0');
 		$this->smartydata['id'] = $id;
 		$this->smartydata['otype'] = $otype;
+	}
+	
+	/**
+	*	地址跳转
+	*/
+	public function gotoAction()
+	{
+		$url = $this->get('url');
+		if(!$url)return 'urlerror';
+		$url = urldecode($url);
+		//return $url;
+		$this->rock->location($url);
 	}
 }

@@ -3,24 +3,19 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title><?=$da['title']?></title>
-<link rel="stylesheet" type="text/css" href="<?=$da['p']?>/css/webmain.css"/>
-<link rel="stylesheet" type="text/css" id="mainstylecss" href="<?=$da['stylecss']?>"/>
+<link rel="stylesheet" type="text/css" href="<?=$da['p']?>/css/rock.css?<?=$nowtime?>"/>
 <link rel="stylesheet" type="text/css" href="web/res/fontawesome/css/font-awesome.min.css">
-<!--[if IE 7 ]><link rel="stylesheet" type="text/css" href="web/res/fontawesome/css/font-awesome-ie7.min.css"><![endif]-->
 <link rel="stylesheet" type="text/css" href="web/res/mode/menu/jquery-rockmenu.css"/>
 <link rel="stylesheet" type="text/css" href="mode/plugin/css/jquery-rockdatepicker.css"/>
 <link rel="shortcut icon" href="<?=$da['icon']?>" />
 <script type="text/javascript" src="web/res/js/jquery.1.9.1.min.js"></script>
-<script type="text/javascript" src="js/js.js"></script>
+<script type="text/javascript" src="js/js.js?<?=$nowtime?>"></script>
 <script type="text/javascript" src="js/worker.js"></script>
 <script type="text/javascript" src="js/base64-min.js"></script>
-<script type="text/javascript" src="<?=$da['p']?>/<?=$da['d']?><?=$da['m']?>/<?=$da['m']?>public.js"></script>
-<script type="text/javascript" src="<?=$da['p']?>/<?=$da['d']?><?=$da['m']?>/<?=$da['m']?>script.js"></script>
+<script type="text/javascript" src="<?=$da['p']?>/<?=$da['d']?><?=$da['m']?>/<?=$da['m']?>public.js?<?=$nowtime?>"></script>
+<script type="text/javascript" src="<?=$da['p']?>/<?=$da['d']?><?=$da['m']?>/<?=$da['m']?>script.js?<?=$nowtime?>"></script>
 <script type="text/javascript" src="web/res/mode/menu/jquery-rockmenu.js"></script>
 <script type="text/javascript">
-<?php 
-$maincolor = getconfig('apptheme','#1389D3');
-?>
 js.servernow	= '<?=$da['now']?>';
 PROJECT			= '<?=$da['p']?>';
 adminip			= '<?=$da['ip']?>';
@@ -38,62 +33,66 @@ function globalbody(){
 	adminranking= '<?=$da['my']['ranking']?>';
 }
 datesss = 'background:url(mode/icons/date.png) no-repeat right';
-js.winiframewidth = '<?=$da['tanwidth']?>';
-maincolor = '<?=getconfig('apptheme','#1389D3')?>';
+js.winiframewidth = '<?=arrvalue($da, 'tanwidth')?>';
 homestyle = 0;
 </script>
-<style>
 <?php
-$maincolora= c('image')->colorTorgb($maincolor);
-$maincolors= ''.$maincolora[0].','.$maincolora[1].','.$maincolora[2].'';
-echo 'body{--main-color:'.$maincolor.'}';
+$colobj = c('color');
+echo $colobj->getApptheme(true, false, true);
+$colorarr = $colobj->getColor();
+$maincolor= $colorarr['color'];
+$height = '60px';
 ?>
+<style>
+.meiheight{align-items:center;height:<?=$height?>;}
+
+.tabsindex div:hover,.tabsindex td:hover{}
+.tabsindex td{height:50px;overflow:hidden;line-height:50px;padding:0px 20px;cursor:pointer;position:relative;}
+.tabsindex span{font-size:12px;color:#aaaaaa;position:absolute;top:2px;right:2px;display:inline-block;height:16px;width:16px;line-height:14px;text-align:center;}
+.tabsindex span:hover{background-color:rgba(0,0,0,0.1);color:white;border-radius:50%}
+.tabsindex .active{background-color:rgba(0,0,0,0.05);}
+.jtcls{height:50px;line-height:50px;overflow:hidden;width:14px;text-align:center;position:absolute;z-index:8;top:50px; background-color:rgba(0,0,0,0.1);right:0px;font-size:12px;cursor:pointer;color:#888888;display:none;top:0px}
+.jtcls:hover{background-color:rgba(0,0,0,0.2);}
+.navindex li{padding:0px 10px;height:<?=$height?>;align-items:center;display:flex}
+.navindex li:hover{background-color:rgba(0,0,0,0.05)}
+#indexmenu .hover:hover{background:var(--main-vgcolor)}
+.navindex a{color:white;TEXT-DECORATION:none;}
 </style>
 </head>
-<body style="padding:0px;margin:0px; overflow:hidden;" scroll="no">
+<body style="padding:0px;margin:0px;overflow:hidden;" scroll="no">
+
 <?php if(isempt($da['homeurl'])){?>
 
-<div id="topheaderid">
-<nav class="navbar navbar-<?=$da['styledev']?> navbar-static-top" id="navtopheader" style="margin:0px;z-index:0">
-	<div>
-		<div class="navbar-header" id="index-navbar-left">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#app-navbar-collapse">
-				<span class="sr-only">Toggle</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand" href="">
-			   <img src="<?=$da['logo']?>" style="display:inline;" align="absmiddle" height="24" width="24"> <?=$da['title']?>
-			</a>
-		</div>
-		<div class="collapse navbar-collapse" id="app-navbar-collapse">
-			<ul class="nav navbar-nav" id="index-navbar-center" style="overflow:hidden;">
-				<?php foreach($da['topmenu'] as $k=>$rs){
-					$str = '<li pmenuid="'.$rs['id'].'" title="'.lang($rs['name'],'menu').'" icon="'.$rs['icons'].'"><a>';
-					if($rs['icons'])$str.='<i class="icon-'.$rs['icons'].'"></i> ';
-					$str.=''.lang($rs['name'],'menu').'</a></li>';
-					echo $str;
-				}
-				?>
-			</ul>
-			<ul class="nav navbar-nav navbar-right" id="index-navbar-right">
-				<?php 
-				if(getconfig('mobile_show',true))echo '<li><a href="javascript:;" onclick="openmobile()"><i class="icon-tablet"></i> '.lang('手机版').'</a></li>';
-				if(getconfig('reim_show', true))echo '<li><a href="javascript:;" onclick="openreim(this)"><span><i class="icon-comments-alt"></i> REIM <font class="badge red" id="reim_stotal" style="font-size:12px;background:red;color:white"></font></span></a></li>';
-				?>
-				<li id="indexuserl">
-					<a href="javascript:;">
-						<div style="padding-right:10px">
-						<img style="width:18px;height:18px;border-radius:50%" id="myface" src="<?=$da['face']?>" align="absmiddle">
-						<?=$da['adminname']?><span class="caret"></span>
-						</div>
-					</a>
-				</li>
-			</ul>
-		</div>
+<div id="topheaderid" class="meiheight" style="background:<?=$maincolor?>;background:var(--main-color);color:white;display:flex;cursor:pointer">
+	<div onclick="js.reload()" style="padding:0px 10px;height:24px;overflow:hidden">
+		<img src="<?=$da['logo']?>" height="24" width="24"> 
 	</div>
-</nav>
+	<div onclick="js.reload()" style="padding-right:15px;font-size:18px">
+		<?=$da['title']?>
+	</div>
+	<div style="flex:1">
+		<ul id="index-navbar-center" class="navindex" style="overflow:hidden;display:flex;">
+			<?php foreach($da['topmenu'] as $k=>$rs){
+				$str = '<li pmenuid="'.$rs['id'].'" title="'.lang($rs['name'],'menu').'" icon="'.$rs['icons'].'"><a>';
+				if($rs['icons'])$str.='<i class="icon-'.$rs['icons'].'"></i> ';
+				$str.=''.lang($rs['name'],'menu').'</a></li>';
+				echo $str;
+			}
+			?>
+		</ul>
+	</div>
+	<ul style="display:flex;align-items:center" class="navindex">
+		<?php 
+		if(getconfig('mobile_show',true))echo '<li onclick="openmobile()"><i class="icon-tablet"></i>手机版</li>';
+		if(getconfig('reim_show', true))echo '<li  onclick="openreim(this)"><span><i class="icon-comments-alt"></i>REIM <font class="badge red" id="reim_stotal" style="font-size:12px;background:red;color:white"></font></span></li>';
+		?>
+		<li id="indexuserl" >
+			<div>
+			<img style="width:18px;height:18px;border-radius:50%" id="myface" src="<?=$da['face']?>" align="absmiddle">
+			<?=$da['adminname']?> <i class="icon-caret-down"></i>
+			</div>
+		</li>
+	</ul>
 </div>
 <?php }?>
 
@@ -104,20 +103,19 @@ echo 'body{--main-color:'.$maincolor.'}';
 	<td >
 		
 	<div id="indexmenu" style="width:200px;overflow:hidden;">
-		<ul class="list-group" style="margin:0">
-			<li style="border-radius:0px;border-left:none;border-right:none;border-top:none;cursor:pointer;border-bottom:0px" class="list-group-item list-group-item-info"><b id="menulisttop">基本</b>
+		<ul style="height:50px;line-height:50px;padding:0px 10px;background:var(--main-hgcolor)">
+			<li style="border-radius:0px;border-left:none;border-right:none;border-top:none;cursor:pointer;border-bottom:0px"><b id="menulisttop">基本</b>
 			<span style="float:right"><i id="indesearchmenu" class="icon-search"></i>&nbsp; &nbsp;<i id="reordershla" class="icon-reorder cursor"></i></span>
 			</li>
 		</ul>
-		<div style="overflow:auto;height:200px;" id="menulist">
-			<ul class="list-group" style="margin:0" id="menushow">
-			</ul>
+		<div style="overflow:auto;height:200px;background:var(--main-bgcolor)" id="menulist">
+			<div id="menushow"></div>
 		</div>
 	</div>
-	<div id="indexmenuss" style="display:none;background:rgba(0,0,0,0.3)" class="menulistbg cursor"><i class="icon-reorder"></i><br>打<br>开<br>导<br>航</div>
+	<div id="indexmenuss" style="display:none;background:rgba(0,0,0,0.1);text-align:center;padding:5px 2px" class="cursor"><i class="icon-reorder"></i><br>打<br>开<br>导<br>航</div>
 	</td>
 	<td>
-		<div id="indexsplit" style="overflow:hidden;width:5px;background:rgba(0,0,0,0.1)"></div>
+		<div id="indexsplit" style="overflow:hidden;width:5px;background:rgba(0,0,0,0.05)"></div>
 	</td>
 	<?php }?>
 	<td width="100%">
@@ -125,21 +123,21 @@ echo 'body{--main-color:'.$maincolor.'}';
 			<div class="jtcls" id="jtcls_left" onclick="_changesrcool(1)">&gt;</div>
 			<div class="jtcls" id="jtcls_right" onclick="_changesrcool(-1)" style="left:0px">&lt;</div>
 			
-			<div class="panel panel-default" style="border:none;border-radius:0;margin-bottom:0">
-			<div id="tabsindexm" class="panel-heading tabsindex" style="border:none;border-radius:0;padding:0px;overflow:hidden;">
-			<table border="0" cellspacing="0" cellpadding="0"><tr id="tabs_title"></tr></table>
+			<div style="border:none;background:var(--main-hgcolor);height:50px;overflow:hidden">
+				<div id="tabsindexm" class="tabsindex" style="border:none;border-radius:0;padding:0px;overflow:hidden;">
+				<table border="0" cellspacing="0" cellpadding="0"><tr id="tabs_title"></tr></table>
+				</div>
 			</div>
-			</div>
+			
 			<div id="indexcontent" style="overflow:auto;position:relative;">
-				<div id="content_allmainview" style="margin:10px;"></div>
+				<div id="content_allmainview"></div>
 			</div>
 		</div>
 	</td>
 </tr>
 </table>
-<script src="mode/bootstrap3.3/bootstrap.min.js"></script>
-<script type="text/javascript" src="mode/bootstrapplugin/jquery-bootstable.js"></script><!--表格插件-->
-<script type="text/javascript" src="mode/bootstrapplugin/jquery-bootsform.js"></script><!--表单插件-->
+<script type="text/javascript" src="mode/bootstrapplugin/jquery-bootstable.js?<?=$nowtime?>"></script><!--表格插件-->
+<script type="text/javascript" src="mode/bootstrapplugin/jquery-bootsform.js?<?=$nowtime?>"></script><!--表单插件-->
 <script type="text/javascript" src="mode/bootstrapplugin/jquery-bootstree.js"></script><!--表格树形插件-->
 <script type="text/javascript" src="mode/plugin/jquery-rockdatepicker.js"></script><!--日期选择插件-->
 <script type="text/javascript" src="web/res/js/jquery-imgview.js"></script><!--图片预览-->

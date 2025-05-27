@@ -48,8 +48,8 @@ class logClassModel extends Model
 		}else{
 			$arr['stotal']	= (int)$onrs['stotal']+1;
 		}
-		$arr['ip']		= $this->rock->ip;
-		$arr['web']		= $this->rock->web;
+		//$arr['ip']		= $this->rock->ip;//存这个没用，不在存储
+		//$arr['web']		= $this->rock->web;
 		$arr['optdt']	= $this->rock->now();
 		$dbs->record($arr, $where);
 	}

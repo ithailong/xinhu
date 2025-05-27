@@ -6,6 +6,9 @@ class mode_flowsetClassAction extends inputAction{
 	
 	public $pobj;
 	protected function savebefore($table, $arr, $id, $addbo){
+		if(!in_array('filelx', $this->mallfields)){
+			$this->db->addFields('[Q]'.$table.'','filelx','tinyint(1)','0','录入页相应文件0选上传,1必须上传');
+		}
 		include_once('webmain/main/flow/flowAction.php');
 		$this->pobj = new flowClassAction();
 		return $this->pobj->flowsetsavebefore($table, $arr);

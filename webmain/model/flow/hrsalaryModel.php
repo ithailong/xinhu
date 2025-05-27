@@ -40,14 +40,16 @@ class flow_hrsalaryClassModel extends flowModel
 	}
 	
 	public function flowrsreplace($rs, $lx=0){
-		$s = '<font color=red>待发放</font>';
-		$rs['ispays']	= $rs['ispay'];
-		if($rs['ispay']==1)$s = '<font color=green>已发放</font>';
-		$rs['ispay'] = $s;
-		
-		$s = '<font color=red>待核算</font>';
-		if($rs['isturn']==1)$s = '<font color=green>已核算</font>';
-		$rs['isturnss'] = $s;
+		if(isset($rs['ispay'])){
+			$s = '<font color=red>待发放</font>';
+			$rs['ispays']	= $rs['ispay'];
+			if($rs['ispay']==1)$s = '<font color=green>已发放</font>';
+			$rs['ispay'] = $s;
+			
+			$s = '<font color=red>待核算</font>';
+			if($rs['isturn']==1)$s = '<font color=green>已核算</font>';
+			$rs['isturnss'] = $s;
+		}
 		
 		//详情展示时
 		if($lx==1){
@@ -219,7 +221,7 @@ class flow_hrsalaryClassModel extends flowModel
 	}
 	
 	//导入之前判断
-	public function flowdaorubefore($rows)
+	public function flowdaorubefore($rows, &$errdata)
 	{
 		$inarr	= array();
 		$uarra	= array();
@@ -231,10 +233,16 @@ class flow_hrsalaryClassModel extends flowModel
 			
 			$arr 	= $rs;
 			$urs 	= $this->adminmodel->getone("`name`='$name'");
-			if(!$urs)continue;
+			if(!$urs){
+				$errdata[$rs['drxu']] = '('.$name.')用户不存在';
+				continue;
+			}
 			
 			$to 	= $this->rows("`xuid`='".$urs['id']."' and `month`='$month'");
-			if($to>0)continue;//已经存在了
+			if($to>0){
+				$errdata[$rs['drxu']] = '('.$name.'的'.$month.')已经存在了';
+				continue;//已经存在了
+			}
 			
 			$arr['month'] = $month;
 			$arr['xuid'] = $urs['id'];

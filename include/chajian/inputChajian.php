@@ -63,7 +63,7 @@ class inputChajian extends Chajian
 			$str = '<input class="inputs" style="border:none;background:none" name="base_sericnum" value="'.$this->flow->createnum().'" readonly>';
 		}
 		if($fid=='file_content'){
-			$str = '<input name="fileid" type="hidden" id="fileidview-inputEl"><div id="view_fileidview" style="width:98%;height:auto;min-height:60px;border:1px #cccccc solid; background:white;overflow:auto"></div><div id="fileupaddbtn"><a href="javascript:;" class="blue" onclick="c.upload()"><u>＋添加文件</u></a></div>';
+			$str = '<input name="fileid" type="hidden" id="fileidview-inputEl"><div id="view_fileidview" style="height:auto;min-height:60px;border:1px #cccccc solid;border:var(--border); background:white;background:var(--main-bgcolor);border-radius:5px;;overflow:auto"></div><div id="fileupaddbtn"><a href="javascript:;" class="blue" onclick="c.upload()"><u>＋添加文件</u></a></div>';
 		}
 
 		if($fid=='删'){
@@ -127,7 +127,7 @@ class inputChajian extends Chajian
 		$onblue = ' onblur="c.inputblur(this, '.$iszb.')"';
 		$iszhang= false;
 		if($type=='text' && !isempt($data)){
-			$attr.=' onkeyup="c.autocomplete(this,\''.$data.'\','.$a['id'].', '.$iszb.',event)" onclick="this.onkeyup()"';
+			$attr.=' onclick="c.autocomplete(this,\''.$data.'\','.$a['id'].', '.$iszb.',event)"';
 		}
 		$str 	= '<input class="inputs" type="text" value="'.$val.'" '.$attr.''.$onblue.''.$styles.''.$lenstr.' name="'.$fname.'">';
 		
@@ -202,18 +202,17 @@ class inputChajian extends Chajian
 			));
 		}
 		if($type=='selectdatafalse' || $type=='selectdatatrue'){
-			$str 	= '<table width="98%" cellpadding="0" border="0"><tr><td width="100%"><input '.$attr.''.$onblue.''.$styles.' class="inputs" style="width:99%" value="'.$val.'" readonly type="text" name="'.$fname.'"></td>';
-			$str   .= '<td nowrap>';
+			$str 	= '<div class="btn-group"><input '.$attr.''.$onblue.''.$styles.' class="inputs" style="flex:1" value="'.$val.'" readonly type="text" name="'.$fname.'">';
 			if($isbt=='0')$str   .= '<button onclick="c.selectdataclear(\''.$fname.'\',\''.$data.'\','.$iszb.')" class="webbtn" type="button">x</button>';
-			$str   .= '<button type="button" onclick="c.selectdata(\''.$data.'\','.substr($type,10).',\''.$fname.'\',\''.$fieldname.'\','.$iszb.')" class="webbtn">选</button></td></tr></table>';
+			$str   .= '<button type="button" onclick="c.selectdata(\''.$data.'\','.substr($type,10).',\''.$fname.'\',\''.$fieldname.'\','.$iszb.')" class="webbtn">选</button></div>';
 		}
 		if($type=='ditumap'){
 			$zbnae	= $data;
 			if($iszb>0)$zbnae = ''.($iszb-1).''.$leox.'';
-			$str 	= '<table width="99%" cellpadding="0" border="0"><tr><td width="100%"><input '.$attr.''.$onblue.''.$styles.''.$lenstr.' class="inputs" style="width:99%" value="'.$val.'" type="text" name="'.$fname.'"></td>';
-			$str   .= '<td nowrap>';
+			$str 	= '<div class="btn-group"><input '.$attr.''.$onblue.''.$styles.''.$lenstr.' class="inputs" style="flex:1" value="'.$val.'" type="text" name="'.$fname.'">';
 			if($isbt=='0')$str   .= '<button onclick="c.selectmapclear(\''.$fname.'\',\''.$zbnae.'\','.$iszb.')" class="webbtn" type="button">x</button>';
-			$str   .= '<button type="button" onclick="c.selectmap(\''.$fname.'\',\''.$zbnae.'\',\''.$fieldname.'\','.$iszb.')" class="webbtn">选</button></td></tr></table>';
+			if(contain($this->rock->HTTPweb, 'XINHUOAAPP'))$str .= '<button onclick="c.selectlocation(\''.$fname.'\',\''.$zbnae.'\','.$iszb.')" class="webbtn" type="button">定位</button>';
+			$str   .= '<button type="button" onclick="c.selectmap(\''.$fname.'\',\''.$zbnae.'\',\''.$fieldname.'\','.$iszb.')" class="webbtn">选</button></div>';
 		}
 		if($type=='htmlediter'){
 			$iszhang= false;
@@ -233,12 +232,12 @@ class inputChajian extends Chajian
 		}
 		if($type=='uploadfile'){
 			$str = '<input name="'.$fname.'" value="'.$val.'" type="hidden">';
-			$str.= '<div style="display:inline-block" id="fileview_'.$fname.'"><div onclick="c.uploadfilei(\''.$fname.'\',\''.$a['attr'].'\')" style="display:;border:dashed 1px #cccccc" id="'.$fname.'_divadd" class="upload_items"><img class="imgs" src="images/jia.png"></div></div>';
+			$str.= '<div style="display:inline-block" id="fileview_'.$fname.'"><div onclick="c.uploadfilei(\''.$fname.'\',\''.$a['attr'].'\')" style="display:;border:dashed 1px rgba(0,0,0,0.1)" id="'.$fname.'_divadd" class="upload_items"><img class="imgs" src="images/jia.png"></div></div>';
 			$str.= '<div style="display:none" tsye="file" tnam="'.$fname.'" tdata="'.$data.'" id="filed_'.$fname.'"><input type="file" style="width:120px" multiple="multiple" id="filed_'.$fname.'_inp"></div>';
 		}
 		if($type=='graph'){
 			$str = '<input name="'.$fname.'" value="'.$val.'" type="hidden">';
-			$str.= '<div id="graphview_'.$fname.'" >';
+			$str.= '<div id="graphview_'.$fname.'" class="btn-group">';
 			$str.= '<button type="button" onclick="c.autograph(\''.$fname.'\',0)" class="webbtn">手写</button><button type="button" onclick="c.autograph(\''.$fname.'\',1)" class="webbtn">引入</button><button onclick="c.autograph(\''.$fname.'\',2)" class="webbtn" type="button">x</button></div>';
 		}
 		if($type=='auto'){
@@ -289,8 +288,8 @@ class inputChajian extends Chajian
 		$_vals0	= $valea[0];
 		$_vals1	= arrvalue($valea,1, $oarr['valueid']);
 		
-		$str 	= '<table width="99%" cellpadding="0" border="0"><tr><td width="100%"><input class="inputs" style="width:99%" '.$oarr['attr'].' placeholder="'.$oarr['placeholder'].'" id="change'.$fname.'" value="'.$_vals0.'" readonly type="text" name="'.$fname.'"><input name="'.$zbnae.'" value="'.$_vals1.'" id="change'.$fname.'_id" type="hidden"></td>';
-		$str   .= '<td nowrap><button onclick="js.changeclear(\'change'.$fname.'\')" class="webbtn" type="button">x</button><button id="btnchange_'.$fname.'" onclick="js.changeuser(\'change'.$fname.'\',\''.$type.'\',\''.$oarr['title'].'\' ,{changerange:\''.$oarr['changerange'].'\'})" type="button" class="webbtn">选</button></td></tr></table>';
+		$str 	= '<div class="btn-group"><input class="inputs" style="flex:1" '.$oarr['attr'].' placeholder="'.$oarr['placeholder'].'" id="change'.$fname.'" value="'.$_vals0.'" readonly type="text" name="'.$fname.'"><input name="'.$zbnae.'" value="'.$_vals1.'" id="change'.$fname.'_id" type="hidden">';
+		$str   .= '<button onclick="js.changeclear(\'change'.$fname.'\')" class="webbtn" type="button">x</button><button id="btnchange_'.$fname.'" onclick="js.changeuser(\'change'.$fname.'\',\''.$type.'\',\''.$oarr['title'].'\' ,{changerange:\''.$oarr['changerange'].'\'})" type="button" class="webbtn">选</button></div>';
 		
 		return $str;
 	}
@@ -386,6 +385,7 @@ class inputChajian extends Chajian
 				$barr[] = array(
 					'name'	=> $rs[1],
 					'value' => $rs[0],
+					'color' => $rs[2]
 				);
 			}
 			$fopt = $barr;

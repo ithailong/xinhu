@@ -100,6 +100,11 @@ class indexClassAction extends Action{
 		}
 	}
 	
+	public function oldAction()
+	{
+		$this->defaultAction();
+	}
+	
 	public function newAction()
 	{
 		$this->homestylebool = true;
@@ -312,6 +317,11 @@ class indexClassAction extends Action{
 	{
 		//header("HTTP/1.1 500 Not Found");
 		echo $this->get('abc');
+	}
+	
+	public function testAction()
+	{
+		
 	}
 	
 	public function getxings($str)

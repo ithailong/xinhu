@@ -52,7 +52,7 @@ class goodsClassModel extends Model
 	public function getdaishu()
 	{
 		$where = m('admin')->getcompanywhere(1);
-		return $this->db->rows('`[Q]goodm`','`status`=1 and `state`<>1 '.$where.'');
+		return $this->db->rows('`[Q]goodm`','`status`=1 and `type`<>6 and `state`<>1 '.$where.'');
 	}
 	
 	//判断是否存在相同库存

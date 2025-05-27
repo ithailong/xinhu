@@ -17,12 +17,12 @@
 <link rel="stylesheet" type="text/css" href="web/res/css/chat.css"/>
 <link rel="shortcut icon" id="ico" href="<?=$da['logo']?>" />
 <script type="text/javascript" src="web/res/js/jquery.1.9.1.min.js"></script>
-<script type="text/javascript" src="js/js.js"></script>
+<script type="text/javascript" src="js/js.js?<?=time()?>"></script>
 <script type="text/javascript" src="js/base64-min.js"></script>
 <script type="text/javascript" src="web/res/js/nwjs.js"></script>
 <script type="text/javascript" src="web/res/mode/menu/jquery-rockmenu.js"></script>
-<script type="text/javascript" src="web/res/js/notify.js"></script>
-<script type="text/javascript" src="web/res/js/strformat.js"></script>
+<script type="text/javascript" src="web/res/js/notify.js?<?=time()?>"></script>
+<script type="text/javascript" src="web/res/js/strformat.js?<?=time()?>"></script>
 <script type="text/javascript" src="js/reim_xina.js?<?=time()?>"></script>
 <script type="text/javascript" src="web/res/js/websocket.js"></script>
 <script type="text/javascript" src="web/res/perfectscrollbar/perfect-scrollbar.js"></script>
@@ -36,14 +36,16 @@
 .lefticons:hover{background: rgba(0,0,0,0.05);}
 .leftactive {background: rgba(0,0,0,0.1);}
 <?php
-$col = getconfig('apptheme','#1389D3');
-$cola= c('image')->colorTorgb($col);
-echo 'body{--main-color:'.$col.'}.leftcls{background:'.$col.'}.webbtn{background:'.$col.'}.qipao .qipaocontright{background:rgba('.$cola[0].','.$cola[1].','.$cola[2].',0.4)}.qipao .qipaoright{border-color: transparent transparent transparent rgba('.$cola[0].','.$cola[1].','.$cola[2].',0.4)}';
+$cola= c('color')->getColor();
+$cols= $cola['colors'];
+echo '.qipao .qipaocontright{background:rgba('.$cols.',0.4)}.qipao .qipaoright{border-color: transparent transparent transparent rgba('.$cols.',0.4)}';
 ?>
 </style>
+<?php
+echo c('color')->getApptheme();
+?>
 <script>
 companynum 		= '<?=COMPANYNUM?>';
-maincolor 		= '<?=$col?>';
 js.servernow	= '<?=$da['now']?>';
 PROJECT			= '<?=$da['p']?>';
 adminip			= '<?=$da['ip']?>';
@@ -51,6 +53,7 @@ systitle		= '<?=$da['title']?>';
 companymode		= <?=(getconfig('companymode')? 'true' : 'false')?>;
 video_bool		= <?=(getconfig('video_bool')? 'true' : 'false')?>;
 function globalbody(){
+	token 		= js.getoption('admintoken', token);
 	adminid		= '<?=$da['adminid']?>';
 	adminface	= '<?=$da['face']?>';
 	adminname	= '<?=$da['adminname']?>';
@@ -67,7 +70,7 @@ function winfocus(){
 </script>
 </head>
 
-<body style="background:#f5f5f5;border:0px rgba(0,0,0,0.2) solid;overflow:hidden" oncontextmenu="return false" scroll="no">
+<body style="overflow:hidden" oncontextmenu="return false" scroll="no">
 
 <div class="cursor lefticons" align="center" id="reimcog" style="position:fixed;bottom:0px;left:0px;width:60px;line-height:50px;height:50px;color:#ffffff;font-size:16px;"><i class="icon-reorder"></i></div>
 
@@ -75,7 +78,7 @@ function winfocus(){
 
 	<table style="width:100%;" height="100%">
 	<tr valign="top">
-	<td height="100%" style="border-right:0px #dddddd solid" width="60" class="leftcls">
+	<td height="100%" style="background:var(--main-color)" width="60" class="leftcls">
 		<div align="center" style="width:60px;overflow:hidden">
 			<div style="margin-top:20px"><img title="<?=$da['adminname']?>" onclick="reim.openmyinfo()" src="images/noface.png" id="myface" style="border-radius:50%;" align="absmiddle" height="40" width="40">
 			</div>
@@ -103,8 +106,8 @@ function winfocus(){
 			</div>
 		</div>
 	</td>
-	<td width="220px" id="maincenter" bgcolor="#ebebeb" style="border-right:1px #dddddd solid">
-		<div style="height:60px;overflow:hidden" align="center"><input id="reim_keysou" placeholder="搜索联系人/会话/应用" style="border:none;background-color:#d4d6d9; width:150px;height:30px;border-radius:5px;margin-top:13px;padding:0px 10px" type="text"> &nbsp;&nbsp;<span class="cursor" id="homeplus" style="color:#999999"><i class="icon-plus"></i></span></div>
+	<td width="220px" id="maincenter" style="border-right:var(--border);background:rgba(<?=$cols?>,0.03)">
+		<div style="height:60px;overflow:hidden" align="center"><input id="reim_keysou" placeholder="搜索联系人/会话/应用" style="border:none;background-color:rgba(0,0,0,0.1); width:150px;height:30px;border-radius:5px;margin-top:13px;padding:0px 10px" type="text"> &nbsp;&nbsp;<span class="cursor" id="homeplus" style="color:#999999"><i class="icon-plus"></i></span></div>
 		
 		<div id="centlist" style="height:300px;overflow:hidden;position:relative;width:220px">
 			<div id="centshow0">
@@ -114,10 +117,10 @@ function winfocus(){
 				</div>
 			</div>
 			<div id="centshow1" style="display:none">
-				<div style="padding:5px;color:#aaaaaa;border-bottom:1px #e1e1e1 solid">组织结构</div>
+				<div style="padding:5px;color:#aaaaaa;border-bottom:var(--border)">组织结构</div>
 				<div id="showdept"></div>
 				<div id="showgroup"></div>
-				<div align="center" style="padding:10px;"><a onclick="reim.initload(true)" style="font-size:12px;color:#bbbbbb" href="javascript:;"><i class="icon-refresh"></i> 刷新</a></div>
+				<div align="center" style="padding:10px;"><a onclick="reim.initloads()" id="mainreload" style="font-size:12px;color:#bbbbbb" href="javascript:;"><i class="icon-refresh"></i> 刷新</a></div>
 			</div>
 			<?php if(getconfig('rockkefu_url')){?>
 			<div id="centshow3" style="display:none">
@@ -131,7 +134,7 @@ function winfocus(){
 	</td>
 	<td>
 		<div id="viewzhulist" style="height:300px;overflow:hidden;">
-			<div align="center" tabs="home" id="tabs_home" style="margin-top:150px;font-size:150px;color:#e8e8e8">
+			<div align="center" tabs="home" id="tabs_home" style="margin-top:150px;font-size:150px;color:rgba(0,0,0,0.05);">
 				<i class="icon-comments-alt"></i>
 			</div>	
 		</div>

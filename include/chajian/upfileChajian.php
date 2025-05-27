@@ -15,7 +15,7 @@ class upfileChajian extends Chajian{
 	private $jpgallext		= '|jpg|png|gif|bmp|jpeg|';	//图片格式
 	
 	//可上传文件类型，也就是不保存为uptemp的文件
-	private $upallfile		= '|doc|docx|xls|xlsx|ppt|pptx|pdf|swf|rar|zip|txt|gz|wav|mp3|avi|mp4|flv|wma|chm|apk|amr|log|json|cdr|psd|';
+	private $upallfile		= '|doc|docx|xls|xlsx|ppt|pptx|pdf|swf|rar|zip|txt|gz|wav|mp3|avi|mp4|flv|wma|chm|apk|amr|log|json|cdr|psd|caf|wps|';
 	
 	/**
 		初始化
@@ -77,6 +77,8 @@ class upfileChajian extends Chajian{
 		$bo 		= false;
 		$upallfile	= $this->jpgallext.$this->upallfile;
 		if($this->contain($upallfile, '|'.$ext.'|'))$bo = true;
+		$stype = getconfig('savefiletype');//可直接保存的文件类型
+		if($stype && !$bo && $this->contain(','.$stype.',', ','.$ext.','))$bo = true;
 		return $bo;
 	}
 	

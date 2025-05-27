@@ -66,7 +66,7 @@ class inputClassModel extends Model
 		$strm.= '&nbsp;&nbsp;&nbsp;{删,'.$xu.'}';
 		$strm.= '</td></tr></table>';
 		
-		if($ism==0)$str.='<div style="background-color:#F1F1F1;">{新增,'.$xu.'}</div>';
+		if($ism==0)$str.='<div class="addys">{新增,'.$xu.'}</div>';
 		if($ism==1){
 			$str.='<div>{新增,'.$xu.'}</div>';
 			$strm.='<div style="margin:8px">{新增,'.$xu.'}</div>';

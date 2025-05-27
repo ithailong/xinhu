@@ -294,4 +294,53 @@ class loginClassAction extends apiAction
 			'fid'  => $fid,
 		));
 	}
+	
+	//保存设置
+	public function setwxqyAction()
+	{
+		$callback= $this->get('callback');
+		$num	 = $this->get('num');
+		$agentid = (int)$this->get('agentid');
+		$shouji	 = $this->jm->base64decode($this->get('shouji'));
+		$userid	 = $this->jm->base64decode($this->get('userid'));
+		$urs 	 = m('admin')->getone("`mobile`='$shouji' AND `status`=1");
+		$barr 	 = returnerror('错误');
+		if(!$urs){
+			$barr 	= returnerror('手机号“'.$shouji.'”在设置OA地址里不存在');
+		}else{
+			$barr	= returnsuccess(array());
+		}
+		if($barr['success']){
+			if($urs['type']==1)$this->option->setval('wxqyplat_cnum@-10', $num);
+			$obj = m('zwxqy_user');
+			$uarr['uid'] 	 = $urs['id'];
+			$uarr['mobile']  = $shouji;
+			$uarr['userid']  = $userid;
+			$uarr['agentid'] = $agentid;
+			$uarr['cnum'] 	 = $num;
+			$uarr['state'] = 1;
+			$ors	= $obj->getone("`userid`='$userid'");
+			if($ors){
+				$obj->update($uarr, $ors['id']);
+			}else{
+				$obj->insert($uarr);
+			}
+			$data['user'] = $urs['user'];
+			$barr['data'] = $data;
+		}
+		return ''.$callback.'('.json_encode($barr).')';
+	}
+	
+	//读取表结构
+	public function dbinfoAction()
+	{
+		$tab = $this->get('tab');
+		if(!$tab)return 'error';
+		$table= ''.PREFIX.''.$tab.'';
+		$rows = $this->db->gettablefields($table);
+		if(!$rows)return '无表';
+		
+		$barr[$table]['fields'] = $rows;
+		return $barr;
+	}
 }

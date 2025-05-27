@@ -61,6 +61,24 @@ $(document).ready(function(){
 					o1.disabled=false;
 				}
 			});
+		},
+		fenbiao:function(o){
+			js.confirm('却要现在就分表了吗？',function(jg){
+				if(jg=='yes'){
+					c.fenbiaos(o);
+				}
+			});
+		},
+		fenbiaos:function(o){
+			js.loading('处理中...');
+			js.ajax(js.getajaxurl('fenbiao','{mode}','{dir}'),{}, function(s){
+				js.unloading();
+				if(s=='ok'){
+					js.msgok('处理完成');
+				}else{
+					js.msg('msg', s);
+				}
+			});
 		}
 	}
 	js.initbtn(c);
@@ -85,5 +103,9 @@ $(document).ready(function(){
 	<div class="blank20"></div>
 	<div><button click="deluser" class="btn btn-danger" type="button">初始化部门和用户</button></div>
 	<div class="tishi">初始化部门和用户，将会删除你创建的用户和部门，为了防止误删只能使用一次，请备份好数据谨慎使用！</div>
+	
+	<div class="blank20"></div>
+	<div><button click="fenbiao" class="btn btn-default" type="button">flow_log单据操作记录分表</button></div>
+	<div class="tishi">单据操作记录表单据越多，数据越大优化做好分表，建议超过5W条记录在分表，当前总记录<?=m('flow_log')->rows('1=1')?>条</div>
 	
 </div>

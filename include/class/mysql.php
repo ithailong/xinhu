@@ -72,8 +72,8 @@ abstract class mysql{
 			$this->tranend();
 			$this->close();
 		}
-		//记录访问sql日志
-		if(getconfig('sqllog')){
+		//记录访问sql日志(2024-10-13弃用)
+		if(getconfig('sqllog') && 1==2){
 			$sql = '';
 			$filstr = 'sqllog_'.date('Y.m.d.H.i.s').'_'.$this->rock->adminid.'_'.str_shuffle('abcdefghijklmn').'.log';
 			foreach($this->sqlarr as $sql1)$sql.="\n\n$sql1;";
@@ -95,7 +95,7 @@ abstract class mysql{
 	public function fetch_array($res, $type=0){return false;}
 	public function insert_id(){return 0;}
 	
-	public function error(){return '';}
+	public function error(){return $this->errorlast;}
 	public function close(){}
 	
 	
@@ -127,13 +127,8 @@ abstract class mysql{
 		$this->sqlarr[]	= $sql;
 		$this->nowsql	= $sql;
 		$this->count 	= 0;
-		try {
-			$rsbool		= $this->querysql($sql);
-		} catch (Exception $e) {
-			$rsbool		= false;
-			$this->errormsg = $e->getMessage();
-		}
 		
+		$rsbool			= $this->querysql($sql);
 		$this->nowerror	= false;
 		if(!$rsbool)$this->nowerror = true;
 		
@@ -142,7 +137,7 @@ abstract class mysql{
 		
 		//记录错误sql
 		if(!$rsbool && $ebo){
-			$txt	= '[ERROR SQL]'.chr(10).''.$sql.''.chr(10).''.chr(10).'[Reason]'.chr(10).''.$this->error().''.chr(10).'';
+			$txt	= '[ERROR SQL]'.chr(10).$sql.chr(10).chr(10).''.$this->getError().''.chr(10).'';
 			$efile 	= $this->rock->debug($txt,''.DB_DRIVE.'_sqlerr', true);
 			$errmsg = str_replace("'",'&#39;', $this->error());
 			if(!contain($sql, $stabs)){
@@ -152,6 +147,30 @@ abstract class mysql{
 			}
 		}
 		return $rsbool;
+	}
+	
+	public $isError  	 = false;
+	private $msgerror 	 = '';
+	private $msgerrorall = '';
+	
+	/**
+	*	设置错误信息
+	*/
+	public function setError($str, $sql){
+		if(!$str)return;
+		$this->isError   = true;
+		$this->errorlast = $str;
+		$this->errormsg	 = $str;
+		$this->msgerror .= ''.$str.';';
+		$this->msgerrorall .= ''.$sql.chr(10).chr(10).$str.chr(10).chr(10).'';
+	}
+	
+	/**
+	*	获取错误
+	*/
+	public function getError()
+	{
+		return $this->msgerrorall;
 	}
 	
 	/**
@@ -260,12 +279,13 @@ abstract class mysql{
 		return $this->getall($sql);
 	}
 	
-	public function getall($sql)
+	public function getall($sql, $call=null, $cans=array())
 	{
 		$res=$this->query($sql);
 		$arr=array();
 		if($res){
 			while($row=$this->fetch_array($res)){
+				if($call != null)$row = $call($row, $cans);
 				$arr[]	= $row;
 				$this->count++;
 			}
@@ -593,15 +613,14 @@ abstract class mysql{
 	}
 	
 	/**
-		返回表所有字段
+	*	返回表所有字段，如['id','name']
 	*/	
 	public function getallfields($table)
 	{
-		$finfo 	= $this->gettablefields($table);
-		foreach ($finfo as $val) {
-			$arr[] = $val['name'];
-		}
-		return $arr;
+		$sql 	= 'SHOW FULL COLUMNS FROM `'.$table.'`';
+		return $this->getall($sql, function($row){
+			return $row['Field'];
+		});
 	}
 	
 	public function getfields($table)
@@ -614,8 +633,26 @@ abstract class mysql{
 	public function gettablefields($table, $base='',$whe='')
 	{
 		if($base=='')$base = $this->db_base;
-		$sql	= "select COLUMN_NAME as `name`,DATA_TYPE as `type`,COLUMN_COMMENT as `explain`,COLUMN_TYPE as `types`,`COLUMN_DEFAULT` as dev,`IS_NULLABLE` as isnull,`CHARACTER_MAXIMUM_LENGTH` as lens,`NUMERIC_PRECISION` as xslen1,`NUMERIC_SCALE` as xslen2 from information_schema.COLUMNS where `TABLE_NAME`='$table' and `TABLE_SCHEMA` ='$base' $whe order by `ORDINAL_POSITION`";
-		return $this->getall($sql);
+		$sql	= "select COLUMN_NAME as `name`,DATA_TYPE as `type`,COLUMN_COMMENT as `explain`,COLUMN_TYPE as `types`,`COLUMN_DEFAULT` as dev,`IS_NULLABLE` as isnull,`CHARACTER_MAXIMUM_LENGTH` as lens,`NUMERIC_PRECISION` as xslen1,`NUMERIC_SCALE` as xslen2 from information_schema.COLUMNS where  `TABLE_SCHEMA` ='$base' AND `TABLE_NAME`='$table' $whe order by `ORDINAL_POSITION`";
+		if($whe)return $this->getall($sql);
+		$sql 	= 'SHOW FULL COLUMNS FROM '.$base.'.`'.$table.'`;';
+		return $this->getall($sql, function($row){
+			$len  = null;$dbtype = strtolower($row['Type']);
+			$arrs = explode('(',$dbtype);
+			$type = $arrs[0]; 
+			if(isset($arrs[1]))$len = (int)str_replace(')','', $arrs[1]);
+			return array(
+				'name' 	=> $row['Field'],
+				'types' 	=> $row['Type'],
+				'explain' 	=> $row['Comment'],
+				'type'   	=> $type,
+				'dev'   	=> $row['Default'],
+				'isnull'   => $row['Null'],
+				'lens'   	=> $len,
+				'xslen1'   => 0,
+				'xslen2'   => 0,
+			);
+		});
 	}
 	
 	/**
@@ -751,6 +788,36 @@ abstract class mysql{
 			$pid	= $rsa[$pfields];
 			if($pid!=$afid)if($this->rows($table,"`$afield`='$pid'")>0)$this->getpvala($table,$pfields,$jfield,$pid,$afield,$maxlen);
 		}
+	}
+	
+	/**
+	*	添加字段
+	*/
+	public function addFields($table, $fields, $types, $dev=null, $name='')
+	{
+		$sql = "ALTER TABLE `$table` ADD `$fields` ".$types."";
+		if($dev===null){
+			$sql.=' DEFAULT NULL';
+		}else if(!isempt($dev)){
+			$sql.=" DEFAULT '$dev'";
+		}
+		if(!isempt($name))$sql.=" COMMENT '$name'";
+		return $this->query($sql);
+	}
+	
+	/**
+	*	编辑字段
+	*/
+	public function editFields($table, $fields, $types, $dev=null, $name='')
+	{
+		$sql = "ALTER TABLE `$table` MODIFY `$fields` ".$types."";
+		if($dev===null){
+			$sql.=' DEFAULT NULL';
+		}else if(!isempt($dev)){
+			$sql.=" DEFAULT '$dev'";
+		}
+		if(!isempt($name))$sql.=" COMMENT '$name'";
+		return $this->query($sql);
 	}
 }
 class DB{

@@ -24,9 +24,11 @@ function initbody(){
 		},{
 			name:'<i class="icon-picture"></i> 修改头像',num:'face','icon':'picture'
 		},{
-			name:'<i class="icon-laptop"></i> 新版首页1',num:'jiu','icon':'laptop'
+			name:'<i class="icon-adjust"></i> 切换主题',num:'theme','icon':'adjust'
 		},{
-			name:'<i class="icon-certificate"></i> 新版首页2',num:'jiu2','icon':'laptop'
+			name:'<i class="icon-certificate"></i> 背景首页',num:'jiu','icon':'laptop'
+		},{
+			name:'<i class="icon-list"></i> 列表首页',num:'jiu2','icon':'laptop'
 		},{
 			name:'<i class="icon-user"></i> 帐号('+adminuser+')',num:'user'
 		}];
@@ -51,6 +53,10 @@ function initbody(){
 				}
 				if(d.num=='jiu2'){
 					js.location('?a=new');
+					return;
+				}
+				if(d.num=='theme'){
+					changetheme();
 					return;
 				}
 				if(d.num=='user')return;
@@ -91,22 +97,27 @@ function initbody(){
 		});
 	}catch(e){}
 	
-	/*
-	var o1 = $('#index-navbar-center');
-	var hei = $('#index-navbar-left').width()+$('#index-navbar-right').width();
-	var wid = winWb()-hei;
-	if(o1.width()>wid){
-		o1.css({width:''+(wid-30)+'px',height:''+$('#index-navbar-right').height()+'px'});
-		$('#index-navbar-right').prepend('<li><a href="javascript:;" onclick="openmobile()"><i class="icon-chevron-down"></i></a></li>');
-	}*/
 }
 
+function changetheme(){
+	var zys = ['#1389D3','#99cc66','#003366','#6666CC','#CC3333','#009966','#333333','#990066','#333300','#333366','#99CC99','#663366','#003399','#338899'];
+	var h 	= '<div style="padding:10px"><table height="20px" class="cursor"><tr>';
+	var nst = '';
+	for(var i=0;i<zys.length;i++){
+		nst = (zys[i]==maincolor) ? '✔':'&nbsp;';
+		h+='<td width="20px" style="color:white;font-size:12px" align="center" onclick="js.location(\'?apptheme='+zys[i].substr(1)+'\')" bgcolor="'+zys[i]+'">'+nst+'</td>';
+	}
+	h+='</tr></table></div>';
+	js.tanbody('color','切换主题',310,200,{
+		html:h
+	});
+}
 
 function _searchmenus(){
 	js.prompt('搜索菜单','请输入搜索菜单名：',function(jg,txt){
 		if(jg=='yes' && txt){
 			$('#menulisttop').html('搜索结果');
-			$('#menulist').html('<div style="padding:30px;" align="center"><img src="images/mloading.gif"></div>');
+			$('#menulist').html('<div style="padding:30px;" align="center">'+js.ling(30)+'</div>');
 			js.ajax(js.getajaxurl('getmenusou','index'),{key:txt}, function(da){
 				showmenula(da);
 			},'post,json');
@@ -123,7 +134,7 @@ function loadmenu(o){
 	if(ico)s1='<i class="icon-'+ico+'"></i> '+s1+'';
 	$('#menulisttop').html(s1);
 	showmenupid = id;
-	$('#menulist').html('<div style="padding:30px;" align="center"><img src="images/mloading.gif"></div>');
+	$('#menulist').html('<div style="padding:30px;" align="center">'+js.ling(30)+'</div>');
 	js.ajax(js.getajaxurl('getmenu','index'),{pid:id,loadci:loadmenuci}, function(da){
 		if(da.menutopid)menutopid=da.menutopid;
 		showmenula(da.menuarr);
@@ -135,30 +146,34 @@ function showmenula(a){
 	hongbadge={};
 	for(i=0; i<a.length; i++){
 		o   = a[i];
-		css1='border-radius:0px;border-left:none;border-right:none;cursor:pointer;TEXT-DECORATION:none';
-		s+='<a class="list-group-item" onClick="clickmenu(this,'+i+',-1,-1)" style="'+css1+'"><i class="icon-'+o.icons+'"></i> '+o.name+'';
+		css1='cursor:pointer;TEXT-DECORATION:none;padding:15px 10px';
+		s+='<div class="hover" onClick="clickmenu(this,'+i+',-1,-1)" style="'+css1+'"><i class="icon-'+o.icons+'"></i> '+o.name+'';
 		if(o.bh && o.stotal==0)s+=' <span class="badge" badge="'+o.bh+'" style="float:none;display:none;background:red;color:white"></span>';
 		if(o.stotal>0)s+='<font color="red" id="hongdian_'+o.num+'" style="display:none">●</font><span style="float:right" id="menu_down_isons_'+o.num+'" class="icon-caret-down"></span>';
-		s+='</a>';
+		s+='</div>';
 		if(o.stotal>0){
 			child = o.children;
+			s+='<div downmenu="'+i+'_0" style="display:none;background:rgba(var(--rgb-r),var(--rgb-g),var(--rgb-b),0.05)">'
 			for(j=0; j<child.length; j++){
 				o = child[j];
-				s+='<a downmenu="'+i+'_'+j+'" class="list-group-item" style="'+css1+';padding-left:30px;background:rgba(0,0,0,0.05);display:none" id="menu_list_'+o.num+'" onClick="clickmenu(this,'+i+','+j+',-1)"><i class="icon-'+o.icons+'"></i> '+o.name+'';
+				s+='<div class="hover" style="'+css1+';padding-left:30px;" id="menu_list_'+o.num+'" onClick="clickmenu(this,'+i+','+j+',-1)"><i class="icon-'+o.icons+'"></i> '+o.name+'';
 				if(o.bh){
 					hongbadge[o.bh]=a[i].num;
 					s+=' <span class="badge" badge="'+o.bh+'" style="float:none;display:none;background:red;color:white"></span>';
 				}
 				if(o.stotal>0)s+='<span style="float:right" id="menu_down_isons_'+o.num+'" class="icon-caret-down"></span>';
-				s+='</a>';
+				s+='</div>';
 				if(o.stotal>0){
 					hhild = o.children;
+					s+='<div downmenu="'+i+'_'+j+'_0" style="display:none;background:rgba(var(--rgb-r),var(--rgb-g),var(--rgb-b),0.02)">'
 					for(k=0; k<hhild.length; k++){
 						o = hhild[k];
-						s+='<a downmenu="'+i+'_'+j+'_'+k+'" class="list-group-item" style="'+css1+';padding-left:60px;background:rgba(0,0,0,0.02);display:none" id="menu_list_'+o.num+'" onClick="clickmenu(this,'+i+','+j+','+k+')"><i class="icon-'+o.icons+'"></i> '+o.name+'</a>';
+						s+='<div class="hover" style="'+css1+';padding-left:60px;" id="menu_list_'+o.num+'" onClick="clickmenu(this,'+i+','+j+','+k+')"><i class="icon-'+o.icons+'"></i> '+o.name+'</div>';
 					}
+					s+='</div>';
 				}	
 			}
+			s+='</div>';
 		}
 	}
 	if(s=='')s='<div style="padding:30px;color:#cccccc" align="center">暂无</div>';
@@ -220,7 +235,7 @@ function resizewh(){
 	var h = winHb(),_ht=0;
 	if(get('topheaderid'))_ht=get('topheaderid').offsetHeight;
 	viewwidth = w; 
-	viewheight = h-_ht-44;
+	viewheight = h-_ht-50;
 	$('#indexcontent').css({width:''+viewwidth+'px',height:''+(viewheight)+'px'});
 	$('#tabsindexm').css({width:''+viewwidth+'px'});
 	var nh = h-_ht;
@@ -256,15 +271,15 @@ function clickmenu(o, i, j,k){
 		$('#hongdian_'+a.num+'').hide();//隐藏红点
 		if(j>-1){
 			dxu+=''+j+'_';
-			$('a[downmenu^="'+dxu+'"]').toggle();
+			$('div[downmenu^="'+dxu+'"]').toggle();
 		}
 		var o1	= get('menu_down_isons_'+a.num+'');
 		if(o1.className.indexOf('down')>0){
 			o1.className='icon-caret-up';
-			if(j==-1)$('a[downmenu^="'+dxu+'"]').show();
+			if(j==-1)$('div[downmenu^="'+dxu+'"]').show();
 		}else{
 			o1.className='icon-caret-down';
-			if(j==-1)$('a[downmenu^="'+dxu+'"]').hide();
+			if(j==-1)$('div[downmenu^="'+dxu+'"]').hide();
 		}
 	}else{
 		addtabs(a);
@@ -415,7 +430,7 @@ function addtabs(a){
 	var s = '<td temp="tabs" oncontextmenu="tabsright(\''+num+'\',event);return false;"; nowrap onclick="changetabs(\''+num+'\',1)" id="tabs_'+num+'" class="active"><font>';
 	if(a.icons)s+='<i class="icon-'+a.icons+'"></i>  ';
 	s+=a.name+'</font>';
-	if(!a.hideclose)s+='<span onclick="closetabs(\''+num+'\')"><img src="images/del.png" width="12" height="12"></span>';
+	if(!a.hideclose)s+='<span onclick="closetabs(\''+num+'\')">x</span>';
 	s+='</td>';
 	objtabs.append(s);
 	_changhhhsv(num);
@@ -438,10 +453,10 @@ function addtabs(a){
 		urlpms += ",'"+nus[0]+"':'"+nus[1]+"'";
 	}
 	if(urlpms!='')urlpms = urlpms.substr(1);
-	var bgs = '<div id="mainloaddiv" style="width:'+viewwidth+'px;height:'+viewheight+'px;overflow:hidden;background:#000000;color:white;filter:Alpha(opacity=20);opacity:0.2;z-index:3;position:absolute;left:0px;line-height:'+viewheight+'px;top:0px;" align="center"><img src="images/mloading.gif"  align="absmiddle">&nbsp;加载中...</div>';
+	var bgs = '<div id="mainloaddiv" style="width:'+viewwidth+'px;height:'+viewheight+'px;overflow:hidden;background:#000000;color:white;filter:Alpha(opacity=20);opacity:0.2;z-index:3;position:absolute;left:0px;line-height:'+viewheight+'px;top:0px;" align="center">'+js.ling(30)+'&nbsp;加载中...</div>';
 	$('#indexcontent').append(bgs);
 	a.urlpath = url+'.php';
-	objcont.append('<div temp="content" id="content_'+num+'"></div>');
+	objcont.append('<div temp="content" style="margin:10px;" id="content_'+num+'"></div>');
 	$.ajax({
 		url:'?m=index&a=getshtml&surl='+jm.base64encode(url)+'&num='+num+'&menuname='+jm.base64encode(a.name)+'&urlpms='+jm.base64encode(urlpms)+'',
 		type:'get',
@@ -455,6 +470,7 @@ function addtabs(a){
 				s = s.replace(/\{dir\}/gi, dir);
 				s = s.replace(/\{params\}/gi, "var params={"+urlpms+"};");
 			var obja = $('#content_'+num+'');
+			if(num!='home')s='<div style="background:var(--main-bgcolor);overflow:auto;border-radius:5px"><div style="padding:10px">'+s+'</div></div>';
 			obja.html(s);
 		},
 		error:function(){

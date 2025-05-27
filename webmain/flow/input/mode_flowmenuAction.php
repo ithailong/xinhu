@@ -17,6 +17,7 @@ class mode_flowmenuClassAction extends inputAction{
 	public $alldata = array();
 	protected function storeafter($table, $rows)
 	{
+		$this->db->update('[Q]menu', '`status`=1' , '`id` in(1,2) and `status`=0');//总有一些人把系统菜单给停用了
 		$pid = (int)$this->post('pid','0');
 		if($pid>0){
 			$this->showgetmenu($rows,0,1,1);

@@ -305,7 +305,7 @@ class goodsClassAction extends Action
 		}
 		$where .= m('admin')->getcompanywhere(1,'a.');
 		return array(
-			'where' => 'and a.`status`=1 and a.`state`<>1 '.$where.'',
+			'where' => 'and a.`status`=1 and a.`type`<>6 and a.`state`<>1 '.$where.'',
 			'table' => '`[Q]'.$table.'` a left join `[Q]flow_bill` b on a.id=b.mid and b.`table`=\''.$table.'\'',
 			'fields' => 'a.id,a.applydt,a.optdt,a.`explain`,a.`state`,a.`type`,b.uname,b.sericnum,b.udeptname'
 		);

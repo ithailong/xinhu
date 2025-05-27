@@ -23,7 +23,7 @@ if(pnum=='all'){
 	bootparams.checked=true; //开启复选框
 	bootparams.autoLoad=false;
 
-	var shtm = '<table width="100%"><tr valign="top"><td><div style="border:1px #cccccc solid;width:220px"><div id="optionview_{rand}" style="height:400px;overflow:auto;"></div></div></td><td width="8" nowrap><div style="width:8px;overflow:hidden"></div></td><td width="95%"><div id="view'+modenum+'_{rand}"></div></td></tr></table>';
+	var shtm = '<table width="100%"><tr valign="top"><td><div style="border:var(--border);width:220px"><div id="optionview_{rand}" style="height:400px;overflow:auto;"></div></div></td><td width="8" nowrap><div style="width:8px;overflow:hidden"></div></td><td width="95%"><div id="view'+modenum+'_{rand}"></div></td></tr></table>';
 	$('#view'+modenum+'_{rand}').after(shtm).remove();
 	c.stable = 'assetm'; //模块的主表
 	c.optionview = 'optionview_{rand}';

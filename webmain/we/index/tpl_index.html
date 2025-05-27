@@ -9,25 +9,19 @@
 <link rel="shortcut icon" href="favicon.ico" />
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/js.js"></script>
-<script type="text/javascript" src="js/jswx.js"></script>
+<script type="text/javascript" src="js/jswx.js?<?=time()?>"></script>
 <script type="text/javascript" src="js/base64-min.js"></script>
 <script type="text/javascript" src="js/jsmain.js"></script>
 <script type="text/javascript" src="webmain/we/index/tpl_index.mini.js?<?=time()?>"></script>
 <link rel="stylesheet" type="text/css" href="web/res/fontawesome/css/font-awesome.min.css">
 <style>
-html,body{overflow:hidden;background-color:#f1f1f1}
-<?php 
-$maincolor = getconfig('apptheme','#1389D3');
-$maincolora= c('image')->colorTorgb($maincolor);
-$maincolors= ''.$maincolora[0].','.$maincolora[1].','.$maincolora[2].'';
-echo 'body{--main-color:'.$maincolor.';}';
-?>
+html,body{overflow:hidden;font-size:var(--font-size)}
 .weui_tabbar_icon{text-align:center;color:#888888;font-size:20px;overflow:hidden;;height:28px}
 .weui_tabbar_item{padding-top:2px;margin-bottom:5px;position:relative}
 .weui_media_box{padding:10px 15px}
 .weui_media_box.weui_media_appmsg .weui_media_hd {height:40px;width:40px;line-height:40px}
 .weui_media_box .weui_media_desc{height:20px;line-height:20px;padding-right:20px}
-.weui_bar_item_on .weui_tabbar_icon{color:<?=$maincolor?>}
+.weui_bar_item_on .weui_tabbar_icon{color:var(--main-color)}
 .weui_grid_icon{width:26px;height:26px;text-align:center;}
 .weui_grid_icon img{border-radius:6px}
 .weui_grid_icon i{font-size:26px}
@@ -47,12 +41,14 @@ echo 'body{--main-color:'.$maincolor.';}';
 .weui_daohang .jiantou{padding:0px;font-size:12px;color:#cccccc}
 .weui_grid_label{height:20px;overflow:hidden}
 </style>
-</head>
+<?php
+echo c('color')->getApptheme(false, true);
+?>
 <script>
 xhauthkey = '<?=$xhauthkey?>';
-maincolor = '<?=$maincolor?>';
 </script>
-<body scroll="no" style="overflow:hidden;user-select:none">
+</head>
+<body scroll="no" style="overflow:hidden;user-select:none;background:#f1f1f1">
 <?php if($showheader==1){?>
 <div>
 	<div class="r-header">
@@ -223,5 +219,6 @@ maincolor = '<?=$maincolor?>';
 <script type="text/javascript" src="mode/plugin/jquery-rockdoupull.js"></script>
 <script type="text/javascript" src="mode/plugin/jquery-rocksilder.js"></script>
 <script type="text/javascript" src="web/res/js/jquery-changeuser.js"></script>
+<script type="text/javascript" src="mode/plugin/jquery-rockmodels.js"></script>
 </body>
 </html>

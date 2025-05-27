@@ -82,7 +82,9 @@ class sysClassAction extends runtAction
 		if(in_array(''.PREFIX.'dailyfx', $alltabls))
 			m('dailyfx')->delete("`month`<'$month3'"); //日志分析
 		
-		//更多清理自己添加
+
+		m('todo')->delete("`optdt`<'$date2 23:59:59'"); //6个月通知提醒
+		m('flow_todos')->delete("`adddt`<'$date2 23:59:59'"); //6个月单据提醒
 		
 		return 'success';
 	}

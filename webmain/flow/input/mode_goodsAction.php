@@ -14,5 +14,10 @@ class mode_goodsClassAction extends inputAction{
 	}
 	
 	
+	public function reloadstockAjax()
+	{
+		m('goods')->setstock();
+		return 'ok';
+	}
 }	
 			

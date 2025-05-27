@@ -152,7 +152,7 @@
 				if(this.upheight>50){
 					this.reloadbo = true;
 					o1.animate({'height':'50px'},200,function(){
-						o1.html('<img src="images/loading.gif" align="absmiddle"> 刷新中...');
+						o1.html(''+js.ling(14)+' 刷新中...');
 						me.ondownsuccess ? me.ondownsuccess(e) : me.ondownok();
 					});
 				}else{

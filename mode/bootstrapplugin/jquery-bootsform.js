@@ -152,7 +152,7 @@
 			s+='</table>';
 			s+='</form>';
 			s+='</div>';
-			s+='<div style="padding:8px 10px;background:#eeeeee;line-height:30px" align="right"><span id="msgview_'+rand+'"></span>&nbsp;';
+			s+='<div style="padding:8px 10px;background:rgba(0,0,0,0.05);line-height:30px" align="right"><span id="msgview_'+rand+'"></span>&nbsp;';
 			s+='	<button type="button" class="btn btn-'+can.saveCls+'" disabled id="save_'+rand+'"><i class="icon-save"></i>&nbsp;'+can.saveText+'</button>';
 			if(can.cancelbtn)s+='&nbsp; <button type="button" class="btn btn-default" id="cancel_'+rand+'"><i class="icon-remove"></i>&nbsp;取消</button>';
 			s+='</div>';

@@ -1,7 +1,7 @@
 //<script>
 
 c.optalign = 'left';
-c.opttype = '<button type="button" class="btn btn-default" style="padding:3px 5px;font-size:12px">操作</button>';
+c.opttype = '<button type="button" class="btn btn-default btn-xs" style="padding:3px 5px;font-size:12px">操作</button>';
 bootparams.statuschange = true;
 bootparams.checked = true;
 var editarr = ['pctx','status','emtx','mctx','wxtx','ddtx','istxset','ispl','islu','isup','ishz'];
@@ -71,24 +71,46 @@ c.allcreate=function(){
 	},'get',false,'生成中...');
 }
 
+c.opentixing=function(fid, val){
+	js.ajax(js.getajaxurl('opentixing','flow','main'),{fields:fid,value:val},function(s){
+		js.msg('success', s);
+		a.reload();
+	},'get',false,'处理中...');
+}
+
 $('#btndownbtn_{rand}').rockmenu({
-	width:170,top:35,donghua:false,
+	width:190,top:35,donghua:false,
 	data:[{
 		name:'主表管理',lx:0
-	},{
-		name:'清空此模块数据',lx:2
 	},{
 		name:'同步到单位数据',lx:3
 	},{
 		name:'同步菜单到单位数据',lx:4
+	},{
+		name:'☑全部模块开启PC提醒',lx:5,'fields':'pctx','value':1
+	},{
+		name:'☐全部模块关闭PC提醒',lx:5,'fields':'pctx','value':0
+	},{
+		name:'☑全部模块开启APP提醒',lx:5,'fields':'mctx','value':1
+	},{
+		name:'☐全部模块关闭APP提醒',lx:5,'fields':'mctx','value':0
+	},{
+		name:'☑全部模块开启微信提醒',lx:5,'fields':'wxtx','value':1
+	},{
+		name:'☐全部模块关闭微信提醒',lx:5,'fields':'wxtx','value':0
+	},{
+		name:'☑全部模块开启钉钉提醒',lx:5,'fields':'ddtx','value':1
+	},{
+		name:'☐全部模块关闭钉钉提醒',lx:5,'fields':'ddtx','value':0
 	}],
 	itemsclick:function(d, i){
 		var id = a.changedata.id;
 		if(!id)return;
 		if(d.lx==0)c.biaoge();
-		if(d.lx==2)c.clearalldata(id);
+		//if(d.lx==2)js.alert('已弃用，防止删除数据不可逆的操作');
 		if(d.lx==3)c.tongbudanwu();
 		if(d.lx==4)c.tongbumenu();
+		if(d.lx==5)c.opentixing(d.fields,d.value);
 	}
 });
 

@@ -111,6 +111,18 @@ class checkChajian extends Chajian{
 	}
 	
 	/**
+	*	仅支持0-9A-Za-z - |
+	*	return boolean
+	*/
+	public function onlynoen($str)
+	{
+		$str1 = ''.$str.'';
+		$bobg = preg_replace("/[a-zA-Z0-9_]/",'', $str1);
+		$bobg = str_replace(array('-','|'),'', $bobg);
+		return $bobg;
+	}
+	
+	/**
 	*	替换空格
 	*/
 	public function replacekg($str)
@@ -133,4 +145,36 @@ class checkChajian extends Chajian{
 		}
 		return implode('', $strArr);
 	}
+	
+		
+	/**
+	*	判断是不是内网地址
+	*/
+	public function isneiurl($str)
+	{
+		$strt = strtolower($str);
+		$strt = str_replace($strt, 'https:', 'http:');
+		$nearr= array('localhost','127.0.0','192.','10.','172.');
+		$bool = false;
+		foreach($nearr as $ip){
+			if(contain($str, 'http://'.$ip.'')){
+				$bool = true;
+				break;
+			}
+		}
+		return $bool;
+	}
+	
+	/**
+	*	过滤sql的
+	*/
+	public function onlysql($str)
+	{
+		$str 	= $this->rock->iconvsql($str);
+		$str 	= str_replace('(','（', $str);
+		$str 	= str_replace(')','）', $str);
+		$str 	= str_replace(',','，', $str);
+		return $str;
+	}
+	
 }

@@ -1,4 +1,5 @@
 <?php 
+//腾讯地图的。
 class mapqqChajian extends Chajian{
 	
 	private $mapqq_key 		= '';
@@ -12,7 +13,7 @@ class mapqqChajian extends Chajian{
 	{
 		$key = getconfig('qqmapkey');
 		if(!$key){
-			$key = $this->rock->jm->base64decode('NTVRQlotSkdZTE8tQkFMV1gtU1pFNEgtNVNWNUstSkNGVjc:');
+			$key = $this->rock->jm->base64decode('T0I0QlotRDRXM1UtQjdWVk8tNFBKV1ctNlRLREotV1BCNzc:');
 		}else{
 			$this->mapqq_key = $key;
 		}

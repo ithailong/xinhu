@@ -66,11 +66,11 @@ final class rockClass
 	{
 		$ip = '';
 		if(isset($_SERVER['HTTP_CLIENT_IP'])){
-			$ip = $_SERVER['HTTP_CLIENT_IP'];
-		}else if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])){
-			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+			$ip = $_SERVER['HTTP_CLIENT_IP']; //这个会被模拟
 		}else if(isset($_SERVER['REMOTE_ADDR'])){
 			$ip = $_SERVER['REMOTE_ADDR'];
+		}else if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])){
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
 		}
 		$ip= htmlspecialchars($this->xssrepstr($ip));
 		if($ip){$ipar = explode('.', $ip);foreach($ipar as $ip1)if(!is_numeric($ip1))$ip='';}
@@ -84,6 +84,11 @@ final class rockClass
 		$this->adminid	= (int)$this->session('adminid',0);
 		$this->adminname= $this->session('adminname');
 		$this->adminuser= $this->session('adminuser');
+		
+		$apptheme		= $this->get('apptheme');
+		if(strlen($apptheme)==6)$this->savecookie('apptheme', $apptheme);
+		if(!$apptheme)$apptheme = $this->cookie('apptheme');
+		if(strlen($apptheme)==6)$GLOBALS['config']['apptheme']='#'.$apptheme.'';
 	}
 	
 	public function iconvsql($str,$lx=0)
@@ -251,7 +256,7 @@ final class rockClass
 		$valn	= $valarr;
 		if(!is_array($valarr))$valn=explode(',',$valarr);
 		for($i=0;$i<count($arrn);$i++){
-			setcookie(QOM.$arrn[$i],$valn[$i], $time, $path,'');
+			@setcookie(QOM.$arrn[$i],$valn[$i], $time, $path,'');
 		}
 	}
 	

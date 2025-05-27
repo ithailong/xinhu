@@ -77,12 +77,12 @@
 		this._create	= function(){
 			var a	= can.columns;
 			var s 	= '',i,len=a.length,val,s1,s2='',cols,s3='',s4='',s5='',le,st,ov,j,j1,na,attr,sty='',hs='',dis,dlen=this.data.length,mcol;
-			s+='<table id="tablemain_'+rand+'" class="table table-striped table-bordered table-hover" style="margin:0px">';
+			s+='<table id="tablemain_'+rand+'" class="rock-table table table-striped table-bordered table-hover" style="margin:0px">';
 			if(!can.hideHeaders){
 				mcol = window['maincolor'];
 				if(!mcol)mcol='#3399FF';
-				s+='<thead><tr><th width="40" thxu="-1"></th>';
-				if(can.checked)s+='<th width="40"><div align="center"><input id="seltablecheck_'+rand+'" type="checkbox"></div></th>';
+				s+='<thead><tr><th width="40" thxu="-1" class="rock-table-th"></th>';
+				if(can.checked)s+='<th width="40" class="rock-table-th"><div align="center"><input id="seltablecheck_'+rand+'" type="checkbox"></div></th>';
 				var nstr = js.getoption(this.tablekeymd5()),nda={};
 				if(nstr)nda = JSON.parse(nstr);
 				for(i=0;i<len;i++){
@@ -96,7 +96,7 @@
 					if(a[i].width)attr+=' width="'+a[i].width+'"';
 					if(a[i].tooltip)attr+=' title="'+a[i].tooltip+'"';
 					if(cols && cols>1)attr+=' colspan="'+cols+'"';
-					s+='<th nowrap '+attr+' thxu="'+i+'"><div style="'+hs+'" align="'+a[i].align+'" lfields="'+na+'">';
+					s+='<th nowrap '+attr+' thxu="'+i+'" class="rock-table-th"><div style="'+hs+'" align="'+a[i].align+'" lfields="'+na+'">';
 					if(can.celleditor&&a[i].editor)s+='<i class="icon-pencil"></i>&nbsp;';
 					s+=a[i].text;
 					if(a[i].sortable){
@@ -184,13 +184,15 @@
 			if(ov.trbgcolor)trsty+='background:'+ov.trbgcolor+';';
 			if(ov.trstyle)trsty+=''+ov.trstyle+';';
 			if(trsty)trsty='style="'+trsty+'"';
-			s='<tr clickbo="false" oi="'+j+'" dataid="'+ov.id+'" '+s3+' '+trsty+'>';
+			s='<tr class="rock-table-tr" clickbo="false" oi="'+j+'" dataid="'+ov.id+'" '+s3+' '+trsty+'>';
 			xu = ov.trxu;if(!xu)xu=j+1+can.pageSize*(this.page-1);
-			s+='<td '+s5+' align="right" width="40">'+xu+'</td>';
+			s+='<td '+s5+' align="right" width="40" class="rock-table-td">'+xu+'</td>';
 			if(can.checked){
 				dis = '';
 				if(ov.checkdisabled)dis='disabled';
-				s+='<td align="center" width="40"><input oi="'+j+'" name="tablecheck_'+rand+'" '+dis+' value="'+ov.id+'" type="checkbox"></td>';
+				s+='<td align="center" class="rock-table-td" width="40">';
+				if(ov.id)s+='<input oi="'+j+'" name="tablecheck_'+rand+'" '+dis+' value="'+ov.id+'" type="checkbox">';
+				s+='</td>';
 			}
 			for(i=0;i<len;i++){
 				na	= a[i].dataIndex;
@@ -201,15 +203,19 @@
 					val = '';
 					this.data[j][na]=val;
 				}
-				if(a[i].type == 'checkbox'){
+				if(ov.colums_type=='hj' && i==0)val='合计';
+				if(a[i].type == 'checkbox' && ov.id){
 					s1 = '<img height="20" width="20" src="images/checkbox'+val+'.png">';
 				}else{
 					s1 = val;
+					if(ov[na+'_textcn'])s1 = ov[na+'_textcn'];
 				}
+				
 				if(typeof(a[i].renderer)=='function'){
 					s3 = a[i].renderer(val, ov, j);
 					if(!isempt(s3))s1=s3;
 				}
+				
 				s2 = '';
 				if(i == 0 && can.tree){
 					st = ov.stotal;
@@ -227,10 +233,15 @@
 					s3 = a[i].renderattr(val, ov, j);
 					if(!isempt(s3))attr+=' '+s3+'';
 				}
-				s+='<td align="'+a[i].align+'" '+attr+' style="'+sty+'" row="'+j+'" cell="'+i+'">'+s2+''+s1+'</td>';
+				
+				if(ov[''+na+'_color'])sty+='color:'+ov[''+na+'_color']+';';
+				if(ov[''+na+'_style'])sty+=''+ov[''+na+'_style']+';';
+				if(ov[''+na+'_title'])attr+=' title="'+ov[''+na+'_title']+'"';
+				
+				s+='<td class="rock-table-td" align="'+a[i].align+'" '+attr+' style="'+sty+'" row="'+j+'" cell="'+i+'">'+s2+''+s1+'</td>';
 			}
 			s+='</tr>';
-			if(s4)s+='<tr><td colspan="'+(len+1)+'">'+s4+'</td></tr>';
+			if(s4)s+='<tr class="rock-table-tr"><td  class="rock-table-td" colspan="'+(len+1)+'">'+s4+'</td></tr>';
 			return s;
 		};
 		this._tredat={};
@@ -300,7 +311,7 @@
 				var off = obj.offset();
 				var a = can.columns,s='',i,len=a.length,w1,o2;
 				if(!get('headerla_'+rand+'')){
-					s = '<div style="position:fixed;left:'+(off.left)+'px;top:'+(off.top)+'px;width:100%;height:34px;overflow:hidden; background:rgba(255,255,255,0.5);border-bottom:1px #dddddd solid;z-index:2" id="headerla_'+rand+'"></div>';
+					s = '<div style="position:fixed;left:'+(off.left)+'px;top:'+(off.top)+'px;width:100%;overflow:hidden; background:rgba(255,255,255,0.5);border-bottom:0px #dddddd solid;z-index:2" id="headerla_'+rand+'"></div>';
 					obj.append(s);
 				}
 				var o1 = $('#headerla_'+rand+'');
@@ -308,14 +319,14 @@
 				o1.css({left:''+(off.left)+'px',top:''+(off.top)+'px',width:''+($('#tablemain_'+rand+'').width())+'px'});
 				if(o1.html()==''){
 					s = '';
-					s+='<table class="table table-striped table-bordered" style="margin:0px" width="100%">';
-					s+='<tr style="background:white"><th width="40"></th>';
-					if(can.checked)s+='<th width="40"></th>';
+					s+='<table class="rock-table table table-striped table-bordered" style="margin:0px" width="100%">';
+					s+='<tr><th width="40" class="rock-table-th"></th>';
+					if(can.checked)s+='<th width="40" class="rock-table-th"></th>';
 					for(i=0;i<len;i++){
 						o2 = obj.find("div[lfields='"+a[i].dataIndex+"']");
 						w1 = o2[0].clientWidth-1;
 						w1 = 'width:'+w1+'px';
-						s+='<th><div style="'+w1+'" align="'+a[i].align+'">'+o2.html()+'</div></th>';
+						s+='<th class="rock-table-th"><div style="'+w1+'" align="'+a[i].align+'">'+o2.html()+'</div></th>';
 					}
 					s+='</tr>';
 					s+='</table>';
@@ -335,12 +346,12 @@
 				w		= o1.clientWidth,
 				h		= o1.clientHeight,
 				at		= '',
-				v		= a[fields];
+				v		= a[fields];if(!a.id)return;
 			$('#edittable_'+rand+'').remove();
 			if(b.editorbefore && !b.editorbefore(a))return;
 			if(!b.textmsg)b.textmsg='';
-			var s	= '<div id="edittable_'+rand+'" style="position:absolute;z-index:2;left:'+(l.left)+'px;top:'+(l.top+h)+'px">';
-			s+='<div style="border:1px #cccccc solid;background:white;padding:10px;box-shadow:0px 0px 10px rgba(0,0,0,0.3); border-radius:10px">';
+			var s	= '<div id="edittable_'+rand+'" style="position:absolute;z-index:2;left:'+(l.left)+'px;top:'+(l.top+h)+'px; background:white;border-radius:15px">';
+			s+='<div style="border:var(--border);background:var(--main-bgcolor);padding:10px;box-shadow:0px 0px 10px rgba(0,0,0,0.3);border-radius:10px">';
 			s+='	<div>&nbsp;<b>'+b.text+'</b>：&nbsp;<span id="msgteita_'+rand+'">'+b.textmsg+'</span></div>';
 			s+='	<div class="blank10"></div>';
 			var wss = 200;
@@ -531,7 +542,7 @@
 				o1  = $(o2);
 				cell= parseFloat(o1.attr('cell'));
 				farr= can.columns[cell];
-				if(farr.editor)return;//单元格是编辑就退出
+				if(farr && farr.editor)return;//单元格是编辑就退出
 			}
 			can.itemdblclick(this.changedata, oi, e);
 		};
@@ -555,7 +566,7 @@
 			this.page = p;
 			var o1 = $('#tablebody_'+rand+'');
 			var h= o1.height()-2,w= o1.width()-2;
-			s='<div id="modeshow_'+rand+'" style="filter:Alpha(opacity=20);opacity:0.2;height:'+h+'px;width:'+w+'px;overflow:hidden;z-index:3;position:absolute;left:1px;line-height:'+h+'px;top:1px;background:#000000;color:white" align="center"><img src="images/mloading.gif"  align="absmiddle">&nbsp;加载中...</div>';
+			s='<div id="modeshow_'+rand+'" style="height:'+h+'px;width:'+w+'px;overflow:hidden;z-index:3;position:absolute;left:1px;line-height:'+h+'px;top:1px;background:rgba(0,0,0,0.2);color:white" align="center">'+js.ling(20)+'&nbsp;加载中...</div>';
 			o1.append(s);
 			can.beforeload();
 			this.bool = true;
@@ -773,7 +784,7 @@
 		};
 		this._fanye	= function(){
 			var s = '';
-			s='<div style="margin-top:10px" class="btn-toolbar" role="toolbar">'+
+			s='<div style="margin-top:10px;display:flex;align-items:center;">'+
 				'<div class="btn-group">'+
 					'<button id="shouye_'+rand+'" type="button" data-toggle="tooltip" data-placement="top" title="首页"  class="btn btn-default">&laquo;</button>'+
 					'<button id="shang_'+rand+'" data-toggle="tooltip" data-placement="top" title="上一页" type="button" disabled class="btn btn-default">&lt;</button>'+
@@ -781,13 +792,13 @@
 					'<button id="next_'+rand+'" type="button" data-toggle="tooltip" data-placement="top" title="下一页" disabled class="btn btn-default">&gt;</button>'+
 					'<button id="lastye_'+rand+'" type="button" data-toggle="tooltip" data-placement="top" title="尾页" disabled class="btn btn-default">&raquo;</button>'+
 				'</div> '+ 
-				'<div class="btn-group">'+
+				'<div style="margin-left:10px">'+
 				'	 <button id="refresh_'+rand+'" type="button" data-toggle="tooltip" data-placement="top" title="刷新"  class="btn btn-default"><i class="icon-refresh"></i></button>'+ 
 				'</div> '+ 
-				'<div class="btn-group" id="bottomtishi_'+rand+'"></div>'+
-				'<div class="btn-group" style="float:right; padding-top:3px">'+
+				'<div style="flex:1;margin:0px 10px" id="bottomtishi_'+rand+'"></div>'+
+				'<div style="">'+
 					'<span>共记录<span id="zjilu_'+rand+'">0</span>条</span> &nbsp;'+ 
-					'每页<input maxlength="3" onblur="js.number(this)" onfocus="js.focusval=this.value" id="pagesize_'+rand+'" type="number" value="'+can.pageSize+'" style="width:40px;text-align:center;height:24px;border:1px #dddddd solid;margin:0px 2px;font-size:12px">条&nbsp;'+
+					'每页<input maxlength="3" onblur="js.number(this)" onfocus="js.focusval=this.value" id="pagesize_'+rand+'" type="number" value="'+can.pageSize+'" style="width:40px;text-align:center;height:24px;border:var(--border);margin:0px 2px;font-size:12px;border-radius:5px;background:var(--main-bgcolor)">条&nbsp;'+
 				'</div>'+
 			'</div>';
 
@@ -926,7 +937,7 @@
 		5、setparams({key:''},true);//设置参数并搜索
 		6、geturlparams();获取当前Url地址参数,订阅时用到的
 	*/
-	if(typeof(bootsSelectColor)!='string')bootsSelectColor= '';
+	if(typeof(bootsSelectColor)!='string')bootsSelectColor= 'rgba(0,0,0,0.1)';
 	$.fn.bootstable	= function(options){
 		var defaultVal = {
 			columns:[],		//表头

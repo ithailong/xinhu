@@ -35,7 +35,7 @@ class htmlChajian extends Chajian{
 	
 	public function createtable($fields, $arr, $title='',$lx='',$bcolor='')
 	{
-		if(isempt($bcolor))$bcolor = '#cccccc';
+		if(isempt($bcolor))$bcolor = 'var(--main-border)';
 		if($lx=='print'){
 			$bcolor = '#000000';
 			$title='';
@@ -44,12 +44,13 @@ class htmlChajian extends Chajian{
 		if($title != ''){
 			$s .= '<tr><td colspan="2" align="center" style="border:1px '.$bcolor.' solid;padding:10px;font-size:16px;background:#D2E9FF;">'.$title.'</td></tr>';
 		}
+		$pstr = '';
 		foreach($fields as $fid=>$na){
 			$val = '';
 			$sty = 'padding:8px;';
 			if(isset($arr[$fid]))$val = $arr[$fid];
 			if(isset($arr[$fid.'_style']))$sty .= $arr[$fid.'_style'];
-			$s .= '<tr><td align="right" nowrap style="border:1px '.$bcolor.' solid;padding:5px 8px;">'.$na.'</td><td  style="border:1px '.$bcolor.' solid;'.$sty.'" align="left">'.$val.'</td></tr>';
+			$s .= '<tr><td align="right" nowrap style="border:1px '.$bcolor.' solid;'.$pstr.'padding:5px 8px;">'.$na.'</td><td  style="border:1px '.$bcolor.' solid;'.$pstr.''.$sty.'" align="left">'.$val.'</td></tr>';
 		}
 		$s .='</table>';
 		
@@ -84,7 +85,7 @@ class htmlChajian extends Chajian{
 			$head[]	= explode(',', $te_str);
 		}
 		$txt	 = '';
-		$style	 = "padding:3px;border:1px ".$bor." solid";
+		$style	 = "padding:3px;border:1px ".$bor." solid;border:var(--border)";
 		if($lx=='print')$style	 = "border:.5pt #000000 solid";
 		$txt	.= '<table width="100%" class="createrows" border="0" cellspacing="0" cellpadding="0" align="center" style="border-collapse:collapse;" >';
 		$txt	.= '<tr>';
@@ -95,7 +96,7 @@ class htmlChajian extends Chajian{
 				if($h==0)$stls.=';border-left:none';
 				if($h==$lens)$stls.=';border-right:none';
 			}
-			$txt.= '<td style="'.$stls.'" bgcolor="#eeeeee" align="'.$head[$h][2].'"><b>'.$head[$h][1].'</b></td>';
+			$txt.= '<td style="background:#eeeeee; background:var(--main-hgcolor);'.$stls.'"   align="'.$head[$h][2].'"><b>'.$head[$h][1].'</b></td>';
 		}
 		$txt	.= '</tr>';
 		foreach($rows as $k=>$rs){
@@ -211,15 +212,18 @@ class htmlChajian extends Chajian{
 		return $bo;
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	public function importdata($fields,$btfid='', $fid='')
+	private $importerrarr = array();
+	public function importerrda()
 	{
+		return $this->importerrarr;
+	}
+	
+	/**
+	*	导入数据处理
+	*/
+	public function importdata($fields,$btfid='', $fid='', $lx=0)
+	{
+		$this->importerrarr = array();
 		if($fid=='')$fid='importcont';
 		$rows 	= array();
 		$val	= $this->rock->post($fid);
@@ -227,7 +231,7 @@ class htmlChajian extends Chajian{
 		$arrs 	= explode("\n", $val);
 		$farr 	= explode(',', $fields);
 		$fars 	= explode(',', $btfid);
-		foreach($arrs as $valss){
+		foreach($arrs as $xu=>$valss){
 			$dars 	= explode('	', $valss);
 			$barr 	= array();
 			foreach($farr as $k=>$fid){
@@ -236,8 +240,13 @@ class htmlChajian extends Chajian{
 			}
 			$bos 	= true;
 			foreach($fars as $fids){
-				if(isset($barr[$fids]) && isempt($barr[$fids]))$bos = false;
+				if(isset($barr[$fids]) && isempt($barr[$fids])){
+					$bos = false;
+					$this->importerrarr[$xu] = ''.$fids.'是必须的';
+					break;
+				}
 			}
+			if($lx==1)$barr['drxu'] = $xu;
 			if($bos)$rows[] = $barr;
 		}
 		return $rows;

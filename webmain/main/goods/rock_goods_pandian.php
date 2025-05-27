@@ -80,7 +80,7 @@ $(document).ready(function(){
 
 	js.initbtn(c);
 	
-	$('#optionview_{rand}').css('height',''+(viewheight-25)+'px');
+	$('#optionview_{rand}').css('height',''+(viewheight-45)+'px');
 });
 </script>
 

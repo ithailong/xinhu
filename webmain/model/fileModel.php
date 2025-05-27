@@ -120,12 +120,11 @@ class fileClassModel extends Model
 			if(!file_exists($thumbpath))$thumbpath='';
 		}
 		
-		if(isempt($thumbpath))$thumbpath = arrvalue($rs, 'thumbplat');
-		if(!isempt($thumbpath)){
-			$thumbpath = str_replace('{FILEURL}', getconfig('rockfile_url'), $thumbpath);
-			$thumbpath = $this->rock->gethttppath($thumbpath);
+		$thumbplat = arrvalue($rs, 'thumbplat');
+		if(!isempt($thumbplat)){
+			$thumbpath = str_replace('{FILEURL}', getconfig('rockfile_url'), $thumbplat);
 		}
-		return $thumbpath;
+		return $this->rock->gethttppath($thumbpath);
 	}
 	
 	
@@ -339,7 +338,10 @@ class fileClassModel extends Model
 					header('location:'.$filepath.'');
 					return;
 				}
-				
+				if($this->rock->get('openfrom')=='iosapp'){
+					header('location:'.$filepath.'');
+					return;
+				}
 				if($filesize > 10*1024*1024 && 1==1 && $fileext!='pdf'){
 					header('location:'.$filepath.'');
 				}else{

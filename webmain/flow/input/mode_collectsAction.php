@@ -43,6 +43,7 @@ class mode_collectsClassAction extends inputAction{
 		return $arr;
 	}
 	
+	private $zdarr,$zdobj;
 	public function collectstotal_before()
 	{
 		$mid = (int)$this->get('mid','0');

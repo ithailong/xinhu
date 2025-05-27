@@ -3,52 +3,80 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>文档处理</title>
+<link rel="stylesheet" type="text/css" href="webmain/css/rock.css?1747905850"/>
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/js.js"></script>
+<script type="text/javascript" src="js/base64-min.js"></script>
 <script>
-var id = '<?=$da['id']?>',otype='<?=$da['otype']?>';
+var id = '<?=$da['id']?>',otype='<?=$da['otype']?>',nowda,ldata;
 function initbody(){
-	var kei = 'fileid'+id+'';
-	var msg = sessionStorage.getItem(kei);
-	if(msg){
-		$('#zongmsgve').html('刚刚已经打开此文件<br><br><a href="javascript:;" onclick="js.reload()">重新进去</a>，<a href="javascript:;" onclick="js.back()">&lt;&lt;返回</a>');
-		sessionStorage.removeItem(kei,'');
-		return;
-	}
-	var url = 'api.php?m=upload&a=sendedit&id='+id+'&otype='+otype+'';
+	js.setmsg('初始中...');
+	
 	$.ajax({
-		type:'get',
-		url:url,
-		success:function(s){
-			var ret = js.decode(s);
+		type:'get',dataType:'json',
+		url:'api.php?m=upload&a=officeexists&id='+id+'&otype='+otype+'',
+		success:function(ret){
 			if(ret.success){
 				var da = ret.data;
-				$('#msgview').html('跳转中...');
-				sessionStorage.setItem(kei,'trueabc');
-				if(apicloud && api.x5Ver && api.x5Ver>0){
-					api.rockFun('openWinnei',{
-						url:da.url,
-						progress:'true',
-						animtype:'show'
-					});
-					api.closeWin({animtype:'hide'});
-					return;
+				if(da.type==0){
+					js.setmsg('上传中('+da.filesizecn+')('+da.zong+'/<span id="cishu">0</span>)...');
+					nowda = da;
+					upstart(da, 0);
+				}else if(da.type==2){
+					js.setmsg('下载远程文件('+da.filesizecn+')...');
+				}else{
+					js.setmsg('跳转中...');
+					js.location(da.url);
 				}
-				js.location(da.url);
 			}else{
-				$('#msgview').html('<font color=red>'+ret.msg+'</font>');
-			}	
+				js.setmsg(ret.msg);
+			}
 		},
 		error:function(e){
-			$('#msgview').html(e.responseText);
+			js.setmsg(e.responseText);
 		}
 	});
 }
+
+function upstart(da, ci){
+	if(ci==da.zong){
+		js.setmsg('已上传跳转中...');
+		js.location(ldata.url);
+		return;
+	}
+	var url = 'api.php?m=upload&a=officefstart&id='+id+'&otype='+otype+'';
+	url+='&zong='+da.zong+'';
+	url+='&ci='+ci+'';
+	url+='&filemid='+da.filemid+'';
+	url+='&gokey='+da.gokey+'';
+	url+='&gourl='+jm.base64encode(da.gourl)+'';
+	$('#cishu').html(''+(ci+1)+'');
+	$.ajax({
+		url:url,
+		dataType:'json',
+		success:function(ret){
+			if(ret.success){
+				ldata = ret.data;
+				upstart(da, ci+1);
+			}else{
+				$('#cishu').html('<button onclick="chongshi('+ci+')" type="button" class="webbtn">重试</button>'+ret.msg);
+			}
+		},
+		error:function(e){
+			$('#cishu').html('<button onclick="chongshi('+ci+')" type="button" class="webbtn">重试</button>'+e.responseText);
+		}
+	});
+}
+
+function chongshi(ci){
+	upstart(nowda, ci);
+}
+
 </script>
 </head>
 <body style="padding:0px;margin:0px;">
 <div style="margin-top:20%" align="center" id="zongmsgve">
-<img src="images/mloading.gif" align="absmiddle">&nbsp;<span id="msgview">处理中...</span>
+	<span id="msgview"><i class="rock-loading"></i>处理中...</span>
 </div>
 
 </body>

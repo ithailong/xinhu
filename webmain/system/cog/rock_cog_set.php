@@ -5,7 +5,6 @@ $(document).ready(function(){
 	var barr = {};
 	var c={
 		init:function(){
-			this.loadys();
 			js.ajax(js.getajaxurl('getinfo','{mode}','{dir}'),{},function(a){
 				barr = a;
 				for(var i in a)$('#'+i+'_{rand}').val(a[i]);
@@ -13,16 +12,6 @@ $(document).ready(function(){
 				if(isempt(a.asyntest))get('asynsend_{rand}').length=1;
 				if(a.officebj=='1')$('#divofficebj_key').show();
 			},'get,json');
-		},
-		loadys:function(){
-			if(!get('defstype_{rand}'))return;
-			var ysarr = 'cerulean,cosmo,cyborg,darkly,flatly,journal,lumen,paper,readable,sandstone,simplex,slate,spacelab,superhero,united,xinhu,yeti';
-			var sear = ysarr.split(','),i,len=sear.length,das = [];
-			for(i=0;i<len;i++){
-				das.push({name:sear[i],value:i+1});
-				das.push({name:sear[i]+'_def',value:i+1+len});
-			}
-			js.setselectdata(get('defstype_{rand}'),das,'value');
 		},
 		isurl:function(na,dz){
 			if(dz){
@@ -154,8 +143,14 @@ $(document).ready(function(){
 			<td class="tdinput"><input id="reimtitle_{rand}" class="form-control"></td>
 			
 			<td  align="right"><a target="_blank" href="<?=URLY?>">信呼官网</a>key：</td>
-			<td class="tdinput"><input id="xinhukey_{rand}" class="form-control">
-			<font color="#888888">用于在线升级使用,看<a target="_blank" href="<?=URLY?>view_xhkey.html">[帮助]</a>获取</font>,<a href="javascript:;" onclick="$.imgview({url:'http://www.rockoa.com/images/keyhelp.png'})">[怎么获取?]</a></td>
+			<td class="tdinput">
+			
+				<div class="btn-group">
+				<input id="xinhukey_{rand}" placeholder="用于在线升级使用"  readonly class="form-control">
+				<button class="webbtn webbtn-default" onclick="$.imgview({url:'http://www.rockoa.com/images/keyhelp.png'});get('xinhukey_{rand}').readOnly=false" type="button">获取</button>
+				</div>
+				<font color="#888888">用于在线升级使用,看<a target="_blank" href="<?=URLY?>view_xhkey.html">[帮助]</a>获取</font>
+			</td>
 		</tr>
 		
 		<tr>
@@ -224,13 +219,14 @@ $(document).ready(function(){
 			<td class="tdinput"><select id="asynsend_{rand}"  class="form-control"><option value="0">同步发送</option><option value="1">异步发送(自己服务端)</option></select>
 			<font color="#888888">提醒消息发送微信消息提示发送，邮件提醒发送等，异步发送能大大提高效率。</font></td>
 		
-			<td  align="right">是否记录访问sql日志：</td>
-			<td class="tdinput"><select id="sqllog_{rand}"  class="form-control"><option value="0">否</option><option value="1">是</option></select><font color="#888888">开启了日志将记录在目录<?=UPDIR?>/sqllog下</font></td>
+			<td align="right">登录修改密码：</td>
+			<td class="tdinput"><select id="editpass_{rand}"  class="form-control"><option value="0">不用修改</option><option value="1">强制用户必须修改</option></select></td>
 		</tr>
 		
 		<tr>
-			<td  align="right">详情上线条颜色：</td>
-			<td class="tdinput"><input id="bcolorxiang_{rand}" placeholder="用于单据详情默认颜色" maxlength="7" class="form-control"></td>
+			<td  align="right">记录用户操作：</td>
+			<td class="tdinput"><select id="useropt_{rand}"  class="form-control"><option value="">不记录</option><option value="1">记录到日志里</option></select></td>
+			
 		
 			<td  align="right">PC首页显示：</td>
 			<td class="tdinput">REIM：<select id="reim_show_{rand}" ><option value="0">不显示</option><option value="1">显示</option></select>&nbsp;&nbsp;手机版：<select id="mobile_show_{rand}" ><option value="0">不显示</option><option value="1">显示</option></select></td>
@@ -238,11 +234,14 @@ $(document).ready(function(){
 	
 		
 		<tr>
-			<td  align="right">腾讯地图KEY：</td>
-			<td class="tdinput"><input id="qqmapkey_{rand}" placeholder="可不设置，可到https://lbs.qq.com/下申请" class="form-control"></select></td>
 			
 			<td  align="right">登录方式：</td>
 			<td class="tdinput"><select id="loginyzm_{rand}"  class="form-control"><option value="0">仅使用帐号+密码</option><option value="1">帐号+密码/手机+手机验证码</option><option value="2">帐号+密码+手机验证码</option><option value="3">仅使用手机+手机验证码</option></select></td>
+			
+			<?php if(!getconfig('platdwnum')){?>
+			<td align="right">多单位模式：</td>
+			<td class="tdinput"><select id="companymode_{rand}"  class="form-control"><option value="0">不开启</option><option value="1">开启(各单位分开数据管理)</option></select></td>
+			<?php }?>
 			
 		</tr>
 		
@@ -259,31 +258,10 @@ $(document).ready(function(){
 			<td  align="right">文档在线编辑：</td>
 			<td class="tdinput">
 			<select id="officebj_{rand}"  class="form-control"><option value="">安装客户端在线编辑插件</option><option value="1">官网提供在线编辑服务(官网VIP专用)</option></select>
-			<div id="divofficebj_key" style="display:none">在线编辑agentkey，看<a target="_blank" href="<?=URLY?>view_agentkey.html">[帮助]</a>获取<input class="form-control" id="officebj_key_{rand}"></div>
+			<div id="divofficebj_key" style="display:none"><input placeholder="在线编辑key，可不用设置" class="form-control" id="officebj_key_{rand}"></div>
 			</td>
 			
 		</tr>
-		
-		<tr>
-			<td  align="right">PC后端默认主题：</td>
-			<td class="tdinput"><select id="defstype_{rand}" style="width:80px"></select>&nbsp;必须去<a href="<?=URLY?>view_themes.html" target="_blank">下载主题包</a>，否则不能使用</td>
-			
-			<td  align="right">记录用户操作：</td>
-			<td class="tdinput"><select id="useropt_{rand}"  class="form-control"><option value="">不记录</option><option value="1">记录到日志里</option></select></td>
-			
-		</tr>
-		
-		<tr>
-			<?php if(!getconfig('platdwnum')){?>
-			<td align="right">多单位模式：</td>
-			<td class="tdinput"><select id="companymode_{rand}"  class="form-control"><option value="0">不开启</option><option value="1">开启(各单位分开数据管理)</option></select></td>
-			<?php }?>
-			
-			<td align="right">登录修改密码：</td>
-			<td class="tdinput"><select id="editpass_{rand}"  class="form-control"><option value="0">不用修改</option><option value="1">强制用户必须修改</option></select></td>
-			
-		</tr>
-		
 		
 		
 		

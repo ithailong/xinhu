@@ -98,58 +98,33 @@ class rockfileChajian extends Chajian{
 	*/
 	public function uploadfile($fileid)
 	{
-		$frs  = m('file')->getone($fileid);
+		$fobj = m('file');
+		$frs  = $fobj->getone($fileid);
 		if(!$frs)return returnerror('1');
 		$path = ROOT_PATH.'/'.$frs['filepath'];
 		if(!file_exists($path))return returnerror('404');
-		$barr = $this->upload($path, array(
+		
+		$url 	= $this->geturlstr('upload','upfile', array(
 			'optid' 	=> $frs['optid'],
-			'noasyn' 	=> 'no', //no和yes
-			'fileexs' 	=> $frs['fileext'],
-			'optname' 	=> $this->rock->jm->base64encode($frs['optname']),
-			'filename' 	=> $this->rock->jm->base64encode($frs['filename']),
+			'optname' 	=> $this->rock->jm->base64encode($frs['optname'])
 		));
-		if(!$barr['success'])return $barr;
-		$data 	 = $barr['data'];
+		
+		$result 	= c('curl')->postcurl($url, array('file' => new CURLFile($path, '', $frs['filename'])), 1);
+		if(!$result)return returnerror('errors');
+		
+		if(substr($result,0,1)!='{')return returnerror($result);
+		$data = json_decode($result, true);
+		
 		$filenum 	= arrvalue($data, 'filenum');
 		$thumbpath 	= arrvalue($data, 'thumbpath');
 		if($filenum){
-			$guar['filenum'] = $filenum;
-			if($thumbpath)$guar['thumbplat'] = $thumbpath;
-			m('file')->update($guar,$fileid);
+			$guar['filenum'] 	= $filenum;
+			if($fobj->isimg($frs['fileext']))$guar['thumbplat'] = $thumbpath;
+			$fobj->update($guar,$fileid);
 			unlink($path);
 			$path = ROOT_PATH.'/'.$frs['thumbpath'];
 			if($path && file_exists($path))unlink($path);
 		}
-		return $barr;
-	}
-	
-	/**
-	*	上传文件(分割发送)
-	*/
-	public function upload($path,$upcs=array(), $fcs=0.5)
-	{
-		if(!file_exists($path))return returnerror('404');
-		$oi 	 = 0;
-		$fp 	 = fopen($path,'rb');
-		$filesize= filesize($path);
-		$fileext = c('upfile')->getext($path);
-		$size 	 = $fcs*1024*1024;
-		$zong	 = ceil($filesize/$size);
-		if($zong<=0)$zong = 1;
-		$barr 	 = false;
-		$biaoshi = rand(100000,999999);
-		while(!feof($fp)){
-			$cont = fread($fp, $size);
-			$conts= base64_encode($cont);
-			$upcan= array('ci'=>$oi,'biaoshi'=>$biaoshi,'zong'=>$zong,'filesize' => $filesize,'fileext'=>$fileext);
-			foreach($upcs as $k=>$v)$upcan[$k] = $v;
-			$barr = $this->postdata('upfile','index', $conts, $upcan);
-			if(!$barr['success'])break;
-			$oi++;
-		}
-		fclose ($fp);
-		if($barr)return $barr;
-		return returnerror('无效文件');
+		return returnsuccess();
 	}
 }

@@ -15,8 +15,9 @@ js.dw = {
 	
 	//开始定位
 	init:function(isgzh){
-		var dws = navigator.userAgent;
-		if(dws.indexOf('REIMPLAT')>0)return;
+		var dws 	= navigator.userAgent;
+		this.ISAPP 	= dws.indexOf('XINHUOA')>0;
+		if(dws.indexOf('REIMPLAT')>0 || this.ISAPP)return;
 		if(openfrom=='nppandroid' || openfrom=='nppios')return;
 		if(isgzh==1){
 			js.jssdkwxgzh();
@@ -36,10 +37,9 @@ js.dw = {
 	start:function(){
 		if(this.dwbool)return;
 		this.successbo = false;
-		this.dwbool = true;
 		this.chaoshi();
 		this.ondwstart(js.jssdkstate);
-		if(js.jssdkstate != 1){
+		if(js.jssdkstate != 1 || this.ISAPP){
 			this.htmldingw(0);
 		}else{
 			this.wxdingw();
@@ -72,17 +72,19 @@ js.dw = {
 		var msg;
 		if(appobj1('startLocation','appbacklocation')){
 			this.wait('原生app定位中...');
+			this.dwbool = true;
 			return;
 		}
 		if(window['api'] && api.startLocation){
 			js.msg();
+			this.dwbool = true;
 			if(api.systemType=='ios'){
 				this.wait(''+api.systemType+'APP定位中...');
 				api.startLocation({},function(ret,err){
 					js.dw.appLocationSuc(ret,err);
 				});
 				return;
-			}else if(lx==0){
+			}else if(lx==0){ //这个是旧版的app里弃用了
 				this.wait(''+api.systemType+'百度地图定位中...');
 				if(!this.baiduLocation)this.baiduLocation = api.require('baiduLocation');
 				if(this.baiduLocation){
@@ -113,24 +115,46 @@ js.dw = {
 				return;
 			}
 		}
-		
+		if(this.ISAPP)return;
 		if(!navigator.geolocation){
 			msg = '不支持浏览器定位';
 			js.msg('msg',msg);
 			this.clearchao();
 			js.dw.ondwerr(msg);
 		}else{
-			this.wait('浏览器定位中...');
-			//本地虚拟定位
-			if(HOST=='127.0.0.1'){this.showPosition({coords:{latitude:24.51036967,longitude:118.178837299,accuracy:100}});return;}
-			navigator.geolocation.getCurrentPosition(this.showPosition,this.showError,{
-				enableHighAccuracy: true,
-				timeout: 19000,
-				maximumAge: 3000
-			});
+			this.liulqdw();
 		}
 	},
 	
+	liulqdw:function(){
+		this.wait('浏览器定位中...');
+		var dwrand = sessionStorage.getItem('dwrand');
+		if(dwrand){
+			sessionStorage.setItem('dwrand', '');
+			this.wait('跳转定位获取中...');
+			$.ajax({
+				url:'api.php?m=kaoqin&a=dwget&dwrand='+dwrand+'',
+				dataType:'json',
+				success:function(ret){
+					if(ret.success && ret.data){
+						js.dw.showPosition({coords:ret.data});
+					}else{
+						js.dw.showcuowu('跳转定位错误:'+ret.msg);
+					}
+				},
+				error:function(){
+					js.dw.showcuowu('跳转定位错误');
+				}
+			});
+			return;
+		}
+		if(HOST=='127.0.0.1'){this.showPosition({coords:{latitude:24.51036967,longitude:118.178837299,accuracy:100}});return;}//本地虚拟定位
+		navigator.geolocation.getCurrentPosition(this.showPosition,this.showError,{
+			enableHighAccuracy: true,
+			timeout: 10000,
+			maximumAge: 3000
+		});
+	},
 	
 	//微信定位
 	wxdingw:function(){
@@ -179,7 +203,17 @@ js.dw = {
 		var lat 	= parseFloat(res.latitude); // 纬度，浮点数，范围为90 ~ -90
         var lng 	= parseFloat(res.longitude); // 经度，浮点数，范围为180 ~ -180。
         var jid 	= parseFloat(res.accuracy); // 位置精度
-		this.geocoder(lat,lng, jid);
+		var address = res.address;
+		if(address){
+			js.msg('none');
+			res.addressinfo = address+'(精确'+js.float(jid,1)+'米)';
+			res.latitude    = lat;
+			res.longitude   = lng;
+			res.accuracy    = jid;
+			this.ondwcall(res);
+		}else{
+			this.geocoder(lat,lng, jid);
+		}
 	},
 		
 	showError:function (error){
@@ -200,19 +234,47 @@ js.dw = {
 			msg="未知错误。"
 			break;
 		}
+		clearTimeout(js.dw.timeerrbo)
 		if(NOWURL.substr(0,5)!='https')msg+='必须使用https访问';
 		js.dw.timeerrbo = setTimeout(function(){
 			if(!js.dw.successbo){
-				js.msg('msg', msg);
-				js.dw.ondwerr(msg);	
+				js.dw.showErrorss(msg);
 			}else{
 				js.msg();
 			}
 		},1000);
 	},
-	
+	showcuowu:function(msg){
+		js.msg('msg', msg);
+		js.dw.ondwerr(msg);
+	},
+	showErrorss:function(msg){
+		js.confirm('点确定继续去定位('+msg+')', function(jg){
+			if(jg=='yes'){
+				setTimeout('js.dw.gotodingw()',100);
+			}else{
+				js.dw.showcuowu(msg);
+			}
+		});
+	},
+	gotodingw:function(){
+		js.alert('跳转在定位中，可点确定读取定位内容。','', function(){
+			js.reload();
+		});
+		var dwrand = js.getrand();
+		$.ajax({
+			url:'api.php?m=kaoqin&a=dwurl&dwrand='+dwrand+'',
+			dataType:'json',
+			success:function(ret){
+				var da  = ret.data;
+				sessionStorage.setItem('dwrand', da.dwrand);
+				js.location(da.url);
+			}
+		});
+	},
 	showPosition:function(position){
 		js.dw.successbo = true;
+		js.tanclose('confirm');
 		clearTimeout(js.dw.timeerrbo);
 		js.msg();
 		var res 		= position.coords;

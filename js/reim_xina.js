@@ -10,6 +10,7 @@ var agentarr={},userarr={},grouparr={},cnum='',windowfocus=true,jietubool=false;
 var reim={
 	chatobj:{},
 	maindata:{},
+	nowtabs:'home',
 	initci:0,
 	timeloads:0,
 	ruloadtime:5*60, //5分钟
@@ -31,7 +32,7 @@ var reim={
 		//if(sw)$('#centlist').css('width',''+sw+'px');
 		
 		$(window).resize(this.resize);
-		$(window).focus(function(){windowfocus=true;im.windowfocus()});
+		$(window).focus(function(){windowfocus=true;im.windowfocus();reim.lastload();});
 		$(window).blur(function(){windowfocus=false});
 		//数秒
 		setInterval('reim.timeload()', 1000);
@@ -56,7 +57,7 @@ var reim={
 			inputfile:'allfileinput',
 			initpdbool:false,
 			updir:'reimchat',
-			urlparams:{noasyn:'yes'}, //不需要同步到文件平台上
+			urlparams:{noasyn:'no',shuiyin:'size'}, //不需要同步到文件平台上
 			onchange:function(d){
 				im.sendfileshow(d);
 			},
@@ -208,7 +209,7 @@ var reim={
 	getapiurl:function(m,a,lx){
 		if(lx=='gout')return this.outgroup.geturl(a);
 		if(lx=='zixun' || lx=='wait')m='rockkefu';
-		var dzs = 'api.php?m='+m+'&a='+a+'&cfrom=reim';
+		var dzs = 'api.php?m='+m+'&a='+a+'&cfrom=reim&adminid='+adminid+'&token='+token+'';
 		if(companynum)dzs+='&dwnum='+companynum+'';
 		return dzs;
 	},
@@ -231,6 +232,24 @@ var reim={
 			}
 		},''+lx+',json', efun);
 	},
+	initloads:function(){
+		$('#mainreload').html(''+js.ling(12)+' 刷新中...');
+		this.initload(true);
+	},
+	lastload:function(){
+		if(!this.loadtime)this.loadtime = parseInt(js.now('time') * 0.001);
+		this.ajax(this.getapiurl('indexreim','loadhit'),{'time':this.loadtime}, function(ret){
+			var da = ret.data;
+			reim.lastloads(da);
+		});
+	},
+	lastloads:function(da){
+		this.loadtime = da.loadtime;
+		var i,ds=da.rows;
+		for(i=0;i<ds.length;i++){
+			this.showhistorys(ds[i], true);
+		}
+	},
 	//初始加载数据
 	initload:function(bo){
 		this.initbool = true;
@@ -238,11 +257,13 @@ var reim={
 			reim.initci++;
 			reim.showdata(ret.data);
 			if(bo)reim.reloaduser();
+			$('#mainreload').html('<i class="icon-refresh"></i> 刷新');
 		});
 	},
 	firstpid:0,
 	showdata:function(ret){
 		if(!ret.userjson)return;
+		this.loadtime		= ret.loadtime;
 		this.lastloaddt		= ret.loaddt;
 		this.maindata.darr 	= js.decode(ret.deptjson);
 		this.maindata.uarr 	= js.decode(ret.userjson);
@@ -334,7 +355,7 @@ var reim={
 			return;
 		}
 		this.searchright.setData(d);
-		this.searchright.showAt(off.left+1,off.top+25,$('#reim_headercenter').width()-2);
+		this.searchright.showAt(off.left+1,off.top+30);
 	},
 	websocketlink:function(a){
 		if(this.connectbool){
@@ -471,7 +492,10 @@ var reim={
 			this.otherlogins();
 			return;
 		}
-	
+		if(d.optdt){
+			var time = parseInt(js.now('time', d.optdt) * 0.001);
+			this.loadtime = time;
+		}
 		if(lx=='user' || lx=='group'){
 			if(sendid!=adminid)this.receivechat(d);
 		}
@@ -566,7 +590,7 @@ var reim={
 			}
 		}
 		var len=ds.length,d,s='',s1,lx;
-		s='<div style="padding:5px;margin-top:5px;color:#aaaaaa;border-bottom:1px #e1e1e1  solid">会话('+len+')</div>';
+		s='<div style="padding:5px;margin-top:5px;color:#aaaaaa;border-bottom:var(--border)">会话('+len+')</div>';
 		for(i=0;i<len;i++){
 			d = ds[i];
 			lx= d.type1;
@@ -635,7 +659,7 @@ var reim={
 	showhistorydata:{},
 	showhistorys:function(d,pad, lex, glx){
 		var s,ty,o=$('#historylist'),d1,st,nas=d.names,qz=d.qian;
-		var num = ''+d.type+'_'+d.receid+'';
+		var num = ''+d.type+'_'+d.receid+'';if(num==this.nowtabs)lex=true;
 		this.showhistorydata[num]=d;
 		$('#history_'+num+'').remove();
 		st	= d.stotal;if(st=='0')st='';
@@ -658,12 +682,18 @@ var reim={
 			tit+='@'+d.subname+'';
 		}
 		var s1 = this.grouptype(d.deptid,d.type);
-		s	= '<div class="lists'+cls+'" rtype="hist" oncontextmenu="reim.historyright(this,event,\''+num+'\')" tsaid="'+d.receid+'" tsaype="'+d.type+'"  temp="hist" id="history_'+num+'" onclick="reim.openchat(\''+ty+'\',\''+d.receid+'\',\''+d.name+'\',\''+d.face+'\')">';
-		s+='<table cellpadding="0" border="0" width="100%"><tr>';
-		s+='<td style="padding-right:8px"><div style="height:30px;overflow:hidden"><img src="'+d.face+'"></div></td>';
-		s+='<td align="left" width="100%"><div title="'+tit+'" id="lname_'+num+'" class="name">'+na+''+nas+''+s1+'</div><div class="huicont">'+jm.base64decode(d.cont)+'</div></td>';
-		s+='<td align="right" nowrap><span id="'+qz+'_stotal_'+num+'" class="badge red">'+st+'</span><br><span style="color:#aaaaaa;font-size:10px">'+ops+'</span></td>';
-		s+='</tr></table>';
+		s	= '<div class="lists'+cls+'" rtype="hist" oncontextmenu="reim.historyright(this,event,\''+num+'\')" tsaid="'+d.receid+'" tsaype="'+d.type+'" style="display:flex;align-items:center;" temp="hist" id="history_'+num+'" onclick="reim.openchat(\''+ty+'\',\''+d.receid+'\',\''+d.name+'\',\''+d.face+'\')">';
+		s+='<div style="padding-right:8px"><div class="img"><img src="'+d.face+'"></div></div>';
+		s+='<div style="flex:1;overflow:hidden;">';
+		s+='	<div style="display:flex;align-items:center;">';
+		s+='		<div style="flex:1;" title="'+tit+'" id="lname_'+num+'" class="name">'+na+''+nas+''+s1+'</div>';
+		s+='		<span id="'+qz+'_stotal_'+num+'" class="badge red">'+st+'</span>';
+		s+='	</div>';
+		s+='	<div style="display:flex;align-items:center;">';
+		s+='		<div style="flex:1;padding-right:3px" class="huicont">'+strhtml(jm.base64decode(d.cont))+'</div>';
+		s+='		<div style="color:#aaaaaa;font-size:10px;white-space:nowrap">'+ops+'</div>';
+		s+='	</div>';
+		s+='</div>';
 		s+='</div>';
 		if(glx)return s;
 		if(!pad){o.append(s);}else{o.prepend(s)}
@@ -720,7 +750,7 @@ var reim={
 		if(d.tel==null)d.tel='';
 		var num = 'userinfo_'+d.id+'';
 		var s = '<div align="center"><div align="left" style="width:300px;margin-top:50px">';
-		s+='	<div style="padding-left:70px"><img id="myfacess" onclick="$(this).imgview()" src="'+d.face+'" height="100" width="100" style="border-radius:50%;border:1px #eeeeee solid"></div>';
+		s+='	<div style="padding-left:70px"><img id="myfacess" onclick="$(this).imgview()" src="'+d.face+'" height="100" width="100" style="border-radius:50%;border:var(--border)"></div>';
 		if(d.id==adminid)s+='<div style="padding-left:90px"><a href="javascript:;" id="fupbgonet" onclick="reim.upfaceobj.click()" style="font-size:12px">修改头像</a></div>';
 
 		s+='	<div style="line-height:30px;padding:10px;padding-left:20px;"><font color=#888888>姓名：</font>'+d.name+'<br><font color=#888888>部门：</font>'+d.deptallname+'<br><font color=#888888>职位：</font>'+d.ranking+'<br><font color=#888888>性别：</font>'+d.sex+'<br><font color=#888888>电话：</font>'+d.tel+'<br><font color=#888888>手机：</font>'+d.mobile+'<br><font color=#888888>邮箱：</font>'+d.email+'</div>';
@@ -779,10 +809,10 @@ var reim={
 			return;
 		}
 		var s = '<div>';
-		s+='<div id="viewtitle_'+num+'" style="height:50px;overflow:hidden;border-bottom:#dddddd solid 1px;">';
+		s+='<div id="viewtitle_'+num+'" style="height:50px;overflow:hidden;border-bottom:var(--border);">';
 		s+='</div>';
 		var hei = 206;
-		s+='<div resizeh="'+hei+'" id="viewcontent_'+num+'" style="height:'+(viewheight-hei)+'px;overflow:hidden;position:relative;"><div style="margin-top:50px" align="center"><img src="images/mloading.gif"></div></div>';
+		s+='<div resizeh="'+hei+'" id="viewcontent_'+num+'" style="height:'+(viewheight-hei)+'px;overflow:hidden;position:relative;"><div style="margin-top:50px;color:#cccccc" align="center">'+js.ling(30)+'</div></div>';
 		
 		s+='<div class="toolsliao" style="background:none" id="toolsliao_'+num+'">';
 		s+='	<span title="表情" tools="emts" class="cursor"><i class="icon-heart"></i></span>';
@@ -987,7 +1017,7 @@ var reim={
 		for(ty in agedt){
 			a 	= agedt[ty];
 			len	= a.length;
-			s+='<div style="color:#aaaaaa;padding-left:20px;margin-bottom:10px;padding:5px;border-bottom:'+sodd+'px solid #eeeeee">&nbsp;&nbsp;'+ty+'</div>';
+			s+='<div style="color:#aaaaaa;padding-left:20px;margin-bottom:10px;padding:5px;border-bottom-width:'+sodd+'px;border-bottom:var(--border)">&nbsp;&nbsp;'+ty+'</div>';
 			s+='<div class="agenhclsdiv">';
 			for(i=0;i<len;i++){
 				d1 = a[i];
@@ -1033,7 +1063,7 @@ var reim={
 		this.showbadge('chat');
 		this.biaoyd('agent',d.id);
 		
-		var w = 1100,h=600,url = d.urlpc;
+		var w = screen.width-200,h=screen.height-150,url = d.urlpc;
 		if(isempt(url)){
 			url = d.urlm;
 			if(isempt(url)){
@@ -1089,7 +1119,7 @@ var reim={
 				reim.clickcogclick(d);
 			}
 		});
-		var d = [{'name':'消息记录',lx:'jl'},{'name':'刷新',lx:'sx'},{'name':'创建会话',lx:'create'},{'name':'修改密码',lx:'pass'}];
+		var d = [{'name':'消息记录',lx:'jl'},{'name':'刷新',lx:'sx'},{'name':'创建会话',lx:'create'},{'name':'修改密码',lx:'pass'},{'name':'切换主题',lx:'theme'}];
 		if(companymode)d.push({'name':'切换单位',lx:'qhqy'});
 		if(nwjsgui)d.push({'name':'下载管理器',lx:'down'});
 		d.push({'name':'设置',lx:'cog'});
@@ -1112,24 +1142,13 @@ var reim={
 				location.reload();
 			}
 		}
-		if(lx=='exit'){
-			this.exitlogin();
-		}
-		if(lx=='cog'){
-			this.cogshow();
-		}
-		if(lx=='jl'){
-			this.openrecord();
-		}
-		if(lx=='create'){
-			this.creategroup();
-		}
-		if(lx=='pass'){
-			this.editpass();
-		}
-		if(lx=='qhqy'){
-			this.changecom();
-		}
+		if(lx=='exit')this.exitlogin();
+		if(lx=='cog')this.cogshow();
+		if(lx=='jl')this.openrecord();
+		if(lx=='create')this.creategroup();
+		if(lx=='pass')this.editpass();
+		if(lx=='qhqy')this.changecom();
+		if(lx=='theme')this.changetheme();
 		if(lx=='down')js.open('?d=reim&m=record&a=download', 630,450,'downs');
 	},
 	//创建会话
@@ -1146,6 +1165,19 @@ var reim={
 			}
 		});
 		return false;
+	},
+	changetheme:function(){
+		var zys = ['#1389D3','#99cc66','#003366','#6666CC','#CC3333','#009966','#333333','#990066','#333300','#333366','#99CC99','#663366','#003399','#338899'];
+		var h 	= '<div style="padding:10px"><table height="20px" class="cursor"><tr>';
+		var nst = '';
+		for(var i=0;i<zys.length;i++){
+			nst = (zys[i]==maincolor) ? '✔':'&nbsp;';
+			h+='<td width="20px" style="color:white;font-size:12px" align="center" onclick="js.location(\'?d=reim&a=xina&apptheme='+zys[i].substr(1)+'\')" bgcolor="'+zys[i]+'">'+nst+'</td>';
+		}
+		h+='</tr></table></div>';
+		js.tanbody('color','切换主题',310,200,{
+			html:h
+		});
 	},
 	editpass:function(bt,cse){
 		if(!bt)bt='修改密码';
@@ -1176,7 +1208,7 @@ var reim={
 			});
 			return;
 		}
-		if(nwjsgui){
+		if(nwjsgui || 1==1){
 			js.loading('退出中...');
 			js.ajax(this.getapiurl('login','loginexit'),{},function(ret){
 				js.setoption('autologin', '0');
@@ -1221,21 +1253,22 @@ var reim={
 		js.setoption('setchatlistw', ''+kg+'');
 	},
 	cogshow:function(){
+		//nw.Window.open('file:///F:/IIS/demo/webrtc_v5_latest/quick-demo-js/index.html');return;
 		var chs= (this.getsound())?'checked':'';
 		var ch1= (this.getzhuom())?'checked':'';
 		var num = 'userinfo_cogshow';
-		var s = '<div align="center"><div align="left" style="width:300px;margin-top:50px">';
+		var s = '<div align="center"><div align="left" style="width:300px;margin-top:40px;padding:15px;background:var(--main-bgcolor);border-radius:5px;border:var(--border)">';
 		s+='	<div style="line-height:30px"><b>设置</b></div>';
-		s+='	<div style="padding:10px 0px;border-top:1px #eeeeee solid"><label><input '+ch1+' onclick="reim.setzhuom(this)" type="checkbox">新信息桌面提醒</label></div>';
-		s+='	<div style="padding:10px 0px;border-top:1px #eeeeee solid"><label><input '+chs+' onclick="reim.setsound(this)" type="checkbox">新信息声音提示</label></div>';
-		s+='	<div style="padding:10px 0px;border-top:1px #eeeeee solid">提示声音：<select onchange="reim.changesound(this)" id="changesoundid"><option value="web/res/sound/email.mp3">email.mp3</option><option value="web/res/sound/dong.mp3">dong.mp3</option><option value="web/res/sound/todo.ogg">todo.ogg</option><option value="web/res/sound/niu.mp3">niu.mp3</option><option value="web/res/sound/don1.mp3">don1.mp3</option></select></div>';
+		s+='	<div style="padding:10px 0px;border-top:var(--border)"><label><input '+ch1+' onclick="reim.setzhuom(this)" type="checkbox">新信息桌面提醒</label></div>';
+		s+='	<div style="padding:10px 0px;border-top:var(--border)"><label><input '+chs+' onclick="reim.setsound(this)" type="checkbox">新信息声音提示</label></div>';
+		s+='	<div style="padding:10px 0px;border-top:var(--border)">提示声音：<select onchange="reim.changesound(this)" id="changesoundid"><option value="web/res/sound/email.mp3">email.mp3</option><option value="web/res/sound/dong.mp3">dong.mp3</option><option value="web/res/sound/todo.ogg">todo.ogg</option><option value="web/res/sound/niu.mp3">niu.mp3</option><option value="web/res/sound/don1.mp3">don1.mp3</option></select></div>';
 		
 		chs = 'checked';
 		ch1 = '';
 		if(js.getoption('sendkuijie')=='1'){
 			ch1='checked';chs='';
 		}			
-		s+='	<div style="padding:10px 0px;border-top:1px #eeeeee solid">发送快捷键：<label><input onclick="reim.setsendkkj(0)" '+chs+' type="radio" name="sendkuijie">Enter</label>&nbsp; <label><input onclick="reim.setsendkkj(1)" '+ch1+' type="radio" name="sendkuijie">Ctrl+Enter</label></div>';
+		s+='	<div style="padding:10px 0px;border-top:var(--border)">发送快捷键：<label><input onclick="reim.setsendkkj(0)" '+chs+' type="radio" name="sendkuijie">Enter</label>&nbsp; <label><input onclick="reim.setsendkkj(1)" '+ch1+' type="radio" name="sendkuijie">Ctrl+Enter</label></div>';
 		
 		//s+='	<div style="padding:10px 0px;border-top:1px #eeeeee solid">列表列宽：<label><input onclick="reim.setchatlistw(220)" checked type="radio" name="chatlistw">正常</label>&nbsp; <label><input onclick="reim.setchatlistw(230)" type="radio" name="chatlistw">宽点</label>&nbsp; <label><input onclick="reim.setchatlistw(250)" type="radio" name="chatlistw">大宽</label></div>';
 
@@ -1243,13 +1276,13 @@ var reim={
 			var ips = nwjs.getipmac();
 			var d = nw.process.versions;
 			var json = nw.App.manifest;
-			s+='<div style="padding:10px 0px;border-top:1px #eeeeee solid">开机启动：<button type="button" class="cursor" onclick="reim.kaijistart(0)">启动</button>&nbsp;<button type="button" class="cursor" onclick="reim.kaijistart(1)">删除</button>&nbsp;<button type="button" class="cursor" onclick="reim.kaijistart(2)">快捷方式</button></div>';
-			s+='<div style="padding:10px 0px;border-top:1px #eeeeee solid">我局域网IP：'+ips.ip+'</div>';
-			s+='<div style="padding:10px 0px;border-top:1px #eeeeee solid">我的MAC地址：'+ips.mac+'</div>';
-			s+='<div style="padding:10px 0px;border-top:1px #eeeeee solid">此客户端版本：V'+json.version+'，内核nwjs-'+d.nw+'</div>';
+			s+='<div style="padding:10px 0px;border-top:var(--border)">开机启动：<button type="button" class="cursor" onclick="reim.kaijistart(0)">启动</button>&nbsp;<button type="button" class="cursor" onclick="reim.kaijistart(1)">删除</button>&nbsp;<button type="button" class="cursor" onclick="reim.kaijistart(2)">快捷方式</button></div>';
+			s+='<div style="padding:10px 0px;border-top:var(--border)">我局域网IP：'+ips.ip+'</div>';
+			s+='<div style="padding:10px 0px;border-top:var(--border)">我的MAC地址：'+ips.mac+'</div>';
+			s+='<div style="padding:10px 0px;border-top:var(--border)">此客户端版本：V'+json.version+'，内核nwjs-'+d.nw+'</div>';
 		}
 		
-		s+='	<div style="padding:10px 0px;border-top:1px #eeeeee solid">网络IP：'+this.myip+'</div>';
+		s+='	<div style="padding:10px 0px;border-top:var(--border)">网络IP：'+this.myip+'</div>';
 		s+='	<div style="padding-top:10px;"><input onclick="reim.closetabs(\''+num+'\')" type="button" value="关闭" class="btn btn-danger"></div>';
 		s+='</div></div>';
 		this.addtabs(num,s);
@@ -1429,7 +1462,7 @@ function chatcreate(cans){
 		var iref = (!iref)?false:true;
 		var minid= 0;
 		if(iref)minid=this.minid;
-		if(o1)$(o1).html('<img src="images/loadings.gif" height="14" width="15" align="absmiddle"> 加载中...');
+		if(o1)$(o1).html(''+js.ling(12)+' 加载中...');
 		this.boolload 	= true;
 		reim.ajax(this.getapiurl('reim','getrecord'),{type:this.type,gid:this.gid,minid:minid,loadci:this.loadci,laiyuan:'not',soulx:this.soulx,soukey:jm.base64encode(this.soukey)},function(ret){
 			js.unloading();
@@ -1587,7 +1620,7 @@ function chatcreate(cans){
 		});
 	};
 	this.showhuilist=function(){
-		var s = '<div id="showuserlist" style="height:250px;overflow:hidden;position:relative"><div align="center" style="padding:10px;"><img src="images/mloading.gif" align="absmiddle">&nbsp;加载人员...</div></div>';
+		var s = '<div id="showuserlist" style="height:250px;overflow:hidden;position:relative"><div align="center" style="padding:10px;">'+js.ling()+'&nbsp;加载人员...</div></div>';
 		js.tanbody('syscogshow','会话上人员('+this.usershu+')',480,100,{html:s});
 		if(!this.userlistarr){
 			reim.ajax(this.getapiurl('reim','getgroupuser'),{type:this.type,gid:this.gid},function(ret){
@@ -1602,7 +1635,7 @@ function chatcreate(cans){
 		var sad = this.showtableda(a);
 		$('#showuserlist').html(sad[0]);
 		$('#showuserlist').perfectScrollbar();
-		$('#msgview_syscogshow').html('<span style="font-size:12px;color:#888888">右键人名可以@TA，'+sad[1]+'人在线</span>');
+		$('#msgview_syscogshow').html('<span style="font-size:12px;">右键人名可以@TA，'+sad[1]+'人在线</span>');
 		$('#showuserlist').find('div[xuh]').contextmenu(function(e){
 			me.atright(this,e);
 			return false;
@@ -1623,7 +1656,7 @@ function chatcreate(cans){
 				d1=reim.nowonlinearr;
 				if(d1 && d1.reim==1)zx++;
 			}
-			s+='<td width="20%"><div style="padding:5px" align="center"><div><img style="height:34px;width:34px;border-radius:50%" onclick="$.imgview({url:this.src})" src="'+a[i].face+'"></div><div xuh="'+i+'" style="color:#888888">'+a[i].name+''+s1+'</div></div></td>';
+			s+='<td width="20%"><div style="padding:5px" align="center"><div><img style="height:34px;width:34px;border-radius:50%" onclick="$.imgview({url:this.src})" src="'+a[i].face+'"></div><div xuh="'+i+'">'+a[i].name+''+s1+'</div></div></td>';
 			if(oi%5==0)s+='</tr><tr>';
 		}
 		if(len<5)for(i=0;i<5-len;i++)s+='<td width="20%"></td>';
@@ -1845,7 +1878,7 @@ function chatcreate(cans){
 	};
 	this.getemts=function(o){
 		if(!get('aemtsdiv')){
-			var s = '<div id="aemtsdiv" style="width:400px;height:200px;overflow:hidden;border:1px #cccccc solid;background:white;box-shadow:0px 0px 5px rgba(0,0,0,0.3);left:3px;top:5px;position:absolute;display:none;z-index:6">';
+			var s = '<div id="aemtsdiv" style="width:400px;height:200px;overflow:hidden;border:var(--border);background:var(--main-bgcolor);left:3px;top:5px;position:absolute;display:none;z-index:6;border-radius:5px" class="box">';
 			s+='<div style="padding:5px">';
 			s+=this.getemtsbq('qq',0, 104, 11, 24);
 			s+='</div>';
@@ -2099,13 +2132,13 @@ function chatcreate(cans){
 		var str = '';
 		var d = ret.wdarr;
 		if(d.length>0){
-			str+='<div style="padding:5px 10px;border-bottom:1px solid #eeeeee;font-size:12px;color:gray">未读'+d.length+'人</div>';
+			str+='<div style="padding:5px 10px;border-bottom:var(--border);font-size:12px;color:gray">未读'+d.length+'人</div>';
 			var sad = this.showtableda(d);
 			str+=sad[0];
 		}
 		d = ret.ydarr;
 		if(d.length>0){
-			str+='<div style="padding:5px 10px;border-bottom:1px solid #eeeeee;font-size:12px;color:gray">已读'+d.length+'人</div>';
+			str+='<div style="padding:5px 10px;border-bottom:var(--border);font-size:12px;color:gray">已读'+d.length+'人</div>';
 			var sad = this.showtableda(d);
 			str+=sad[0];
 		}
@@ -2162,7 +2195,7 @@ function chatcreate(cans){
 			s+='</div>';
 		}
 		s+='';
-		if(s2)s2='<div style="display:inline-block;border-bottom:1px #eeeeee solid;width:100%">'+s2+'</div>';
+		if(s2)s2='<div style="display:inline-block;border-bottom:var(--border);width:100%">'+s2+'</div>';
 		$('#showstarlist').html(s2+s);
 		$('#showstarlist').perfectScrollbar();
 		$('#msgview_sysshowstar').html('<a onclick="'+this.objstr+'.showstarshu(this)" href="javascript:;">刷新</a>');

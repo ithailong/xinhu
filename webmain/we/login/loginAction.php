@@ -31,8 +31,8 @@ class loginClassAction extends ActionNot{
 				if(!isempt($qycrid))$iskj=2;
 				if($iskj==0 && $this->option->getval('wxgzh_tplmess')=='1')$iskj=4;	
 			}
-			$kjdl = $this->option->getval('qywxplat_kjdl');
-			if($this->getsession('olaizhi') || $kjdl=='1')$iskj = 5;
+			$kjdl = $this->option->getval('wxqyplat_kjdl');
+			if($kjdl=='1')$iskj = 5;
 		}
 		return $iskj;
 	}
@@ -49,7 +49,7 @@ class loginClassAction extends ActionNot{
 		}else if($iskj==4){
 			m('wxgzh:oauth')->oauthto('we','login');	
 		}else if($iskj==5){
-			c('rockqywx')->authlogin($this->getsession('olaizhi'));
+			c('rockwxqy')->authlogin();
 		}else{
 			return 'wuxiaoopen';
 		}

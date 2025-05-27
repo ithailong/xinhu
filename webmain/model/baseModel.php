@@ -101,4 +101,60 @@ class baseClassModel extends Model
 		}
 		return $str;
 	}
+	
+	/**
+	*	合计处理
+	*/
+	public function hjfieldsRows($rows, $hjfields)
+	{
+		$farr = explode('@', $hjfields);
+		$barr = array('id'=>0, 'colums_type'=>'hj');
+		foreach($farr as $fid){
+			if($fid){
+				$sbar = $this->hjfieldsRowss($rows, $fid);
+				foreach($sbar as $k=>$v)$barr[$k]=$v;
+			}
+		}
+		return $barr;
+	}
+	private function hjfieldsRowss($rows, $hjfields)
+	{
+		$tjval	= 0;
+		$hjfid	= $hjfields;
+		$slaox  = false;
+		$xshu	= 0;
+		if(contain($hjfields,':')){
+			$arr 		= explode(':', $hjfields);
+			$hjfid 		= $arr[0];
+			$hjfields 	= $arr[1];
+			$slaox = true;
+			if(isset($arr[2]))$xshu = floatval($arr[2]);
+		}
+		$strv 	= '';
+		foreach($rows as $k1=>$rs1){
+			if($slaox){
+				if($k1 > 0)$strv .= ' + ';
+				$strv .= '('.$this->rock->reparr($hjfields, $rs1).')';
+			}else{
+				$val = arrvalue($rs1, $hjfid);
+				if(isempt($val))$val='0';
+				$tjval += floatval($val);
+				if($xshu == 0){
+					$vals = ''.$val.'';
+					if(contain($vals, '.')){
+						$avla = explode('.', $vals);
+						if(isset($avla[1]))$xshu = strlen($avla[1]);
+					}
+				}
+			}
+		}
+		if($strv){
+			$tjval = eval('return '.$strv.';');
+		}
+		if($xshu > 0)$tjval = $this->rock->number($tjval, $xshu);
+		return array(
+			$hjfid => $tjval
+		);
+	}
+	
 }

@@ -18,7 +18,7 @@ $(document).ready(function(){
 				var d1,s='';
 				for(d1 in da){
 					s=da[d1];
-					if(s!='')$('#s'+d1+'_{rand}').html('<div style="border-top:1px #eeeeee solid;margin-top:3px;">'+s+'</div>');
+					if(s!='')$('#s'+d1+'_{rand}').html('<div style="border-top:var(--border);margin-top:3px;">'+s+'</div>');
 				}
 				s='';var toarr = da['total'];
 				for(d1 in toarr)s+='，'+d1+':'+toarr[d1]+'';
@@ -73,5 +73,5 @@ $(document).ready(function(){
 	</table>
 </div>
 <div class="blank10"></div>
-<div style="height:30px;line-height:30px;border-top:1px #dddddd solid">&nbsp;统计：<span id="total_{rand}"></span></div>
+<div style="height:30px;line-height:30px;border-top:var(--border)">&nbsp;统计：<span id="total_{rand}"></span></div>
 <div id="veiw_{rand}"></div>

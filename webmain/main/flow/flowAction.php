@@ -720,7 +720,7 @@ class mode_'.$modenum.'ClassAction extends inputAction{
 			$tablesn = explode(',', $mrs['names']);
 			foreach($tablesa as $k=>$tab){
 				$str 	= m('input')->getsubtable($modeid, $k+1, 1);
-				$s.='<tr ><td class="ys2" style="background-color:#CCCCCC;" colspan="4"><strong>'.arrvalue($tablesn, $k).'</strong></td></tr>';
+				$s.='<tr ><td class="ys2 zbtitle" colspan="4"><strong>'.arrvalue($tablesn, $k).'</strong></td></tr>';
 				$s.='<tr><td class="ys0" colspan="4">'.$str.'</td></tr>';
 			}
 		}
@@ -808,7 +808,7 @@ class mode_'.$modenum.'ClassAction extends inputAction{
 				$narr['modename'] 	= $this->moders['name'];
 				$narr['table'] 		= $this->moders['table'];
 				$narr['optdt'] 		= arrvalue($rs,'optdt');
-				$nors 	= $flow->flowrsreplace($rs, 2);
+				$nors 	= $flow->rsreplace($rs, 2, null, 1);
 				$narr['summary'] 	= $this->rock->reparr($this->moders['summary'], $nors);
 				$otehsr = '';
 				if($flow->isflow>0){
@@ -911,7 +911,7 @@ class mode_'.$modenum.'ClassAction extends inputAction{
 		$fiesss = substr($fields,0,5);
 		if($fiesss == 'base_' || $fiesss == 'temp_')return;
 		if(!isempt($tables) && $cans['islu']==1){
-			$_fieldsa = $this->db->gettablefields('[Q]'.$tables.'');$allfields = array();
+			$_fieldsa = $this->db->gettablefields('[Q]'.$tables.'');$allfields = array();$this->rock->debugs($_fieldsa,'fields');
 			foreach($_fieldsa as $k2=>$rs2)$allfields[$rs2['name']] =  $rs2;
 			$this->createfields($allfields, $tables, $fields, $type, $lens, $dev, $name);
 			if(substr($type,0,6)=='change' && !isempt($data)){
@@ -1050,6 +1050,9 @@ class mode_'.$modenum.'ClassAction extends inputAction{
 		if(!$mrs)return '模块不存在';
 		$num 	= $mrs['num'];
 		if($num!='demo' && $mrs['type']=='系统')return '系统类型模块不能删除清空';
+		
+		/*
+		//防止误删2024-09-11已弃用
 		$flow	= m('flow')->initflow($num);
 		$table 	= $mrs['table'];
 		$where 	= $mrs['where'];
@@ -1066,6 +1069,7 @@ class mode_'.$modenum.'ClassAction extends inputAction{
 			$flow->loaddata($ssid, false);
 			$flow->deletebill('清空模块数据', false);
 		}
+		*/
 		
 		$name 	= $mrs['name'];
 		if($dm){
@@ -1083,7 +1087,7 @@ class mode_'.$modenum.'ClassAction extends inputAction{
 			m('log')->addlog('模块','清空模块['.$name.']的数据');
 		}
 		
-		$this->db->query("alter table `[Q]$table` AUTO_INCREMENT=1");
+		//$this->db->query("alter table `[Q]$table` AUTO_INCREMENT=1");
 		return 'ok';
 	}
 	
@@ -1640,5 +1644,14 @@ return array(
 			}
 		}
 		return $arr;
+	}
+	
+	public function opentixingAjax()
+	{
+		$fields = $this->get('fields');
+		if(c('check')->onlynumber($fields))return '错误';
+		$value 	= (int)$this->get('value');
+		m('flow_set')->update("`$fields`='$value'", 'id>0');
+		return '处理成功';
 	}
 }

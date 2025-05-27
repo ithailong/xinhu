@@ -48,6 +48,33 @@ class qcloudCosChajian extends Chajian{
 		return $ret;
 	}
 	
+	//上传
+	public function uploadFile($path)
+	{
+		$ret = $this->upload(ROOT_PATH.'/'.$path,'', $path);
+		if(!$ret)return returnerror();
+		if(!isset($ret['url']))return returnerror();
+		$barr = returnsuccess();
+		$barr['url'] = $ret['url'];
+		return $barr;
+	}
+	
+	/**
+	*	简单上传要调用
+	*/
+	public function uploadBase($path)
+	{
+		if(getconfig('qcloudCos_autoup')){
+			return $this->uploadFile($path);
+		}else{
+			if(getconfig('alioss_autoup')){
+				$obj = c('alioss');
+				if(method_exists($obj, 'uploadFile'))return $obj->uploadFile($path);
+			}
+		}
+		return returnerror();
+	}
+	
 	/**
 	*	创建文件夹
 	*/

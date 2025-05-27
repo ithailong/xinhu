@@ -20,6 +20,13 @@ class tableClassAction extends Action
 		);
 	}
 	
+	public function tableafter($table, $rows)
+	{
+		return array(
+			'dbupurl' => m('option')->getval('dbupurl')
+		);
+	}
+	
 	//保存表备注
 	public function tablesmAjax()
 	{
@@ -123,8 +130,43 @@ class tableClassAction extends Action
 				);
 			}
 		}
+		foreach($rows as $k=>$rs){
+			foreach($rs as $k1=>$v1){
+				if($v1===null){
+					$rows[$k][$k1]='NULL';
+					$rows[$k][''.$k1.'_color']='#aaaaaa';
+				}
+			}
+		}
 		return array(
-			'fieldsarr' => $fieldsar
+			'fieldsarr' => $fieldsar,
+			'rows' => $rows,
 		);
+	}
+	
+	public function savedbupurlAjax()
+	{
+		$dz = $this->get('dz');
+		$dz = $this->jm->base64decode($dz);
+		m('option')->setval('dbupurl', $dz);
+		return 'ok';
+	}
+	
+	public function dbupdateAjax()
+	{
+		$url = m('option')->getval('dbupurl');
+		if(!$url)return returnerror('未设置更新地址');
+		if(substr($url,0,4)!='http')return returnerror('更新地址有问题');
+		$tab  = $this->get('tab');
+		$tab  = str_replace(PREFIX,'', $tab);
+		$url .= 'api.php?m=login&a=dbinfo&tab='.$tab.'&xinhukey='.getconfig('xinhukey').'';
+		$result = c('curl')->getcurl($url);
+		if(substr($result, 0, 1)!='{')return returnsuccess($result);
+		$msg  = m('beifen')->updatefabric($result);
+		if($msg=='ok'){
+			return returnsuccess('已更新');
+		}else{
+			return returnsuccess($msg);
+		}
 	}
 }

@@ -33,22 +33,6 @@ $(document).ready(function(){
 		},
 		beforeload:function(){
 			btn(true);
-		},
-		load:function(a){
-			if(!bools){
-				var s = '<option value="0">-选择模块-</option>',len=a.modearr.length,i,csd,types='';
-				for(i=0;i<len;i++){
-					csd = a.modearr[i];
-					if(types!=csd.type){
-						if(types!='')s+='</optgroup>';
-						s+='<optgroup label="'+csd.type+'">';
-					}
-					s+='<option value="'+csd.id+'">'+csd.name+'</option>';
-					types = csd.type;
-				}
-				$('#mode_{rand}').html(s);
-			}
-			bools=true;
 		}
 	});
 	function btn(bo, d){
@@ -76,14 +60,17 @@ $(document).ready(function(){
 			guanflowviewlist = a;
 			addtabs({num:'flowview'+id+'',url:'main,view,edit,id='+id+',mid='+mid+'',icons:icon,name:name});
 		},
-		changemode:function(){
-			var v=this.value;
+		changemodes:function(v){
 			mid=v;
 			a.search('and modeid='+v+'');
+		},
+		xuanmode:function(o1){
+			js.selectmode(o1, get('modes_{rand}'), function(sna,val,d){
+				c.changemodes(val);
+			});
 		}
 	};
 	js.initbtn(c);
-	$('#mode_{rand}').change(c.changemode);
 });
 </script>
 
@@ -94,7 +81,10 @@ $(document).ready(function(){
 		<button class="btn btn-warning" click="clickwin,0" type="button"><i class="icon-plus"></i> 新增</button>
 	</td>
 	<td style="padding-left:10px">
-		<select style="width:230px" id="mode_{rand}" class="form-control" ><option value="0">-选择模块-</option></select>
+		<div class="btn-group"  style="width:260px;" click="xuanmode">
+		<input class="input" placeholder="-选择模块-" style="flex:1" id="modes_{rand}" readonly>
+		<button class="webbtn webbtn-default">v</button>
+		</div>
 	</td>
 	<td width="90%">
 		

@@ -19,7 +19,9 @@ class mysqliClass extends mysql{
 	
 	protected function querysql($sql)
 	{
-		return $this->conn->query($sql);
+		$roboll = $this->conn->query($sql);
+		if(!$roboll)$this->setError($this->conn->error, $sql);
+		return $roboll;
 	}
 	
 	public function fetch_array($result, $type = 0)
@@ -58,11 +60,7 @@ class mysqliClass extends mysql{
 		}
 		return $arr;
 	}
-		
-	public function error()
-	{
-		return 'mysqliError:'.$this->conn->error;
-	}
+	
 	
 	public function close()
 	{

@@ -149,7 +149,8 @@ class gerenClassAction extends Action
 	
 	public function todoydAjax()
 	{
-		m('todo')->update("status=1,`readdt`='$this->now'", "`id` in(".$this->post('s').") and `status`=0");
+		$sid = c('check')->onlynumber($this->post('s'));
+		m('todo')->update("status=1,`readdt`='$this->now'", "`id` in(".$sid.") and `status`=0");
 	}
 	
 	public function totaldaetods($table, $rows)

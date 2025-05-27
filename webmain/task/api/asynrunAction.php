@@ -168,8 +168,8 @@ class asynrunClassAction extends apiAction
 	//订阅的
 	public function subscribeAction()
 	{
-		$id 		= $this->get('id');
-		$uid 		= $this->get('uid');
+		$id 		= (int)$this->get('id');
+		$uid 		= (int)$this->get('uid');
 		$receid 	= $this->get('receid');
 		$recename 	= $this->jm->base64decode($this->get('recename'));
 		$flow = m('flow')->initflow('subscribeinfo');

@@ -117,7 +117,7 @@ class downChajian extends Chajian{
 		$msg 		= '';
 		$data 		= array();
 		if(is_array($upses)){
-			$noasyn = $this->rock->get('noasyn'); //=yes就不同步到文件平台
+			$noasyn = $this->rock->get('noasyn');$noasyn = ''; //=yes就不同步到文件平台
 			$noyaso = $this->rock->get('noyaso'); //=yes就不压缩
 			$fileext= substr($upses['fileext'],0,10);
 			$arrs	= array(
@@ -162,14 +162,28 @@ class downChajian extends Chajian{
 				}
 			}
 			
+			$shuiyin = $this->rock->get('shuiyin');
 			if($upses['picw']>$lw || $upses['pich']>$lh){
 				$imgaa	= c('image', true);
 				$imgaa->createimg($thumbpath);
 				$thumbpath 	= $imgaa->thumbnail($lw, $lh, 1);
+				if(contain($thumbpath, 'reimchat'))$shuiyin = 'size';
+				if($shuiyin=='size'){
+					$imgaa->createimg($thumbpath);
+					$imgaa->addwater($arrs['filesizecn']);
+				}
 			}
+			
+			
+			
 			if($upses['picw'] == 0 && $upses['pich']==0)$thumbpath = '';
 			$arrs['thumbpath'] = $thumbpath;
 			
+			//有缩略图先上传到云里 && $this->rock->get('sysuptype')=='img'
+			if($thumbpath){
+				$tarr = $this->uploadBase($thumbpath);
+				if($tarr['success'] && isset($tarr['url']))$arrs['thumbplat'] = $tarr['url'];
+			}
 			
 			$bo = $this->db->record('[Q]file',$arrs);
 			if(!$bo)$this->reutnmsg($this->db->error());
@@ -194,10 +208,30 @@ class downChajian extends Chajian{
 				c('rockqueue')->sendfile($id, $stime);
 			}
 			
+			if(arrvalue($arrs, 'thumbplat')){
+				$data['filepath']  = $arrs['thumbplat'];
+				$data['thumbpath'] = $arrs['thumbplat'];
+			}
 		}else{
 			$data['msg'] = $upses;
 		}
 		return $data;
+	}
+	
+	/**
+	*	简单上传要调用
+	*/
+	private function uploadBase($path)
+	{
+		if(getconfig('qcloudCos_autoup')){
+			return c('qcloudCos')->uploadFile($path);
+		}else{
+			if(getconfig('alioss_autoup')){
+				$obj = c('alioss');
+				if(method_exists($obj, 'uploadFile'))return $obj->uploadFile($path);
+			}
+		}
+		return returnerror();
 	}
 	
 	//过滤特殊文件名
@@ -205,8 +239,9 @@ class downChajian extends Chajian{
 	{
 		$s 			= strtolower($str);
 		$s2			= $s.'';
-		$lvlaraa  	= explode(',','user(),found_rows,(),select*from,select*,%20,<,>');
+		$lvlaraa  	= explode(',',' ,user(),found_rows,(),\',",select*from,select*,%20,<,>,\,');
 		$s = str_replace($lvlaraa, '', $s);
+		$s = str_replace(array('(',')'), array('）','）'), $s);
 		if($s!=$s2)$str = $s;
 		return $str;
 	}

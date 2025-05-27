@@ -104,12 +104,12 @@ class imageChajian extends Chajian
 		添加文字水印
 		$str	添加文字
 	*/
-	public function addwater($str,$color='#000000',$size=20,$align='rb')
+	public function addwater($str,$color='#000000',$size=5,$align='lt')
 	{
 		if(!$this->bool)return;
-		$font	= '../fonts/FZZHYJW.TTF';	//方正稚艺简体
-		$lw 	= strlen($str)*($size/2);
-		$lh		= $size*0.5;
+		$font	= 'arial.ttf';	
+		$lw 	= strlen($str)*($size);
+		$lh		= $size*1.5;
 		$color	= $this->color($color,$this->img);
 		$x		= 2;
 		$y		= 2;
@@ -129,7 +129,8 @@ class imageChajian extends Chajian
 				$y		= ($this->h - $lh) * 0.5;
 			break;
 		}
-		imagettftext($this->img, $size,0, $x, $y, $color, $font, $str);
+		//imagettftext($this->img, $size,0, $x, $y, $color, $font, $str);
+		imagestring($this->img, $size, $x, $y, $str, $color);
 		$sapath	= str_replace('.'.$this->ext.'', '_water.'.$this->ext.'', $this->path);
 		$sapath	= $this->path;
 		$this->saveas($sapath, $this->img);//另存为

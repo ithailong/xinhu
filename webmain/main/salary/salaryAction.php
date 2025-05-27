@@ -58,6 +58,8 @@ class salaryClassAction extends Action
 	
 	public function xinziafter($table, $rows)
 	{
+		$heji = 0;
+		
 		return array(
 			'rows' => $rows,
 			'isdaochu' => m('view')->isdaochu($this->flow->modeid, $this->adminid)

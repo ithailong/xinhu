@@ -27,7 +27,7 @@ $(document).ready(function(){
 				if(v==2)s='<button onclick="upsho{rand}(2,'+d.id+',\''+d.key+'\')" class="btn btn-danger btn-sm" type="button">升级</button>';
 				if(v==0)s='<button onclick="upsho{rand}(0,'+d.id+',\''+d.key+'\')" class="btn btn-info btn-sm"  type="button">安装</button>';
 				if(v==0||v==2){
-					if(d.price=='0')s+='&nbsp;<a href="javascript:;" onclick="downup{rand}('+d.id+',\''+d.name+'\')">文件对比</a>';
+					if(d.price=='0')s+='&nbsp;<a href="javascript:;" onclick="downup{rand}('+d.id+',\''+d.name+'\')">文件对比</a>&nbsp;<a href="javascript:;" onclick="opt{rand}.hulue('+d.id+')">忽略</a>';
 					$('#shiw_{rand}').html('有系统模块需要升级/安装！');
 				}
 				if(d.id=='1'){
@@ -142,6 +142,11 @@ $(document).ready(function(){
 		},
 		lianwcs:function(){
 			js.open('?m=index&a=testnet');
+		},
+		hulue:function(_id){
+			js.ajax(js.getajaxurl('hulueup','{mode}','{dir}'),{id:_id},function(s){
+				a.reload();
+			});
 		}
 	};
 	upsho{rand}=function(lx,id,kes){
@@ -152,7 +157,7 @@ $(document).ready(function(){
 		addtabs({num:'upgradefile'+id+'','url':'system,upgrade,file,id='+id+'','name':'['+na+']文件对比'});
 	}
 	js.initbtn(c);
-	
+	opt{rand} = c;
 	upfetwontbu=function(lx, o){
 		if(ISDEMO){js.msg('msg','演示系统不要操作');return;}
 		if(!istongbu && lx!=3){

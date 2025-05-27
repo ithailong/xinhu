@@ -4,6 +4,12 @@
 */
 class openxiangClassAction extends openapiAction
 {
+	
+	public function initAction()
+	{
+		$this->showreturn('', '此页面弃用', 201);//2025-04-09
+	}
+	
 	/**
 	*	详情
 	*/
@@ -38,7 +44,7 @@ class openxiangClassAction extends openapiAction
 		$xcytype = $this->get('xcytype');
 		$mid 	 = (int)$this->get('mid','0');
 		$menuid  = (int)$this->get('menuid','0');
-		$sm 	 = $this->jm->base64decode($this->get('sm'));
+		$sm 	 = c('check')->onlysql($this->jm->base64decode($this->get('sm')));
 		if(isempt($num) || !$xcytype || $mid==0)return returnerror('num isempt');
 		$flow 	 = m('flow')->initflow($num,$mid, false);
 		$msg 	 = $flow->optmenu($menuid,1,$sm);

@@ -16,8 +16,6 @@ $(document).ready(function(){
 		},{
 			text:'分类',dataIndex:'types',editor:true,sortable:true
 		},{
-			text:'图标颜色',dataIndex:'iconcolor',editor:true
-		},{
 			text:'编号',dataIndex:'num'
 		},{
 			text:'排序号',dataIndex:'sort',editor:true,sortable:true

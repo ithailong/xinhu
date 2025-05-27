@@ -268,13 +268,13 @@ var strformat = {
 				}
 				s='<img src="'+d.filepath+'"  onclick="strformat.clickimg(this)" '+sttr+' fid="'+d.fileid+'">';
 			}
-		}else if(d.fileext=='amr'){
-			s+='<i class="icon-volume-up"></i> '+(parseInt(d.filesize/1000))+'"';
-			s+='&nbsp;<a href="javascript:;" style="font-size:12px" onclick="js.fileopt('+d.fileid+',1)">下载</a>';
+		}else if(d.filename.indexOf('rockyuyin')==0 && d.fileext=='mp3'){ 
+			var miao= this.getmiao(d.filename);
+			if(!miao)miao = parseInt(d.filesize/1500);
+			s+='<div class="cursor" onclick="strformat.playmp3(\''+d.filepath+'\',0)"><i class="icon-volume-up"></i> '+miao+'"</div>';
 		}else{
 			slx = d.fileext;if(!lj)lj='';
 			if(js.fileall.indexOf(','+slx+',')<0)slx='wz';
-			//s=''+d.filename+'<br><a href="javascript:;" onclick="js.fileopt('+d.fileid+',1)">下载</a>&nbsp;&nbsp;<a href="javascript:;" onclick="js.fileopt('+d.fileid+',0)">预览</a>&nbsp;'+d.filesizecn+'';
 			s='<table><tr><td><div class="qipaofile">'+d.fileext.toUpperCase()+'</div></td><td>'+d.filename+'<br><span style="font-size:12px;color:#888888">('+d.filesizecn+')&nbsp;&nbsp;<a href="javascript:;" onclick="strformat.clickfile(\''+d.fileid+'\',1)">下载</a>&nbsp;&nbsp;<a href="javascript:;" onclick="strformat.clickfile(\''+d.fileid+'\',0)">预览</a></span></td></tr></table>';
 		}
 		return s;
@@ -284,6 +284,17 @@ var strformat = {
 	},
 	clickimg:function(){
 		
+	},
+	getmiao:function(name){
+		var arr = name.split('_')
+		if (!arr[1])return 0;
+		arr =  arr[1].split('.')
+		return arr[0];
+	},
+	playmp3:function(path){
+		js.tanbody('play','播放', 300, 50, {
+			html:'<div style="padding:10px"><video src="'+path+'?'+js.getrand()+'" width="100%" height="60" controls autoplay></video></div>'
+		});
 	}
 }
 strformat.init();

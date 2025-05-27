@@ -59,7 +59,7 @@ $(document).ready(function(){
 	});
 	
 	obj[3] = $('#view3_{rand}').bootstable({
-		tablename:'custfina',params:{'atype':'myfkdwf'},modenum:'custfina',modename:'付款单',limit:5,moreurl:'flow,page,custfina,atype=myfkdwf,pnum=fkd',morenum:'num107',
+		tablename:'custfina',params:{'atype':'myfkdwf'},modenum:'custfinb',modename:'付款单',limit:5,moreurl:'flow,page,custfinb,atype=myfkdwf',morenum:'num107',
 		columns:[{
 			text:'所属日期',dataIndex:'dt'
 		},{

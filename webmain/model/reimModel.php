@@ -675,14 +675,16 @@ class reimClassModel extends Model
 				if($frs){
 					$type = $frs['fileext'];
 					$path = $frs['filepath'];
+					$isimg= $this->contain($imgext, ','.$type.',');
 					$boc  = false;
 					if(substr($path,0,4)=='http' || !isempt($frs['filenum'])){
 						$boc = true;
 					}else{
 						if(file_exists($path))$boc = true;
 					}
+					if($isimg && !isempt($frs['thumbplat']))$boc = true;
 					if($boc){
-						if($this->contain($imgext, ','.$type.',')){
+						if($isimg){
 							$frs['thumbpath'] = $fobj->getthumbpath($frs);
 							//$cont = '<img fid="'.$fid.'" src="'.$frs['thumbpath'].'">';
 							//$rows[$k]['cont'] = $this->rock->jm->base64encode($cont);
@@ -858,6 +860,7 @@ class reimClassModel extends Model
 		if(isset($cans['fileid']))$fileid=$cans['fileid'];
 		if(isset($cans['msgid']))$msgid=$cans['msgid'];
 		$pushcont	= arrvalue($cans, 'pushcont');
+		$ispushapp	= arrvalue($cans, 'ispushapp');//是否推送app
 		$arr = array(
 			'cont'		=> $cont,
 			'sendid'	=> $sendid,
@@ -900,20 +903,21 @@ class reimClassModel extends Model
 		if($sendid!=$receid)$this->addhistory('user', $sendid, $receid, $optdt, $cont, $sendid,'','', $arr['id']);
 		
 		//推送的原生App上(使用异步推送哦)
-		$tuicont['sendid'] 		= $arr['sendid'];
-		$tuicont['sendname'] 	= $this->adminname;
-		$tuicont['name'] 		= $this->adminname;
-		$tuicont['cont'] 		= $cont;
-		$tuicont['pushcont'] 	= $pushcont;
-		$tuicont['pushtype'] 	= 'chat'; //推送消息类型
-		$tuicont['receid'] 		= $receid;
-		$tuicont['fileid'] 		= $fileid;
-		$tuicont['type'] 		= 'user';
-		$tuicont['id'] 			= $arr['id'];
-		$tuicont['optdt'] 		= $optdt;
-		$tuicont['optdts'] 		= substr($optdt,11,5);
-		$this->pushapp($receid, '['.$this->adminname.']发来一条消息', $tuicont, $lx);
-		
+		if($ispushapp != 'no'){
+			$tuicont['sendid'] 		= $arr['sendid'];
+			$tuicont['sendname'] 	= $this->adminname;
+			$tuicont['name'] 		= $this->adminname;
+			$tuicont['cont'] 		= $cont;
+			$tuicont['pushcont'] 	= $pushcont;
+			$tuicont['pushtype'] 	= 'chat'; //推送消息类型
+			$tuicont['receid'] 		= $receid;
+			$tuicont['fileid'] 		= $fileid;
+			$tuicont['type'] 		= 'user';
+			$tuicont['id'] 			= $arr['id'];
+			$tuicont['optdt'] 		= $optdt;
+			$tuicont['optdts'] 		= substr($optdt,11,5);
+			$this->pushapp($receid, '['.$this->adminname.']发来一条消息', $tuicont, $lx);
+		}
 		/*
 		$last	= date('Y-m-d H:i:s', time()-15);
 		$where 	= "`uid`='$receid' and `online`=1 and `cfrom` in('appandroid','appios') and `moddt`<'$last'";
@@ -1062,7 +1066,8 @@ class reimClassModel extends Model
 		}
 		$uwhere = "$where `status`=1";
 		$rows 	= m('logintoken')->getrows("`uid` in(select id from `[Q]admin` where $uwhere) and `cfrom` in ('nppandroid','nppios') and `online`=1",'*','id desc');
-		$uida 	= $pushuids = $alias2019 = $uid2019 = array();
+		$jpreg	= '';
+		$uida 	= $pushuids = $alias2019 = $uid2019 = $jparr =  array();
 		$uids	= '0';
 		$times  = date('Y-m-d H:i:s', time()-5*60);//5分钟
 		foreach($rows as $k=>$rs){
@@ -1076,14 +1081,19 @@ class reimClassModel extends Model
 				$nestr.=''.$rs['pushtoken'].''; //个推
 			}else if(contain($_web,'huawei') && !contain($rs['ip'],'.')){
 				$nestr.=''.$rs['ip'].'';
-			}else if(contain($_web,'xiaomi')){
+			}else if(contain($_web,'xiaomi') || !isempt($rs['pushtoken'])){
 				$nestr.=''.$rs['pushtoken'].'';
+			}
+			if(arrvalue($rs,'regid')){
+				$nestr.='|'.$rs['regid'].'';
+				$jpreg = 'yes';
+				$jparr[] = $rs['regid'];
 			}
 			$alias2019[] = $nestr;
 			if(!in_array($_uid, $uid2019))$uid2019[] = $_uid;
 			if($rs['ispush']=='1')$pushuids[] = $_uid;//可以手机推送的用户
 		}
-		return array('uids'=>$uids,'alias2019'=>$alias2019,'uid2019'=>$uid2019,'pushuids'=>$pushuids);
+		return array('uids'=>$uids,'alias2019'=>$alias2019,'uid2019'=>$uid2019,'pushuids'=>$pushuids, 'jpreg'=>$jpreg, 'jparr' => $jparr);
 	}
 	
 	/**
@@ -1118,13 +1128,14 @@ class reimClassModel extends Model
 				));
 				//服务端返回{"zshu":2,"yfuid":"1,8","wfuid":""}
 				if($gbarr && $gbarr['success'] && $bstr = arrvalue($gbarr, 'data')){
-					$data = json_decode($bstr, true);
-					$yfuid= explode(',', arrvalue($data, 'yfuid'));
-					if($yfuid){
+					$data  = json_decode($bstr, true);
+					$yfuid = arrvalue($data, 'yfuid');
+					if(!isempt($yfuid)){//有在线人员用了服务端推送
+						$yfuida = explode(',', $yfuid);
 						$nealas = array();
 						foreach($alias2019 as $alis){
 							$bo = false;
-							foreach($yfuid as $yfid){if(contain($alis,'|'.$yfid.'|'))$bo=true;};
+							foreach($yfuida as $yfid){if(contain($alis,'|'.$yfid.'|'))$bo=true;};
 							if(!$bo)$nealas[] = $alis;
 						}
 						$alias['alias2019'] = $nealas;
@@ -1132,7 +1143,6 @@ class reimClassModel extends Model
 				}
 			}
 		}
-		
 		return c('JPush')->push($title, $pushcont, $contjson, $alias);
 	}
 	
@@ -1227,6 +1237,8 @@ class reimClassModel extends Model
 		foreach($cans as $k=>$v)$carr[$k]=$v;
 		
 		$reimtype = $this->option->getval('reimservertype');
+		
+		//if($carr['atype']=='sendapp')c('JPush')->sendJpush($carr);
 		if($reimtype=='1')return c('rockqueue')->pushdata($carr);
 		
 		$str 			= json_encode($carr);

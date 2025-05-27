@@ -32,7 +32,8 @@ class apiAction extends ActionNot
 		$time 		= time();
 		$this->cfrom= $this->request('cfrom');
 		$this->token= $this->request('token', $this->admintoken);
-		$this->adminid 	 = (int)$this->request('adminid', $this->adminid);
+		$nadminid 		 = $this->adminid;
+		$this->adminid 	 = (int)$this->request('adminid', $nadminid);
 		$this->adminname = '';
 		$boss = (M == 'login|api');
 		if(!$boss){
@@ -46,11 +47,11 @@ class apiAction extends ActionNot
 		if(!$this->userrs && !$boss){
 			$this->showreturn('', '用户已经不存在了，请重新登录', 199);
 		}
-		
 		$this->adminname 		= arrvalue($this->userrs, 'name');
 		$this->rock->adminid	= $this->adminid;
 		$this->rock->adminname 	= $this->adminname;
 		$this->admintoken 		= $this->token;
+		if(!$boss && $nadminid != $this->adminid)m('login')->setsession($this->adminid, $this->adminname, $this->token, $this->userrs['user']);
 	}
 	
 	public function getvals($nae, $dev='')

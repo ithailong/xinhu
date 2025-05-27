@@ -7,7 +7,7 @@ class uploawClassAction extends apiAction
 	}
 	
 	/**
-	*	上传文件
+	*	上传文件(外部信息收集使用的)
 	*/
 	public function upfileAction()
 	{

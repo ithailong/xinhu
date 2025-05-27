@@ -10,7 +10,7 @@
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/js.js"></script>
 <script type="text/javascript" src="js/base64-min.js"></script>
-<script type="text/javascript" src="mode/agora/AgoraRTC_N-4.7.1.js"></script>
+<script type="text/javascript" src="mode/plugin/trtc.js"></script>
 <script type="text/javascript" src="mode/plugin/jquery-rockmodels.js"></script>
 <script>
 adminid = <?=$da['adminid']?>;
@@ -27,9 +27,11 @@ var c = {
 	callshu:30,
 	id:<?=$ars['id']?>,
 	nwwin:false,
+	isuse:false,
 	init:function(){
+		this.userid  = 'rock'+this.id+'';
 		this.typearr = ['语音','视频'];
-		this.name   = '<?=$ars['name']?>';
+		this.name    = '<?=$ars['name']?>';
 		this.playobj = get('notify_sound_tonghua');
 		js.initbtn(this);
 		//接收端
@@ -46,13 +48,28 @@ var c = {
 				c.bodyunload(this);
 			});
 		}
+		if(window['TRTC']){
+			this.isuse = true;
+		}else{
+			this.stateupdate('未安装插件，无法使用');
+		}
+		if(NOWURL.substr(0,5)!='https'){
+			if(HOST.indexOf('localhost')==0 || HOST.indexOf('127.0.0.1')==0){
+			}else{
+				js.msg('msg','未使用https，功能受限');
+			}
+		}
 	},
 	hujiao:function(o1,lx){
 		if(this.hujiaobo)return;
+		if(!this.isuse){
+			js.msg('msg','未安装插件，无法使用');
+			return;
+		}
 		js.loading('请求中...');
 		this.hujiaobo = true;
 		this.type 	  = lx;
-		js.ajax('tonghua|thinit',{id:this.id,type:lx},function(ret){
+		js.ajax('tonghua|thinit',{id:this.id,type:lx,rtctype:1},function(ret){
 			c.hujiaoback(ret);
 		}, 'get', function(str){
 			js.msgerror(str);
@@ -116,26 +133,12 @@ var c = {
 		this.callmiashuetime = setTimeout(function(){c.callmiashue()},1000);
 	},
 	initagoraRtc:async function(){
-		client = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
-		
-		client.on("user-published", async (user, mediaType) => {
-			await client.subscribe(user, mediaType);
-			if (mediaType === "video") {
-				remoteVideoTrack = user.videoTrack;
-				remoteVideoTrack.play('remote_stream');
-			}
-			if (mediaType === "audio") {
-				remoteAudioTrack = user.audioTrack;
-				remoteAudioTrack.play();
-			}
+		trtc = TRTC.create();
+		trtc.on(TRTC.EVENT.REMOTE_VIDEO_AVAILABLE, ({ userId, streamType }) => {
+			const view = `remote_stream`;
+			trtc.startRemoteVideo({ userId, streamType, view });
 		});
-		client.on("user-joined", (user) => {
-			//showSuccess('有人来('+JSON.stringify(user)+')');
-		});
-		client.on("user-left", (user, reason) => {
-			//showAlert('有人退出['+reason+']('+JSON.stringify(user)+')');
-			c.guaduanok(false);
-		});
+		//trtc.muteRemoteAudio(this.userid, false);
 	},
 	cancelhu:function(){
 		this.cancelhus(3);
@@ -191,18 +194,21 @@ var c = {
 			$('#remote_stream').show();
 		}
 		
-		await client.join(this.thcan.appid, this.thcan.channel, this.thcan.token, this.thcan.uid);
-	
-		// 通过麦克风采集的音频创建本地音频轨道对象。
-		localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-		await client.publish(localAudioTrack);
-		
+		await trtc.startLocalAudio();
 		if(this.type==1){
-			// 通过摄像头采集的视频创建本地视频轨道对象。
-			localVideoTrack = await AgoraRTC.createCameraVideoTrack();
-			// 将这些音视频轨道对象发布到频道中。
-			await client.publish(localVideoTrack);
-			localVideoTrack.play('local_stream'); //播放视频
+			const view = 'local_stream';
+			await trtc.startLocalVideo({ view })
+		}
+		
+		try {
+			const strRoomId = this.thcan.channel;
+			const sdkAppId = this.thcan.appid;
+			const userId = 'rock'+this.thcan.uid;
+			const userSig = this.thcan.token;
+			await trtc.enterRoom({ strRoomId: strRoomId, scene:'rtc', sdkAppId, userId, userSig });
+			console.log('进房成功');
+		} catch (error) {
+			js.msg('msg','接通失败： ' + error);
 		}
 	},
 	showmian:function(){
@@ -243,12 +249,12 @@ var c = {
 			this.guaduanokok();
 		}
 	},
-	guaduanokok:function(){
+	guaduanokok:async function(){
 		clearTimeout(this.showmiantime);
-		if(localAudioTrack)localAudioTrack.close();
-		if(localVideoTrack)localVideoTrack.close();
-		client.unpublish();
-		client.leave();
+		trtc.stopLocalVideo() 
+		trtc.stopLocalAudio();
+		await trtc.exitRoom();
+		trtc.destroy();
 		this.stateupdate('通话已结束', true);
 		$('#canceldiv').remove();
 		this.cancalpayls();
@@ -265,12 +271,12 @@ var c = {
 	},
 	qiehysq:function(){
 		if(!this.yuancjinb){
-			remoteAudioTrack.setVolume(0);
+			trtc.setRemoteAudioVolume(this.userid, 0);
 			this.yuancjinb = true;
 			$('#jingyinclltxt').html('开启声音');
 			get('jingyincll').className='icon-volume-off';
 		}else{
-			remoteAudioTrack.setVolume(100);
+			trtc.setRemoteAudioVolume(this.userid, 100);
 			this.yuancjinb = false;
 			$('#jingyinclltxt').html('静音');
 			get('jingyincll').className='icon-volume-up';
@@ -309,6 +315,10 @@ var c = {
 		}
 	},
 	jiedianha:function(o1,lx){
+		if(!this.isuse && lx==1){
+			js.msg('msg','未安装插件，只能拒绝');
+			return;
+		}
 		clearTimeout(this.jieshoutimesa);
 		this.ismybool = true;
 		this.isyaoqbool = false;
@@ -460,20 +470,6 @@ js.initbtn = function(obj){
 	}
 	o.attr('clickadd','true');
 }
-function showAlert(str,col){
-	var obj = $('div[temp="div"]'),hei=0;
-	for(var i=0;i<obj.length;i++)hei+=$(obj[i]).height()+15;
-	if(!col)col='red';
-	var str = '<div temp="div" onclick="$(this).remove()" style="background:rgba(0,0,0,0.8);position:fixed;left:0px;top:'+hei+'px;padding:5px;color:'+col+'">'+str+'</div>';
-	$('body').append(str);
-}
-
-
-function showSuccess(str){
-	showAlert(str,'white');
-}
-
-
 
 </script>
 </head>

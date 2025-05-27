@@ -6,13 +6,14 @@
 class tonghuaClassAction extends runtAction
 {
 	
-	public function sendcpush($arr)
+	public function sendcpush($arr, $isnei=false)
 	{
 		$arr['msgtype'] = 'calltonghua';
 		$arr['type']	= 'calltonghua';
 		$reimobj 		= m('reim');
 		$reimobj->pushserver('sendapp', $arr);
 		$reimobj->pushserver('send', $arr);
+		if($isnei)c('JPush')->sendJpush($arr);
 	}
 
 	/**
@@ -37,7 +38,19 @@ class tonghuaClassAction extends runtAction
 		$this->rock->adminid 	= $uid;
 		$this->rock->adminname 	= $urs['name'];
 		
-		//每3秒呼叫一次
+		if($cishu==1){
+			$typea= array('语音','视频');
+			$cont = $this->jm->base64encode('['.$typea[$data['type']].'通话]');
+			$pushcont = $this->jm->base64encode('邀请与您'.$typea[$data['type']].'通话...');
+			m('reim')->sendinfor('user', $uid, $data['toid'], array(
+				'optdt' => $thrs['adddt'],
+				'cont'  => $cont,
+				'pushcont'  => $pushcont,
+				'msgid'  => $channel
+			));
+		}
+		
+		//每2秒呼叫一次
 		$this->sendcpush(array(
 			'adminid'	=> $uid,
 			'adminname'	=> $urs['name'],
@@ -50,17 +63,6 @@ class tonghuaClassAction extends runtAction
 			'receid'	=> $data['toid']
 		));
 		
-		if($cishu==1){
-			$typea= array('语音','视频');
-			$cont = $this->jm->base64encode('['.$typea[$data['type']].'通话]');
-			$pushcont = $this->jm->base64encode('邀请与您'.$typea[$data['type']].'通话...');
-			m('reim')->sendinfor('user', $uid, $data['toid'], array(
-				'optdt' => $thrs['adddt'],
-				'cont'  => $cont,
-				'pushcont'  => $pushcont,
-				'msgid'  => $channel,
-			));
-		}
 		c('rockqueue')->push('tonghua,call', array('key' => $key,'cishu'=>$cishu+1),time()+2);
 	
 		return 'success';
@@ -78,9 +80,10 @@ class tonghuaClassAction extends runtAction
 		
 		$this->sendcpush(array(
 			'adminid'	=> $data['uid'],
-			'calltype'	=> 'cancel', 
+			'calltype'	=> 'cancel',
+			'th_channel'=> $channel, 
 			'receid'	=> $data['toid']
-		));
+		), true);
 		
 		return 'success';
 	}
@@ -103,6 +106,7 @@ class tonghuaClassAction extends runtAction
 		$this->sendcpush(array(
 			'adminid'	=> $data['toid'],
 			'calltype'	=> $tayar[$state], 
+			'th_channel'=> $channel, 
 			'receid'	=> $data['uid'].','.$data['toid']
 		));
 		
@@ -122,7 +126,8 @@ class tonghuaClassAction extends runtAction
 		$channel 	= $this->getparams('channel');
 		$this->sendcpush(array(
 			'adminid'	=> $uid,
-			'calltype'	=> 'jiesu', 
+			'calltype'	=> 'jiesu',
+			'th_channel'=> $channel, 
 			'receid'	=> $toid
 		));
 		return c('xinhuapi')->getdata('tonghua','jiesu', array('uid'=>$uid,'nowtime'=>$nowtime,'channel'=>$channel));

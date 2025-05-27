@@ -15,7 +15,7 @@ homeobject.showicons=function(a){
 		cols = a[i].color;
 		if(homestyle=='2')cols=maincolor;
 		s='';
-		s+='<div onclick="opentabsshowshwo('+i+')" align="center" style="cursor:pointer;width:135px;float:left;margin:10px 15px;background:'+cols+';border:none" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1" class="thumbnail">';
+		s+='<div onclick="opentabsshowshwo('+i+')" align="center" style="cursor:pointer;width:135px;float:left;margin:10px 15px;background:'+cols+';border:none;border-radius:5px;" onmouseover="this.style.opacity=0.8" onmouseout="this.style.opacity=1" class="thumbnail">';
 		s+='	<div style="position:relative;padding:15px 0px">';
 		s+='		<div style="color:white;font-size:36px"><i class="icon-'+a[i].icons+'"></i></div>';
 		s+='		<a style="TEXT-DECORATION:none;color:white" id="'+a[i].num+'_text">'+a[i].name+'</a>';

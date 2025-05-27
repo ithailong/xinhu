@@ -26,7 +26,7 @@ class loginClassModel extends Model
 		$yanzm = $this->rock->request('yanzm');//验证码
 		$ltype = (int)$this->rock->request('ltype',0);//登录类型，1是手机+验证码
 		if(!isempt($yanzm) && strlen($yanzm)!=6)return '验证码必须是6位数字';
-		$cfroar= explode(',', 'pc,reim,weixin,appandroid,mweb,webapp,nppandroid,nppios,nppiosnew');
+		$cfroar= explode(',', 'pc,reim,weixin,appandroid,mweb,webapp,nppandroid,nppios,nppiosnew,androidapp');
 		if(!in_array($cfrom, $cfroar))return 'not found cfrom['.$cfrom.']';
 		if($user=='')return '用户名不能为空';
 		if($pass==''&&strlen($token)<8 && $ltype==0)return '密码不能为空';
@@ -65,6 +65,7 @@ class loginClassModel extends Model
 		$us		= false;
 		
 		if(getconfig('systype')=='demo')$this->db->update('[Q]admin', '`status`=1' , '`id`=1 and `status`=0');
+		
 		
 		//1.先用用户名判断
 		$arrs 	= array(
@@ -122,9 +123,8 @@ class loginClassModel extends Model
 			if($us)$loginx = '姓名';
 		}
 		
-		
 		if($msg=='' && !$us){
-			$msg = '用户不存在';
+			$msg = '用户或密码不对'; //用户不存在时提示
 		}else if($msg==''){
 			$uid 	= $us['id'];
 			$user 	= $us['user'];
@@ -142,7 +142,7 @@ class loginClassModel extends Model
 				}
 			}else{
 	
-				if(md5($pass)!=$us['pass'])$msg='密码不对';
+				if(md5($pass)!=$us['pass'])$msg='用户或密码不对'; //密码不对提示
 				
 				if($msg!='' && $pass==md5($us['pass']) && c('cache')->get('login'.$user.'')==$uid){
 					$msg='';

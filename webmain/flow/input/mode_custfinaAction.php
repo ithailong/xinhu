@@ -1,6 +1,6 @@
 <?php
 /**
-*	客户.付款单
+*	客户.收款单
 */
 class mode_custfinaClassAction extends inputAction{
 	
@@ -147,7 +147,8 @@ class mode_custfinaClassAction extends inputAction{
 	protected function storeafter($table, $rows)
 	{
 		$money 	 = 0;
-		if($rows){
+		$hjfields	= arrvalue($this->flow->moders, 'hjfields');
+		if($rows && isempt($hjfields)){
 			foreach($rows as $k1=>$rs1){
 				$money+=floatval($rs1['money']);
 			}

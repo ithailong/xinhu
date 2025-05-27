@@ -3,8 +3,14 @@
 class flow_goodsClassModel extends flowModel
 {
 	
+	public $base;
+	public function initModel()
+	{
+		$this->base		= m('goods');
+	}
+	
 	protected function flowchangedata(){
-		$this->rs['typeid']	 = m('goods')->gettypename($this->rs['typeid']);
+		$this->rs['typeid']	 = $this->base->gettypename($this->rs['typeid']);
 	}
 
 	//导入数据的测试显示
@@ -40,6 +46,10 @@ class flow_goodsClassModel extends flowModel
 	//
 	public function flowrsreplace($rs, $lx=0)
 	{
+		
+		if(isset($rs['typeid']) && is_numeric($rs['typeid']))
+			$rs['typeid'] = $this->base->gettypename($rs['typeid']);
+		
 		//详情页下显示对应仓库库存
 		if($lx==1){
 			$drows = $this->db->getall("SELECT `depotid`,sum(count)count FROM `[Q]goodss` where aid=".$rs['id']." and `status`=1 GROUP BY `depotid`");
@@ -83,5 +93,19 @@ class flow_goodsClassModel extends flowModel
 	{
 		m('goodss')->delete('`aid`='.$this->id.'');
 		m('goods')->setstock();
+	}
+	
+	protected function flowbillwhere($uid, $lx)
+	{
+		$where  = '';
+		$typeid = $this->rock->post('typeid','0');
+		if($typeid!='0'){
+			$alltpeid = m('option')->getalldownid($typeid);
+			$where .= ' and `typeid` in('.$alltpeid.')';
+		}
+		return array(
+			'where' => $where,
+			'order' => 'optdt desc',
+		);
 	}
 }

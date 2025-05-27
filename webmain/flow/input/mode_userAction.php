@@ -4,6 +4,7 @@
 */ 
 class mode_userClassAction extends inputAction{
 	
+	private $depta;
 	
 	protected function savebefore($table, $cans, $id, $addbo){
 		if(getconfig('systype')=='demo' && $id>0)return '演示请勿编辑';
@@ -89,7 +90,12 @@ class mode_userClassAction extends inputAction{
 	//组数据源
 	public function groupdata()
 	{
-		return m('sjoin')->getgrouparrs();
+		$data = m('sjoin')->getgrouparrs();
+		if(!$data)$data[] = array(
+			'value'=> '0',
+			'name' => '无组选择'
+		);
+		return $data;
 	}
 	
 	//生成列表页，数据读取后处理

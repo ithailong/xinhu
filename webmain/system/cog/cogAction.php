@@ -128,7 +128,6 @@ class cogClassAction extends Action
 		$arr['url'] 		= $this->post('url');
 		$arr['outurl'] 		= $this->post('outurl');
 		$arr['reimtitle'] 	= $this->post('reimtitle');
-		$arr['qqmapkey'] 	= $this->post('qqmapkey');
 		$arr['platurl'] 	= $this->post('platurl');
 		
 		$apptitle 			= $this->post('apptitle');
@@ -369,7 +368,7 @@ return array(
 		if(getconfig('systype')=='demo')return '演示不要改';
 		$stype = (int)$this->post('stype','0');
 		$msg  = 'ok';
-		if($stype==0)$msg = $this->saveconfig('title,imgcompress,watertype,video_bool,flowchehuitime,saasmode,hoemtimeout,usercache,xiangrecord,beianhao,locallang',',video_bool,');
+		if($stype==0)$msg = $this->saveconfig('title,imgcompress,watertype,video_bool,flowchehuitime,saasmode,hoemtimeout,usercache,xiangrecord,beianhao,locallang,savefiletype',',video_bool,');
 	
 		return $msg;
 	}

@@ -746,3 +746,29 @@ function pirnttablelist(d,na){
 	}
 	window.open('?d=public&m=print&table='+rnd+'&modename='+jm.base64encode(na)+'');
 }
+
+//选择模块
+js.selectmode = function(obj, naobj, fun){
+	this.chajian('rockselect', {
+		viewobj:obj,
+		num:'getmodearr',limit:20,
+		url:js.getajaxurl('getmodearr','flow','main'),
+		onitemclick:function(sna,val,d){fun(sna,val,d)},
+		ondatachuli:function(da){
+			var len=da.length,i,csd,types='',ds=[],dt=[];
+			for(i=0;i<len;i++){
+				csd = da[i];
+				if(types!=csd.type){
+					ds.push({name:csd.type,style:'font-weight:bold',disabled:true});
+					dt.push({name:csd.type,value:csd.type,type:csd.type});
+				}
+				types = csd.type;
+				csd.padding='24';
+				ds.push(csd);
+			}
+			this.setSelectData(dt,'所有分类', 'type');
+			return ds;
+		},
+		nameobj:naobj
+	});
+}

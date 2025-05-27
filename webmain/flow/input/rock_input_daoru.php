@@ -5,18 +5,19 @@ $(document).ready(function(){
 	var modenum = params.modenum;
 	var c={
 		headers:'',
+		yscss:'style="border:var(--border);padding:3px 5px"',
 		yulan:function(){
 			var cont = mobjs.val(),s='',a,a1,i,j,oi=0;
-			s+='<table class="basetable" border="1">';
-			s+='<tr><td></td>'+this.headers+'</tr>';
+			s+='<table border="0">';
+			s+='<tr style="background:rgba(0,0,0,0.1)"><td '+this.yscss+'></td><td '+this.yscss+'>导入结果</td>'+this.headers+'</tr>';
 			a = cont.split('\n');
 			for(i=0;i<a.length;i++){
 				if(a[i]){
 					oi++;
 					a1 = a[i].split('	');
 					s+='<tr>';
-					s+='<td>'+oi+'</td>';
-					for(j=0;j<a1.length;j++)s+='<td>'+a1[j]+'</td>';
+					s+='<td '+this.yscss+'>'+oi+'</td><td '+this.yscss+' id="runstate_'+modenum+'_'+oi+'"></td>';
+					for(j=0;j<a1.length;j++)s+='<td '+this.yscss+'>'+a1[j]+'</td>';
 					s+='</tr>';
 				}
 			}
@@ -37,12 +38,12 @@ $(document).ready(function(){
 			var i,len=ret.length,d;
 			for(i=0;i<len;i++){
 				d=ret[i];
-				this.headers+='<td>';
+				this.headers+='<td '+this.yscss+'>';
 				if(d.isbt=='1'){
 					this.bitian+=','+d.fields+'';
 					this.headers+='<font color=red>*</font>';
 				}
-				this.headers+=''+d.name+'</td>';
+				this.headers+=''+d.name+'('+d.fields+')</td>';
 			}
 			this.yulan();
 		},
@@ -68,10 +69,19 @@ $(document).ready(function(){
 					js.setmsg(ds.msg+'','red', vis);
 					o1.disabled=false;
 				}
+				if(ds.errdata)c.showerrdata(ds.errdata);
 			},'post,json',function(s){
 				js.setmsg(s,'red', vis);
 				o1.disabled=false;
 			});
+		},
+		showerrdata:function(ed){
+			var xu,str,col;
+			for(xu in ed){
+				str = ed[xu];
+				col = (str=='ok') ? 'green' : 'red';
+				$('#runstate_'+modenum+'_'+(parseFloat(xu)+1)+'').html('<font color='+col+'>'+str+'</font>');
+			}
 		},
 		downxz:function(){
 			var url = '?m=input&a=daoruexcel&d=flow&modenum='+modenum+'';

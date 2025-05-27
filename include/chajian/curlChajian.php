@@ -76,7 +76,7 @@ class curlChajian extends Chajian{
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_HEADER, 0);
 		if($this->rock->HTTPweb)curl_setopt($ch, CURLOPT_USERAGENT, $this->rock->HTTPweb);
-		if($this->rock->ip)$headarr['X-FORWARDED-FOR'] = $this->rock->ip;
+		//if($this->rock->ip)$headarr['X-FORWARDED-FOR'] = $this->rock->ip;
 		if($ishttps==1){
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		}
@@ -114,7 +114,7 @@ class curlChajian extends Chajian{
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 			//curl_setopt($ch, CURLOPT_SSL_VERIFYHOST,  false);
 		}
-		if($this->rock->ip)$headarr['X-FORWARDED-FOR'] = $this->rock->ip;
+		//if($this->rock->ip)$headarr['X-FORWARDED-FOR'] = $this->rock->ip;
 		//设置head
 		if($headarr){
 			$heads = array();

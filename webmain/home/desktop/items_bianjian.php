@@ -16,9 +16,9 @@ defined('HOST') or die ('not access');
  <div class="list-group-item" style="padding:0">
 	<table width="100%">
 	<tr valign="top">
-	<td><div style="width:350px;height:290px" id="bianjian_view"></div></td>
+	<td><div style="width:350px;height:300px" id="bianjian_view"></div></td>
 	<td width="100%">
-	<div align="center" style="line-height:40px;background:#f1f1f1"><span id="bianjianmonth"></span></div>
+	<div align="center" style="line-height:40px;background:var(--main-bgcolor)"><span id="bianjianmonth"></span></div>
 	<div style="padding:5px" id="bianqianlists"></div>
 	<div style="color:#cccccc;margin-top:40px" id="bianqianlists22" align="center">无便笺内容</div>
 	
@@ -54,7 +54,7 @@ homeobject.bianjian_init=function(){
 	}
 	
 	this.bianjianobjmb = $('#bianjian_view').rockcalendar({
-		height:280,
+		height:250,
 		changemonth:function(y, m,o1){
 			$('#bianjianmonth').html('<font onclick="homeobject.bianjianobjmb.fanmonth(-1)"><i class="icon-double-angle-left"></i></font> <font onclick="homeobject.bianjianobjmb.nowmonth()">'+y+'年'+xy10(m)+'月</font> <font  onclick="homeobject.bianjianobjmb.fanmonth(1)"><i class="icon-double-angle-right"></i></font>');
 			homeobject.bianjiangetdata(o1.dayobj[1].day,o1.dayobj[42].day);

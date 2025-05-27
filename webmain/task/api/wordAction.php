@@ -33,7 +33,7 @@ class wordClassAction extends apiAction
 		
 		$cqid 	= $this->post('cqid');
 		$typeid = (int)$this->post('typeid','0');
-		$name 	= $this->post('name');
+		$name 	= $this->rock->xssrepstr($this->post('name'));
 		
 		$arr 	= m('word')->createfolder($name, $cqid, $typeid);
 		$this->showreturn($arr);
@@ -43,7 +43,7 @@ class wordClassAction extends apiAction
 	public function renameAction()
 	{
 		$id 	= (int)$this->post('id');
-		$name 	= $this->getvals('name');
+		$name 	= $this->rock->xssrepstr($this->getvals('name'));
 		$type 	= $this->post('type');
 		m('word')->update("`name`='$name'", $id);
 		$this->showreturn('');

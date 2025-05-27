@@ -17,8 +17,10 @@ class openssoClassAction extends openapiAction
 		$lurl		= urldecode($this->get('backurl')); //登录成功跳转地址urlencode
 		if(isempt($ssotoken))return '没有参数ssotoken';
 		
+		$checkurls  = $this->get('checkurl');
 		$checkurl 	= getconfig('sso_checkurl'); //验证地址
 		$ssokey 	= getconfig('sso_key'); //验证key
+		if($checkurls)$checkurl = c('rockwxqy')->geturlstr($checkurls,'','main');
 		
 		if(isempt($checkurl))return '没有配置验证地址';
 		$jg 	= contain($checkurl,'?')?'&':'?';

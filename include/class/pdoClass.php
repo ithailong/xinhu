@@ -11,6 +11,7 @@ class pdoClass extends mysql{
 			$this->conn = @new PDO('mysql:host='.$this->db_host.';dbname='.$this->db_base.'', $this->db_user, $this->db_pass);
 			$this->conn->query("SET NAMES 'utf8'");
 			$this->selectdb($this->db_base);
+			$this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		} catch (PDOException $e) {
 			$this->conn 	= null;
 			$this->errormsg = $e->getMessage();
@@ -23,7 +24,7 @@ class pdoClass extends mysql{
 			$bo = $this->conn->query($sql);
 		} catch (PDOException $e) {
 			$bo = false;
-			$this->errormsg = $e->getMessage();
+			$this->setError($e->getMessage(), $sql);
 		}
 		return $bo;
 	}
@@ -53,11 +54,7 @@ class pdoClass extends mysql{
 		}
 	}
 		
-	public function error()
-	{
-		$str = $this->conn->errorInfo();
-		return 'pdoError('.$str[0].'):'.$str[2].''.$this->errormsg.'';
-	}
+	
 	
 	public function close()
 	{

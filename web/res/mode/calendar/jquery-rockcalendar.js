@@ -74,7 +74,7 @@
 				s+='<tr>';
 				for(var i=0;i<7;i++){
 					x++;
-					s+='<td align="'+can.align+'" height="'+(h/6)+'px" valign="'+can.valign+'" width="'+w+'%" class="tdtext" id="calcontabc'+x+'_'+id+'" temp="'+x+'"></td>';
+					s+='<td align="'+can.align+'" height="'+((h/6)-2)+'px" valign="'+can.valign+'" width="'+w+'%" class="tdtext" id="calcontabc'+x+'_'+id+'" temp="'+x+'"></td>';
 				}
 				s+='</tr>';
 			} 
@@ -413,10 +413,10 @@
 			this.changemonth(a[0], a[1]);
 		}
 	}
-
+	if(typeof(bootsSelectColor)!='string')bootsSelectColor= 'rgba(0,0,0,0.1)';
 	$.fn.rockcalendar = function(options){
 		var defaultVal = {
-			height:400,selbgcolor:'#D3FFF6',month:'',
+			height:400,selbgcolor:bootsSelectColor,month:'',
 			fillot:true,renderer:function(){return ''},align:'left',valign:'top',
 			changemonth:function(){},boofan:true,onclick:function(){},jierixiuxi:'',jierishangban:'',headerbgcolor:'',
 			bordercolor:'',

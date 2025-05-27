@@ -10,20 +10,14 @@
 <script type="text/javascript" src="web/res/js/jquery.1.9.1.min.js"></script>
 <script type="text/javascript" src="js/js.js"></script>
 <script type="text/javascript" src="mode/plugin/jquery-rockmodels.js"></script>
-<link rel="stylesheet" type="text/css" href="web/res/perfectscrollbar/perfect-scrollbar.css"/>
-<script type="text/javascript" src="web/res/perfectscrollbar/perfect-scrollbar.js"></script>
-<script type="text/javascript" src="web/res/perfectscrollbar/jquery.mousewheel.js"></script>
 <style>
-<?php
-$col = getconfig('apptheme','#1389D3');
-echo 'body{--main-color:'.$col.'}';
-?>
-
-.list{padding:10px 10px;border-top:1px #eeeeee solid}
-.list:hover{background:#f1f1f1}
+.list{padding:10px 10px;border-bottom:var(--border)}
+.list:hover{background:rgba(0,0,0,0.05)}
 </style>
+<?php 
+echo c('color')->getApptheme();
+?>
 <script>
-maincolor='<?=$col?>';
 function initbody(){
 	c.init();
 }
@@ -32,7 +26,6 @@ var c = {
 		this.getsese();
 		$(window).resize(c.getsese);
 		if(nwjsgui)this.showdata();
-		$('#downlist').perfectScrollbar();
 	},
 	getsese:function(){
 		var he = winHb()-50;
@@ -139,11 +132,11 @@ var c = {
 </head>
 
 
-<body style="overflow:hidden;background:white">
-<div id="downlist" style="height:100px;overflow:hidden;position:relative">
+<body style="overflow:hidden;">
+<div id="downlist" style="height:100px;overflow:auto;position:relative">
 
 </div>
-<div style="height:50px;padding:0px 10px;text-align:right;line-height:50px;background:#f1f1f1;border-top:1px #cccccc solid">
+<div style="height:50px;padding:0px 10px;text-align:right;line-height:50px;background:var(--main-vgcolor);border-top:var(--border)">
 	<!--<a class="zhu" title="新增下载" onclick="c.add()"><i class="icon-plus"></i></a>&nbsp;&nbsp;-->
 	<a class="zhu" onclick="js.reload()"><i class="icon-refresh"></i> 刷新</a>&nbsp;&nbsp;
 	<a class="zhu" onclick="c.clearall()"><i class="icon-trash"></i> 清空下载项</a>&nbsp;

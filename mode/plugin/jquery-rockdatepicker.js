@@ -121,7 +121,7 @@
 			
 			var s= '',oi=0,w=270,h=278;
 			if(can.view!='time'){
-				s+='	<div style="background:#eeeeee;height:30px;overflow:hidden">';
+				s+='	<div style="background:rgba(0,0,0,0.3);height:30px;overflow:hidden">';
 				s+='	<table border="0" width="100%" cellspacing="0" cellpadding="0"><tr>';
 				s+='		<td style="padding:0px 4px" class="td00" tdaddclick="-y" title="上一年">〈<td>';
 				s+='		<td height="30" style="padding:0px 5px" nowrap><span class="rockdatepicker_span" id="rockdatepicker_year'+rand+'">2014</span>年<td>';
@@ -137,7 +137,7 @@
 				
 				s+='	<div style="height:188px;overflow:hidden" id="rockdatepicker_table'+rand+'" >';
 				s+='	<table border="0" class="rockdatepicker_table"  style="border-collapse:collapse" width="100%" cellspacing="0" cellpadding="0">';
-				s+='	<tr height="30" bgcolor="#dedede">';
+				s+='	<tr height="30" style="background:rgba(0,0,0,0.2)">';
 				for(var d=0; d<7; d++){
 					s+='<td align="center" width="14.28%">'+this.weekarr[d]+'</td>';
 				}
@@ -158,12 +158,12 @@
 				w = 220;h=200;
 			}
 			
-			s+='	<div style="line-height:30px">&nbsp; <font color="#888888">选择：</font><span id="rockdatepicker_span'+rand+'"></span>';
-			s+='		<span><input min="0" max="23" onfocus="js.focusval=this.value"  onblur="js.number(this)" id="rockdatepicker_input_h'+rand+'" style="width:24px;text-align:center;height:20px;line-height:16px;border:1px #cccccc solid;background:none" value="00" maxlength="2"></span>:';
-			s+='		<span><input min="0" max="59" onfocus="js.focusval=this.value"  onblur="js.number(this)" id="rockdatepicker_input_i'+rand+'" style="width:24px;text-align:center;height:20px;line-height:16px;border:1px #cccccc solid;background:none" value="00" maxlength="2"></span>:';
-			s+='		<span><input min="0" max="59" onfocus="js.focusval=this.value"  onblur="js.number(this)" id="rockdatepicker_input_s'+rand+'" style="width:24px;text-align:center;height:20px;line-height:16px;border:1px #cccccc solid;background:none" value="00" maxlength="2"></span>';
+			s+='	<div style="line-height:30px">&nbsp; 选择：<span id="rockdatepicker_span'+rand+'"></span>';
+			s+='		<span><input min="0" max="23" onfocus="js.focusval=this.value"  onblur="js.number(this)" id="rockdatepicker_input_h'+rand+'" style="width:24px;text-align:center;height:20px;line-height:16px;border:var(--border);background:none" value="00" maxlength="2"></span>:';
+			s+='		<span><input min="0" max="59" onfocus="js.focusval=this.value" onblur="js.number(this)" id="rockdatepicker_input_i'+rand+'" style="width:24px;text-align:center;height:20px;line-height:16px;border:var(--border);background:none" value="00" maxlength="2"></span>:';
+			s+='		<span><input min="0" max="59" onfocus="js.focusval=this.value"  onblur="js.number(this)" id="rockdatepicker_input_s'+rand+'" style="width:24px;text-align:center;height:20px;line-height:16px;border:var(--border);background:none" value="00" maxlength="2"></span>';
 			s+=		'</div>';
-			s+='	<div style="height:30px;overflow:hidden;text-align:right;background:#eeeeee;line-height:28px">';
+			s+='	<div style="height:30px;overflow:hidden;text-align:right;background:rgba(0,0,0,0.1);line-height:28px">';
 			s+='		<a href="javascript:;" class="a" id="rockdatepicker_clear'+rand+'">清空</a>&nbsp; ';
 			s+='		<a href="javascript:;" class="a" id="rockdatepicker_now'+rand+'">现在</a>&nbsp; ';
 			s+='		<a href="javascript:;" class="a" id="rockdatepicker_queding'+rand+'">确定</a>&nbsp; ';
@@ -172,7 +172,7 @@
 			
 			
 			var oac	= this.createbasic(w,h);
-			oac.html(s);
+			oac.html('<div style="background:var(--main-bgcolor)">'+s+'</div>');
 			
 			this.objtd	= oac.find("td[temp='nr']");
 			oac.find("td[tdaddclick]").click(function(){
@@ -493,7 +493,7 @@
 			var ma	= parseFloat(o1.attr('max'));
 			o.select();
 			$('#rockdatepicker_spanselfaei'+rand+'').remove();
-			var s='<div style="bottom:52px;position:absolute;right:1px;padding:2px;border:1px #cccccc solid;background-color:#ffffff;font-size:14px;text-align:left" id="rockdatepicker_spanselfaei'+rand+'">';
+			var s='<div style="bottom:52px;position:absolute;right:1px;padding:2px;background-color:var(--main-bgcolor);text-align:left;cursor:pointer;border:var(--border)" id="rockdatepicker_spanselfaei'+rand+'">';
 			this.inputhis=o;
 			for(var a=mi;a<=ma;a++){
 				var ai	= this.sa(a);
@@ -519,20 +519,20 @@
 			var oac	= this.createbasic(w,270);
 			var	s	= '';
 			s+='<table border="0" width="100%" id="rockdatepicker_table'+rand+'" cellspacing="0" cellpadding="0"><tr valign="top">';
-			s+=' <td width="'+w1+'"><div align="center" style="line-height:30px;background:#eeeeee"><a href="javascript:" id="rockdatepicker_yearshang'+rand+'" onclick="return false" class="a02">←</a>&nbsp; 年份&nbsp; <a href="javascript:" id="rockdatepicker_yearxia'+rand+'" onclick="return false" class="a02">→</a> </div><div id="rockdatepicker_yearlist'+rand+'" style="line-height:30px;height:180px;overflow:hidden" align="center"></div></td>';
+			s+=' <td width="'+w1+'"><div align="center" style="line-height:30px;background:rgba(0,0,0,0.3)"><a href="javascript:" id="rockdatepicker_yearshang'+rand+'" onclick="return false" class="a02">←</a>&nbsp; 年份&nbsp; <a href="javascript:" id="rockdatepicker_yearxia'+rand+'" onclick="return false" class="a02">→</a> </div><div id="rockdatepicker_yearlist'+rand+'" style="line-height:30px;height:180px;overflow:hidden" align="center"></div></td>';
 			if(lx == 1){
 				s+=' <td width="2" bgcolor="#cccccc"></td>';
-				s+=' <td width="109"><div align="center" style="line-height:30px;background:#eeeeee">月份</div><div id="rockdatepicker_monthlist'+rand+'" style="line-height:30px" align="center"></div></td>';
+				s+=' <td width="109"><div align="center" style="line-height:30px;background:rgba(0,0,0,0.3)">月份</div><div id="rockdatepicker_monthlist'+rand+'" style="line-height:30px" align="center"></div></td>';
 			}
 			s+='</tr></table>';
-			s+='<div style="line-height:30px">&nbsp; <font color="#888888">选择：</font><span id="rockdatepicker_span'+rand+'">'+this.now.Y+'-0'+this.now.d+'</span></div>';
-			s+='<div style="height:30px;overflow:hidden;text-align:right;background:#eeeeee;line-height:28px">';
+			s+='<div style="line-height:30px">&nbsp; 选择：<span id="rockdatepicker_span'+rand+'">'+this.now.Y+'-0'+this.now.d+'</span></div>';
+			s+='<div style="height:30px;overflow:hidden;text-align:right;background:rgba(0,0,0,0.2);line-height:28px">';
 			s+='	<a href="javascript:" onclick="return false" class="a" id="rockdatepicker_clear'+rand+'">清空</a>';
 			s+='	<a href="javascript:" onclick="return false" class="a" id="rockdatepicker_now'+rand+'">现在</a>';
 			s+='	<a href="javascript:" onclick="return false" class="a" id="rockdatepicker_queding'+rand+'">确定</a>';
 			s+='	<a href="javascript:" onclick="return false" class="a" id="rockdatepicker_close'+rand+'">关闭</a>';
 			s+='</div>';
-			oac.html(s);
+			oac.html('<div style="background:var(--main-bgcolor)">'+s+'</div>');
 			$('#rockdatepicker_close'+rand+'').click(function(){
 				me.hidemenu();
 			});

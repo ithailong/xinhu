@@ -95,6 +95,37 @@ $(document).ready(function(){
 			js.ajax(js.getajaxurl('tongbudw','{mode}','{dir}'),false, function(ret){
 				js.msgok(ret);
 			},'get');
+		},
+		onlinev:function(){
+			var url = get('push_{rand}').value;
+			if(!url){js.msgerror('没配置服务端');return;}
+			js.loading('加载中...');
+			js.ajax(js.getajaxurl('getonline','{mode}','{dir}'),false, function(ret){
+				if(ret.success){
+					js.unloading();
+					c.onlinevs(ret.data);
+				}else{
+					js.msgerror(ret.msg);
+					js.tanclose('online');
+				}
+			},'get,json');
+		},
+		onlinevs:function(da){
+			var s = '',i,j,d;
+			for(i=0;i<da.rows.length;i++){
+				d = da.rows[i];
+				s+='<div style="margin:5px;float:left;padding:5px" class="hover" align="center">';
+				s+='	<div><img width="30" style="border-radius:50%" height="30" src="'+d.face+'"></div>';
+				s+='	<div>'+d.name+'';
+				if(d.pconline)s+='<span class="zhu"><i class="icon-laptop"></i></span>';
+				if(d.apponline)s+='<span class="zhu"><i class="icon-mobile-phone"></i></span>';
+				s+='	</div>';
+				s+='</div>';
+			}
+			js.tanbody('online','服务端在线人员', 450, 300, {
+				html:'<div style="height:350px;overflow:auto;display:inline-block">'+s+'</div>'
+			});
+			$('#msgview_online').html(da.msg);
 		}
 	};
 	
@@ -115,7 +146,8 @@ $(document).ready(function(){
 			<td  align="right"></td>
 			<td class="tdinput">
 			<button click="kuanshu1" class="btn btn-info" type="button">快速设置(推荐)</button>&nbsp;&nbsp;
-			<button click="kuanshu2" class="btn btn-default" type="button">自定义设置</button>
+			<button click="kuanshu2" class="btn btn-default" type="button">自定义设置</button>&nbsp;&nbsp;
+			<button click="onlinev" class="btn btn-default" type="button">在线人员</button>
 			</td>
 		</tr>
 	
@@ -147,7 +179,7 @@ $(document).ready(function(){
 		
 		<tr>
 			<td></td>
-			<td class="tdinput"><font color="#888888">不知道地址？请先安装并运行服务端，</font><a href="<?=URLY?>view_server.html" target="_blank">[去下载安装，看帮助]</a></td>
+			<td class="tdinput"><font color="#888888">不知道地址？请先安装并运行服务端，配置wss请看帮助，</font><a href="<?=URLY?>view_server.html" target="_blank">[去下载安装，看帮助]</a></td>
 		</tr>
 		
 		<tr>

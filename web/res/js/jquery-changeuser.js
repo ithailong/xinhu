@@ -9,7 +9,7 @@
 (function ($) {
 	
 	function _getstyles(){
-		var s='<style>.changeuserlist div.listsss{padding:10px; background:white;border-bottom:1px #eeeeee solid;cursor:default}.changeuserlist td{color:#333333}.changeuserlist div:active{ background:#f1f1f1}.changeuserbotton{height:30px;width:50px; background:#d9534f;color:white;font-size:14px;border:none;padding:0px;margin:0px;line-height:20px;cursor:default;opacity:1;outline:none;border-radius:5px}.changeuserbotton:active{color:white;border:none;opacity:0.8}.changeuserxuan span{background:white;border:1px #cccccc solid;padding:3px;border-radius:5px;font-size:12px;margin-left:5px;cursor:pointer}</style>';
+		var s='<style>.changeuserlist div.listsss{padding:10px; background:white;border-bottom:var(--border);cursor:default}.changeuserlist td{color:#333333}.changeuserlist div:active{ background:rgba(0,0,0,0.1)}.changeuserbotton{height:30px;width:50px; background:#d9534f;color:white;border:none;padding:0px;margin:0px;line-height:20px;cursor:default;opacity:1;outline:none;border-radius:5px}.changeuserbotton:active{color:white;border:none;opacity:0.8}.changeuserxuan span{background:white;border:var(--border);padding:3px;border-radius:5px;font-size:12px;margin-left:5px;cursor:pointer;color:black}</style>';
 		return s;
 	}
 	
@@ -59,13 +59,13 @@
 				hei = $('#'+this.showview+'').height();
 				atts='';
 			}
-			var s='<div style="'+atts+'z-index:100;width:100%;height:100%;overflow:hidden;left:0px;top:0px; background:white" id="changeuser_'+rand+'">';
+			var s='<div style="'+atts+'z-index:100;width:100%;height:100%;overflow:hidden;left:0px;top:0px; background:white;border-radius:0px 0px 5px 5px" id="changeuser_'+rand+'">';
 			if(this.titlebool){
-				s+='<div style="height:50px;line-height:50px;text-align:center; background:white;border-bottom:1px #cccccc solid"><b>'+this.title+'</b></div>';
+				s+='<div style="height:50px;line-height:50px;text-align:center; background:white;border-bottom:var(--border)"><b>'+this.title+'</b></div>';
 				jhei+=50;
 			}
 			if(this.changetype.indexOf('user')>=0){
-				s+='<div style="height:50px;overflow:hidden;border-bottom:1px #cccccc solid"><table width="100%" style="background:none"><tr><td width="100%" height="50" style="background:none"><input id="changekey_'+this.rand+'" placeholder="部门/姓名/职位" style="height:30px;border:none;background:none;width:100%;margin:0px 10px;outline:none"></td><td><button style="background:none;border:none;color:#666666" class="changeuserbotton" id="changesoubtn_'+this.rand+'" type="button" >查找</button></td></tr></table></div>';
+				s+='<div style="height:50px;overflow:hidden;border-bottom:var(--border)"><table width="100%" style="background:none"><tr><td width="100%" height="50" style="background:none"><input id="changekey_'+this.rand+'" placeholder="部门/姓名/职位" style="height:30px;border:none;background:none;width:100%;margin:0px 10px;outline:none;color:black"></td><td><button style="background:none;border:none;color:#666666" class="changeuserbotton" id="changesoubtn_'+this.rand+'" type="button" >查找</button></td></tr></table></div>';
 				jhei+=50;
 			}
 			s+='<div style="-webkit-overflow-scrolling:touch;height:'+(hei-jhei)+'px;overflow:auto; background:#f1f1f1" class="changeuserlist">';
@@ -83,10 +83,10 @@
 				s3+='</select>';
 			}
 			if(type=='checkbox'){
-				s+='<div class="changeuserxuan" style="padding:5px;border-right:1px #cccccc solid;border-top:1px #cccccc solid;line-height:30px;position:absolute;bottom:49px;background:white;"><font style="cursor:pointer" id="yixuanbtn_'+rand+'">∨</font><font id="yixuan_'+rand+'"></font></div>';
+				s+='<div class="changeuserxuan" style="padding:5px;border-right:var(--border);border-top:var(--border);line-height:30px;position:absolute;bottom:49px;background:white;color:black;"><font style="cursor:pointer" id="yixuanbtn_'+rand+'">∨</font><font id="yixuan_'+rand+'"></font></div>';
 			}
 			var cold = window['maincolor'];if(!cold)cold='#1389D3';
-			s+='<div style="height:50px;line-height:50px;border-top:1px #cccccc solid" align="right"><table width="100%" style="background:none"><tr><td width="10" nowrap>&nbsp;</td><td width="80%">'+s3+'</td><td><button style="width:70px;border:none" type="button" id="changereload_'+rand+'" class="changeuserbotton" >刷新数据</button></td><td width="10" nowrap>&nbsp;</td><td><button class="changeuserbotton" type="button" id="changecancl_'+rand+'" >取消</button></td><td width="10" nowrap>&nbsp;</td><td height="50"><button style="background:'+cold+';" id="changeok_'+rand+'" type="button" class="changeuserbotton">确定</button></td><td width="10" nowrap>&nbsp;</td></tr></table></div>';
+			s+='<div style="height:50px;line-height:50px;border-top:var(--border)" align="right"><table width="100%" style="background:none"><tr><td width="10" nowrap>&nbsp;</td><td width="80%">'+s3+'</td><td><button style="width:70px;border:none" type="button" id="changereload_'+rand+'" class="changeuserbotton" >刷新数据</button></td><td width="10" nowrap>&nbsp;</td><td><button class="changeuserbotton" type="button" id="changecancl_'+rand+'" >取消</button></td><td width="10" nowrap>&nbsp;</td><td height="50"><button style="background:'+cold+';" id="changeok_'+rand+'" type="button" class="changeuserbotton">确定</button></td><td width="10" nowrap>&nbsp;</td></tr></table></div>';
 			s+=_getstyles();
 			s+='</div>';
 			if(atts==''){
@@ -379,7 +379,7 @@
 		
 		this._loaddata=function(){
 			var o1 = $('#showdiv'+rand+'_0'),url;
-			o1.html('<div align="center" style="padding:30px"><img src="images/mloading.gif"></div>');
+			o1.html('<div align="center" style="padding:30px;color:#333333">'+js.ling(30)+'</div>');
 			var url = 'index.php?a=deptuserjson&m=dept&d=system&ajaxbool=true&changerange='+this.changerange+'&changerangeno='+this.changerangeno+'&gtype=change';
 			$.getJSON(url, function(ret){
 				if(ret.code==200){
@@ -469,11 +469,11 @@
 			if(this.ismobile)ws='90%';
 			var cold = window['maincolor'];if(!cold)cold='#1389D3';
 			var s='<div style="width:100%;height:100%;overflow:hidden;left:0px;top:0px; background:rgba(0,0,0,0.3);position:fixed;z-index:11" id="selectdata_'+rand+'">';
-			s+='<div tsid="main" id="mints_'+rand+'" style="position:absolute;top:30%; background:white;width:'+ws+';box-shadow:0px 0px 10px rgba(0,0,0,0.3);border-radius:5px">';
-			s+='	<div onmousedown="js.move(\'mints_'+rand+'\')" style="line-height:50px;color:'+cold+';font-size:16px;border-bottom:1px #eeeeee solid;font-weight:bold;"> &nbsp; &nbsp;'+this.title+'</div>';
-			s+='	<div style="height:40px;overflow:hidden;border-bottom:1px #cccccc solid;"><table width="100%" style="background:none"><tr><td><select id="selxuan_'+this.rand+'" style="width:120px;border:none;background:none;display:none"><option value="">选择所有</option></select></td><td width="100%" height="40"><input id="changekey_'+this.rand+'" placeholder="搜索关键词" style="height:30px;border:none;background:none;width:100%;margin:0px 10px;outline:none"></td><td><button style="background:none;color:#666666;" class="changeuserbotton" id="changesoubtn_'+this.rand+'" type="button" >查找</button></td></tr></table></div>';
+			s+='<div tsid="main" id="mints_'+rand+'" style="position:absolute;top:30%; background:white;width:'+ws+';box-shadow:0px 0px 10px rgba(0,0,0,0.3);border-radius:5px;color:black">';
+			s+='	<div onmousedown="js.move(\'mints_'+rand+'\')" style="line-height:50px;color:'+cold+';font-size:16px;border-bottom:var(--border);font-weight:bold;"> &nbsp; &nbsp;'+this.title+'</div>';
+			s+='	<div style="height:40px;overflow:hidden;border-bottom:var(--border);"><table width="100%" style="background:none"><tr><td><select id="selxuan_'+this.rand+'" style="width:120px;border:none;background:none;display:none"><option value="">选择所有</option></select></td><td width="100%" height="40"><input id="changekey_'+this.rand+'" placeholder="搜索关键词" style="height:30px;border:none;background:none;width:100%;margin:0px 10px;outline:none;color:black"></td><td><button style="background:none;color:#666666;" class="changeuserbotton" id="changesoubtn_'+this.rand+'" type="button" >查找</button></td></tr></table></div>';
 			s+='	<div style="-webkit-overflow-scrolling:touch;height:300px;overflow:auto; background:#f1f1f1" id="selectlist_'+rand+'" class="changeuserlist"></div>';
-			s+='	<div style="height:50px;line-height:50px;border-top:1px #cccccc solid;" align="right"><table width="100%" style="background:none"><tr><td width="10" nowrap>&nbsp;</td><td width="80%"><font color="#888888" tsid="count"></font></td><td><button type="button" id="changereload_'+rand+'" class="changeuserbotton">刷新</button></td><td width="10" nowrap>&nbsp;</td><td><button class="changeuserbotton" type="button" id="changecancl_'+rand+'">取消</button></td><td width="10" nowrap>&nbsp;</td><td height="50"><button style="background:'+cold+';" id="changeok_'+rand+'" type="button" class="changeuserbotton">确定</button></td><td width="10" nowrap>&nbsp;</td></tr></table></div>';
+			s+='	<div style="height:50px;line-height:50px;border-top:var(--border);" align="right"><table width="100%" style="background:none"><tr><td width="10" nowrap>&nbsp;</td><td width="80%"><font color="#888888" tsid="count"></font></td><td><button type="button" id="changereload_'+rand+'" class="changeuserbotton">刷新</button></td><td width="10" nowrap>&nbsp;</td><td><button class="changeuserbotton" type="button" id="changecancl_'+rand+'">取消</button></td><td width="10" nowrap>&nbsp;</td><td height="50"><button style="background:'+cold+';" id="changeok_'+rand+'" type="button" class="changeuserbotton">确定</button></td><td width="10" nowrap>&nbsp;</td></tr></table></div>';
 			s+='</div>';
 			s+='</div>';
 			s+=_getstyles();
@@ -637,7 +637,7 @@
 			if(url=='')return;
 			url+='&page='+this.page+'';
 			url+='&limit='+this.maxshow+'';
-			$('#selectlist_'+rand+'').html('<div align="center" style="margin-top:30px"><img src="images/mloading.gif"></div>');
+			$('#selectlist_'+rand+'').html('<div align="center" style="margin-top:30px;color:#333333">'+js.ling(30)+'</div>');
 			$.ajax({
 				type:'get',dataType:'json',url:url,
 				success:function(ret){

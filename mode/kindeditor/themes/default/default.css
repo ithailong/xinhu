@@ -416,17 +416,19 @@
 /* container */
 .ke-container {
 	display: block;
-	border: 1px solid #CCCCCC;
+	border: var(--border);
 	background-color: #FFF;
+	border-radius:5px;
 	overflow: hidden;
 	margin: 0;
 	padding: 0;
 }
 /* toolbar */
 .ke-toolbar {
-	border-bottom: 1px solid #CCC;
+	border-bottom: var(--border);
 	background-color: #F0F0EE;
-	padding: 2px 5px;
+	background-color: var(--main-vgcolor);
+	padding: 5px 5px;
 	text-align: left;
 	overflow: hidden;
 	zoom: 1;
@@ -442,7 +444,7 @@
 	background-image: url(default.png);
 }
 .ke-toolbar .ke-outline {
-	border: 1px solid #F0F0EE;
+	border: 1px solid transparent;
 	margin: 1px;
 	padding: 1px 2px;
 	font-size: 0;
@@ -454,9 +456,11 @@
 }
 .ke-toolbar .ke-on {
 	border: 1px solid #5690D2;
+	border: 1px solid var(--main-color);
 }
 .ke-toolbar .ke-selected {
 	border: 1px solid #5690D2;
+	border: 1px solid var(--main-color);
 	background-color: #E9EFF6;
 }
 .ke-toolbar .ke-disabled {
@@ -505,7 +509,8 @@
 .ke-statusbar {
 	position: relative;
 	background-color: #F0F0EE;
-	border-top: 1px solid #CCCCCC;
+	background-color: var(--main-vgcolor);
+	border-top: var(--border);
 	font-size: 0;
 	line-height: 0;
 	*height: 12px;
@@ -1147,3 +1152,8 @@
 	text-align: center;
 }
 
+.ke-icon-word {
+	background-position: 0px -720px;
+	width: 16px;
+	height: 16px;
+}

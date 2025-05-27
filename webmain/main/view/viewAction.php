@@ -19,7 +19,7 @@ class viewClassAction extends Action
 		}
 		return array(
 			'rows'=>$rows,
-			'modearr' => m('mode')->getmodearr(),
+			//'modearr' => m('mode')->getmodearr(),
 		);
 	}
 	

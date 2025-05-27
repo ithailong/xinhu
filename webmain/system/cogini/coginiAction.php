@@ -65,4 +65,30 @@ class coginiClassAction extends Action
 	}
 	
 	
+	
+	public function phperrAction()
+	{
+		echo '<title>PHP错误信息查看</title>';
+		$path = @ini_get('error_log');
+		if(!$path)return '未设置记录php错误路径，去<a href="'.URLY.'view_phperr.html">看看</a>如何设置。';
+		$cont = '无内容';
+		if(file_exists($path) && getconfig('systype')!='demo'){
+			$cont = @file_get_contents($path);
+			$str  = '';
+			if($cont){
+				$arr = explode("\n", $cont);
+				$len = count($arr);
+				for($i=0;$i<$len;$i++){
+					$str1 = $arr[$i];
+					$str2 = str_replace('\\','/', $str1);
+					if(contain($str2, ROOT_PATH)){
+						if($str)$str.='<hr>';
+						$str.=$str1;
+					}
+				}
+			}
+			$cont = $str;
+		}
+		return $cont;
+	}
 }

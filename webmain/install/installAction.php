@@ -73,7 +73,7 @@ class installClassAction extends ActionNot{
 		if($dbtype=='mysqli' && !class_exists('mysqli'))exit('未开启mysqli扩展模块');
 		@unlink($inpaths);
 		$this->rock->createtxt($paths, '<?php return array();');
-		if(!file_exists($inpaths))exit('无法写入文件夹'.P.'');
+		if(!file_exists($inpaths))exit('无法写入文件夹'.P.'，<a href="'.URLY.'view_wuxux.html" target="_blank" style="color:blue">[帮助]</a>');
 		
 		//1
 		$db1 		= import($dbtype);
